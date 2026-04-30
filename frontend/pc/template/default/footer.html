@@ -1,0 +1,95 @@
+ <!-- 底部版权 -->
+    <div class="footer-link" style="padding-bottom:25px;">
+        <div class="w1200">
+            <div class="foot-menu" style="overflow:hidden;">
+                <ul>
+                    {zhi:list table="article" order="id asc" limit="5" where="sort_id=3 and status=1" id="item" key="k"}
+                         <li><a href="/about/{$item.id}" rel="nofollow">{$item.title}</a></li>
+                    {/zhi:list}
+                    <li><a href="/help" rel="nofollow">帮助中心</a></li>
+                    <li><a href="/about/{$zhicms.service_artice_id}" rel="nofollow">服务条款</a></li>
+                    <li><a href="/about/{$zhicms.privacy_artice_id}" rel="nofollow">隐私条款</a></li>
+                    <li><a href="{$zhicms.account_domain}" target="_blank">手机版</a></li>
+                </ul>
+            </div>
+            <div class="foot-copy">
+                {$zhicms.coms_copy|htmlspecialchars_decode|raw}
+            </div>
+        </div>
+    </div>
+    <!-- 底部版权 End -->
+    <div class="counter" style="display:none;">{$zhicms.coms_stat_code|htmlspecialchars_decode|raw}</div>
+    <!--右侧信息栏-->
+    <div class="side-menu">
+        <!-- 微信客服 -->
+        <div class="side-menu-unit services">
+            <a href="javascript:" class="side-menu-btn">
+                <span class="ico-img">
+                    <i class="icon icon-tubiao-"></i>
+                </span>
+                <p>客服</p>
+            </a>
+            <div class="side-menu-bar">
+                <div class="box-border">
+                    <img src="{$subsite['web']['qrcode']}">
+                    <div class="arrow-right"></div>
+                    <div class="bar-name">扫码添加客服微信</div>
+                </div>
+            </div>
+        </div>
+        <!-- 微信客服 End -->
+        <!-- 服务热线 -->
+        <div class="side-menu-unit hotline">
+            <a href="javascript:" class="side-menu-btn">
+                <span class="ico-img">
+                    <i class="icon icon-phone"></i>
+                </span>
+                <p>热线</p>
+            </a>
+            <div class="side-menu-bar">
+                <div class="box-border">
+                    <div class="d-service-item clearfix">
+                        <h4>官方客服</h4>
+                        <p>如遇问题,请联系客服为您解决</p>
+                        <p class="d-service-item-p1">电话客服:{$subsite['web']['phone']}</p>
+                        <p class="d-service-item-p2">客服微信:{$subsite['web']['wechat']}</p>
+                        <p class="d-service-item-p3">工作时间:9:00-18:00,节假日休息</p>
+                    </div>
+                    <div class="arrow-right"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 服务热线 End -->
+        <!-- 微信公众号 -->
+        <div class="side-menu-unit wechat-oa">
+            <a href="javascript:" class="side-menu-btn">
+                <span class="ico-img">
+                    <i class="icon icon-wechat"></i>
+                </span>
+                <p>公众号</p>
+            </a>
+            <div class="side-menu-bar">
+                <div class="box-border">
+                    <img src="{$zhicms.coms_wechat}">
+                    <div class="arrow-right"></div>
+                    <div class="bar-name">扫码关注微信公众号</div>
+                </div>
+            </div>
+        </div>
+        <!-- 微信公众号 End -->
+        <!-- 返回顶部 -->
+        <div class="side-menu-unit yxw-fr-top" id="top-back" style="display: none;">
+            <a href="javascript:" class="side-menu-btn">
+                <span class="ico-img">
+                    <i class="icon icon-up"></i>
+                </span>
+                <p>顶部</p>
+            </a>
+        </div>
+        <!-- 返回顶部 End -->
+    </div>
+    <!-- 右侧信息栏 End -->
+    <script>
+        //返回顶部
+        WCCE.GoTop();
+    </script>

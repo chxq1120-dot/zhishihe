@@ -1,0 +1,49 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">分销记录</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form,element = layui.element;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("rlist")}',
+            toolbar:'#table-toolbar',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id',title:'ID',align:'center',width:80},
+                {field: 'oavatar',title: '下单用户',align:'center',templet:function(d){
+                    return '<img src="'+d.oavatar+'" width="32" height="32"/> <span>'+d.onickname+'</span>';
+                }},
+                {field: 'ordno',title:'订单号',align:'center',width:180},
+                {field: 'type',title:'类型',align:'center',templet:function(d){
+                    if(d.type==1){
+                        return '购买资源';
+                    }else if(d.type==2){
+                        return '购买会员';
+                    }
+                }},
+                {field: 'omoney',title:'订单金额',align:'center'},
+                {field: 'money',title:'分佣金额',align:'center'},
+                {field: 'avatar',title: '分佣用户',align:'center',templet:function(d){
+                    return '<img src="'+d.avatar+'" width="32" height="32"/> <span>'+d.nickname+'</span>';
+                }},
+                {field: 'ctime', align: 'center',title: '时间'},
+            ]]
+        });
+        
+    })
+</script>

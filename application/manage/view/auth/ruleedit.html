@@ -1,0 +1,109 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="table-body">
+        <div class="layui-card-header">编辑权限</div>
+        <div class="layui-card" style="padding-top: 20px;">
+            <form class="layui-form layui-form-pane" lay-filter="rules">
+                <input type="hidden" name="id" value="{$row['id']}">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">父级分类</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <select name="pid" class="layui-select" lay-search>
+                           <option value="0">顶级</option>
+                            {$sortSelect|raw}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限名称</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="text" name="title" value="{$row['title']}" lay-verify="required" placeholder="{:lang('pleaseEnter')}权限名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限类型</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="radio" name="is_menu" lay-filter="menu_type" value="1" {eq name="$row['is_menu']" value="1"}checked{/eq} title="菜单">
+                        <input type="radio" name="is_menu" lay-filter="menu_type" value="0" {eq name="$row['is_menu']" value="0"}checked{/eq} title="接口">
+                    </div>
+                </div>
+                <div class="layui-form-item" id="method" style="display: none;">
+                    <label class="layui-form-label">请求方式</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <select name="method" class="layui-select">
+                            <option value="GET" {eq name="$row['method']" value="GET"}selected{/eq}>GET</option>
+                            <option value="POST" {eq name="$row['method']" value="POST"}selected{/eq}>POST</option>
+                            <option value="PUT" {eq name="$row['method']" value="PUT"}selected{/eq}>PUT</option>
+                            <option value="DELETE" {eq name="$row['method']" value="DELETE"}selected{/eq}>DELETE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">控制器/方法</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="text" name="href" value="{$row['href']}" lay-verify="required" placeholder="{:lang('pleaseEnter')}控制器/方法" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图标名称</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="text" name="icon" value="{$row['icon']}" placeholder="{:lang('pleaseEnter')}图标名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">排序</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="text" name="sort" value="{$row['sort']}" placeholder="{:lang('pleaseEnter')}排序" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="radio" name="status" value="1" {eq name="$row['status']" value="1"}checked{/eq} title="开启">
+                        <input type="radio" name="status" value="0" {eq name="$row['status']" value="0"}checked{/eq} title="关闭">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" lay-submit="" lay-filter="auth">立即提交</button>
+                        <a href="{:createUrl('adminrule')}" class="layui-btn layui-btn-primary">返回</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form','layer'], function () {
+        var form = layui.form,layer = layui.layer,$ = layui.jquery;
+        var menu_type="{$row['is_menu']}";
+        if(menu_type==1){
+            $('#method').hide();
+        }else {
+            $('#method').show();
+        }
+        form.on('radio(menu_type)', function (data) {
+            if(data.value=='1'){
+                $('#method').hide();
+            }else{
+                $('#method').show();
+            }
+        });
+        form.on('submit(auth)', function (data) {
+            // 提交到方法 默认为本身
+            $.post("{:createUrl('ruleedit')}",data.field,function(res){
+                if(res.status==200){
+                    layer.msg(res.msg,{time:1800,icon:1},function(){
+                        location.href = res.url;
+                    });
+                }else{
+                    layer.msg(res.msg,{time:1800,icon:2});
+                }
+            });
+        })
+    })
+</script>
+</body>
+</html>

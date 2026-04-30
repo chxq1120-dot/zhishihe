@@ -1,0 +1,1 @@
+<view class="textarea bottom-cell-group"><block wx:if="{{wdata.params}}"><wcce-content vue-id="637c4913-1" content="{{wdata.params}}" bind:__l="__l"></wcce-content></block></view>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{$title}</title>
+  <meta name="keywords" content="{$keyword}">
+  <meta name="description" content="{$desc}">
+  <link href="__STATIC__/default/css/index_v3.css?v=3.2.1" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="__STATIC__/default/fonts/iconfont.css?v=3.2.1" media="all">
+  <link rel="shortcut icon" href="{$zhicms.coms_favicon}">
+  <script type="text/javascript" src="__STATIC__/default/js/jquery.js"></script>
+  <script type="text/javascript" src="__STATIC__/common/layer/layer.js"></script>
+  <script type="text/javascript" src="__STATIC__/default/js/main.js?v1.0.2"></script>
+  <link rel="stylesheet" href="__STATIC__/default/css/share.min.css" media="all">
+  <script type="text/javascript" src="__STATIC__/default/js/social-share.min.js"></script>
+</head>
+<body>
+<!-- top头部 -->
+{include file="header"/}
+<!-- top头部 End -->
+  <!-- 面包削 -->
+  <div class="crumbs clearfix">
+    <div class="crumbs-min"><a href="/" title="首页">首页</a> &gt; <a href="/article" title="">精选文章</a> &gt; {$article.title}</div>
+  </div>
+  <!-- 面包削 End -->
+  <div class="news_aricle">
+    <div class="aricle_left">
+      <div class="min_box">
+        <!-- 标题 -->
+        <div class="aricle_tiele">
+            <h1>{$article.title}</h1>
+        </div>
+        <!-- 标题 End -->
+        <div class="aricle_banquan">
+          <span class="ycwz">原创</span>
+          <span class="author">{$article.sort.name}</span>
+          <span class="time">{$article.ctime}</span>
+          <span class="view-num">阅读：{$article.views}人看过
+          </span>
+        </div>
+        <!-- 文章内容 -->
+        <div class="aricle_content">
+          {$article.content|raw}
+        </div>
+        <!-- 文章内容 End -->
+        <!--分享图标-->
+        <div class="share-bar">
+          <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+            <a href="#" class="social-share-icon icon-weibo"></a>
+            <a href="#" class="social-share-icon icon-qq"></a>
+            <a href="#" class="social-share-icon icon-qzone"></a>
+            <a href="#" class="social-share-icon icon-douban"></a>
+            <a href="#" class="social-share-icon icon-wechat"></a>
+          </div>
+        </div>
+        <!-- 版权声明 -->
+        <div class="yxw-banquan-sm">
+          版权声明：{$zhicms.web_name}倡导尊重与保护知识产权。未经许可,任何人不得复制、转载、或以其他方式使用本站《原创》内容,违者将追究其法律责任。本站文章内容,部分图片来源于网络,如有侵权,请联系我们修改或者删除处理。</div>
+        <!-- 版权声明 End -->
+
+        <!-- 相关文章 -->
+        <div class="aricle-tuijian">
+          <h2 class="reading">相关文章</h2>
+          {zhi:list table="article" order="ctime desc" limit="5" where="sort_id=6 and status=1" id="item" key="k"}
+            <div class="post-item">
+              <a href="/article/show/{$item['id']}.html">
+                <img src="{$item['thumb']}" alt="{$item['title']}">
+                <div class="gzs-post-item">
+                  <h3>{$item['title']}</h3>
+                  <p>{$item['content']|strip_tags|str_cut=58}...</p><span>{$item['views']}人看过</span>
+                </div>
+              </a>
+            </div>
+          {/zhi:list}
+        </div>
+        <!-- 相关文章 End -->
+      </div>
+      <!-- 文章内容 End -->
+    </div>
+    <!-- 右侧信息 -->
+    <div class="star-article-r">
+      <div class="article-hot-l">
+        <h2 class="clear-fix">精选推荐</h2>
+        <ul>
+          {zhi:list table="article" order="ctime desc" limit="10" where="is_top=1 and sort_id=6 and status=1" id="item" key="k"}
+              <li><em {if $k<3}class="top"{/if}>{$k+1}</em><a href="/article/show/{$item['id']}.html" title="{$item['title']}">{$item['title']}</a></li>
+          {/zhi:list}
+        </ul>
+      </div>
+
+      <div class="article-hot-l">
+        <h2 class="clear-fix">热门文章</h2>
+        <ul>
+          {zhi:list table="article" order="views desc,ctime desc" limit="10" where="sort_id=6 and status=1" id="item" key="k"}
+            <li><em {if $k<3}class="top"{/if}>{$k+1}</em><a href="/article/show/{$item['id']}.html" title="{$item['title']}">{$item['title']}</a></li>
+          {/zhi:list}
+        </ul>
+      </div>
+    </div>
+    <!-- 右侧信息 End -->
+  </div>
+  {include file="footer"/}
+  <!-- 相关文章显示/隐藏 -->
+  <script>
+      var config = {
+          sites: ['qzone', 'qq', 'weibo', 'wechat', 'douban'], // 启用的站点
+          disabled: ['google', 'facebook', 'twitter'], // 禁用的站点
+      };
+      socialShare('.social-share', config);
+  </script>
+  <!-- 网站导航 End -->
+</body>
+
+</html>

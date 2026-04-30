@@ -1,0 +1,54 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">资源获取记录</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+
+<script>
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form,element = layui.element;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("ulist")}',
+            toolbar:'#table-toolbar',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id',title:'ID',align:'center',width:80},
+                {field: 'title',title:'资源名称',templet:function(d){
+                    if(d.spread){
+                        return d.spread.title;
+                    }else{
+                        return ' - ';
+                    }
+                }},
+                {field: 'type',title: '获取类型',align:'center',width:240,templet:function(d){
+                    if(d.type==1){
+                        return '购买获取';
+                    }else if(d.type==2){
+                        return '任务获取';
+                    }else{
+                        return '会员获取';
+                    }
+                }},
+                {field: 'nickname',title: '用户昵称',align:'center',width:240,templet:function(d){
+                	return d.user.nickname;
+                }},
+                {field: 'ctime',title:'获取时间',width:240,align:'center'},
+            ]]
+        });
+
+    })
+</script>

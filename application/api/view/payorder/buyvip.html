@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>购买会员</title>
+	<link rel="stylesheet" href="__STATIC__/layuiadmin/layui/css/layui.css">
+</head>
+<style>
+	.flex{
+		display: flex;
+	}
+</style>
+<body>
+	<div class="layui-container" style="margin-top:50px;">
+		<div style="font-size:36px;">购买会员</div>
+		<hr>
+		<div style="justify-content: center;margin-top: 50px;font-size: 28px;" class="flex">
+            {$info.name}	
+		</div>
+		<div class="flex" style="justify-content:space-between;font-size: 24px;margin-top: 20px;">
+			<div>时长：<span style="color:#009688;">{$info.days}</span>天</div>
+			<div>价格：<span style="color:#FF5722;">{$info.price}</span></div>
+		</div>
+		<div class="flex" style="font-size:24px;margin-top: 20px;">
+			会员特权：{$info.content}
+		</div>
+		<div style="justify-content: center;margin-top: 50px;" class="flex">
+			<button class="layui-btn" style="height:80px;font-size: 28px;width: 100%;" id="sub">立即支付</button>
+		</div>
+	</div>
+	<script src="__STATIC__/layuiadmin/layui/layui.js"></script>
+	<script>
+		layui.use(['layer'],function(){
+			var layer=layui.layer,$=layui.jquery;
+			$("#sub").on('click',function(){
+				var index=layer.load(1);
+				$.post("{:createUrl('unify')}",{ id:'{$data.id}',token:'{$data.token}',type:'{$data.type}' },function(res){
+					layer.close(index);
+					if(res.status===200){
+						WeixinJSBridge.invoke(
+							'getBrandWCPayRequest',JSON.parse(res.data),
+							function(res){
+							if(res.err_msg == "get_brand_wcpay_request:ok" ){
+
+							    layer.msg('支付成功');  
+							}else{
+								
+							} 
+					    });
+					}else{
+						layer.msg(res.msg);
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

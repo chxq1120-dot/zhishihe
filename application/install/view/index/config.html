@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>智创云享知识付费系统安装向导</title>
+    <link rel="stylesheet" href="__INSTALL__/css/style.css">
+</head>
+<body>
+<nav class="zp-section-primary">
+    <div class="zp-container zp-navbar">
+        <div class="zp-navbar-left">
+            <a href="/" class="zp-navbar-item zp-logo dux-logo">
+                <img src="__STATIC__/admin/images/logo.png"/>知识付费系统
+            </a>
+        </div>
+        <div class="zp-navbar-right">
+            <div class="zp-navbar-item">
+                安装向导
+            </div>
+        </div>
+    </div>
+</nav>
+<br>
+<div class="zp-container">
+    <div class="zp-grid">
+        <div class="zp-width-1-4">
+            <div class="zp-card zp-card-default zp-card-body zp-card-small">
+                <ul class="zp-tab zp-tab-left">
+                    <li><a href="#">使用协议</a></li>
+                    <li><a href="#">安装环境</a></li>
+                    <li class="zp-active"><a href="#">参数配置</a></li>
+                    <li><a href="#">完成安装</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="zp-width-3-4">
+            <form class="zp-form zp-form-horizontal" action="{:url('install')}" method="post">
+            <div class="zp-card zp-card-default zp-card-body ">
+                <h3>
+                    数据库设置
+                </h3>
+                    <div class="zp-form-group">
+                        <label class="zp-form-label ">数据库地址</label>
+                        <div class="zp-form-controls">
+                            <input type="text" name="host" value="127.0.0.1" required>
+                        </div>
+                    </div>
+                    <div class="zp-form-group">
+                        <label class="zp-form-label ">数据库端口</label>
+                        <div class="zp-form-controls">
+                            <input type="text" name="port" value="3306" required>
+                        </div>
+                    </div>
+                    <div class="zp-form-group">
+                        <label class="zp-form-label ">数据库名称</label>
+                        <div class="zp-form-controls">
+                            <input type="text" name="dbname" value="" required>
+                            <div class="zp-form-help">请手动创建数据库，数据库编码请使用utf8mb4</div>
+                        </div>
+                    </div>
+                    <div class="zp-form-group">
+                        <label class="zp-form-label ">数据库用户名</label>
+                        <div class="zp-form-controls">
+                            <input type="text" name="username" value="root" required>
+                        </div>
+                    </div>
+                    <div class="zp-form-group">
+                        <label class="zp-form-label ">数据库密码</label>
+                        <div class="zp-form-controls">
+                            <input type="text" name="password" value="">
+                        </div>
+                    </div>
+                    <div class="zp-form-group">
+                        <label class="zp-form-label ">数据表前缀</label>
+                        <div class="zp-form-controls">
+                            <input type="text" name="prefix" value="zp_" required>
+                        </div>
+                    </div>
+
+                <h3>
+                    管理员设置
+                </h3>
+
+                <div class="zp-form-group">
+                    <label class="zp-form-label">账号</label>
+                    <div class="zp-form-controls">
+                        <input type="text" name="admin_user" value="admin" required>
+                    </div>
+                </div>
+                <div class="zp-form-group">
+                    <label class="zp-form-label ">密码</label>
+                    <div class="zp-form-controls">
+                        <input type="text" name="admin_pw" value="" required>
+                    </div>
+                </div>
+            </div>
+            <div class="zp-margin-top zp-text-center">
+                <a class="zp-button zp-button-secondary" href="{url('detect')}">上一步</a>
+                <button type="submit" class="btn zp-button zp-button-primary">下一步</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__STATIC__/common/js/jquery.min.js"></script>
+</body>
+</html>

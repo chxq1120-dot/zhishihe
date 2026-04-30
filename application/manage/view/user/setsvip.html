@@ -1,0 +1,57 @@
+{include file="common/head"/}
+<body>
+<div class="layui-fluid">
+    <div class="table-body">
+        <form class="layui-form layui-form-pane">
+            <input type="hidden" name="row[id]" value="{$row['id']}"/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员SVIP</label>
+                <div class="layui-input-inline from-inline-5">
+                    {if ($row['vid']>0)}
+                        <div class="layui-text">{$row['svip']['name']}，到期时间：{$row['exp_time']}</div>
+                    {else/}
+                        <div class="layui-text">普通用户</div>
+                    {/if}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择会员等级</label>
+                <div class="layui-input-inline from-inline-5">
+                    <select name="row[vid]">
+                        <option value="-1">普通用户 - 取消会员等级</option>
+                        {volist name="sviplist" id="v"}
+                            <option value="{$v['id']}">{$v['name']} - 有效期{$v['days']}天 - 价格{$v['price']}</option>
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding-top: 10px;">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">确定升级</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form'], function () {
+        var $ = layui.jquery,form = layui.form; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        form.on('submit(sub)', function (data) {
+            loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post('', data.field, function (res) {
+                layer.close(loading);
+                if (res.status == 200) {
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    });
+</script>
+</body>

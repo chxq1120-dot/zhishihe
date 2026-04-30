@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "分类资源",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "go-top": "/components/goTop/goTop",
+    "uv-tabs": "/uni_modules/uv-tabs/components/uv-tabs/uv-tabs",
+    "uv-waterfall": "/uni_modules/uv-waterfall/components/uv-waterfall/uv-waterfall",
+    "uni-load-more": "/uni_modules/uni-load-more/components/uni-load-more/uni-load-more"
+  }
+}

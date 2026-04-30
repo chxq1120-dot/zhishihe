@@ -1,0 +1,74 @@
+{include file="common/head"/}
+<body>
+	<div class="layui-fluid">
+		<div class="table-body">
+			<form class="layui-form layui-form-pane" id="form">	
+			<div class="layui-form-item">
+				<label class="layui-form-label">添加方式</label>
+				<div class="layui-input-inline">
+				    <select name="type" lay-filter="type">
+				    	<option value="1">手动填入</option>
+				    	<option value="2">文件提交</option>
+				    </select>
+				</div>
+			</div>
+			<div class="layui-form-item" id="kammi">
+				<label class="layui-form-label">卡密内容</label>
+				<div class="layui-input-block">
+				    <textarea name="kammi" placeholder="一行一个卡密" class="layui-textarea"></textarea>
+					<div class="layui-word-aux">格式为一行一个，请用回车换行</div>
+				</div>
+			</div>
+			<div class="layui-form-item" id="file" style="display:none;">
+				<label class="layui-form-label">卡密文件</label>
+				<div class="layui-input-block">
+					<input type="file" name="file">
+				</div>
+				<div class="layui-form-mid layui-word-aux">txt文件，格式为一行一个卡密</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+				  <button class="layui-btn" lay-submit lay-filter="sub">立即提交</button>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+{include file="common/foot"/}	
+<script>
+layui.use(['form'], function(){
+  var $ = layui.jquery,form = layui.form;
+  form.on('submit(sub)', function(data){
+  	loading = layer.load(1, { shade: [0.1, '#fff'] });
+  	$.ajax({
+  		url:'',
+  		type:'post',
+  		data:new FormData($("#form")[0]),
+  		contentType: false,
+        processData: false,
+        success:function(res){
+        	layer.close(loading);
+	        if (res.status === 200){
+	            layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+	                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+	                parent.layer.close(index);//再执行关闭
+	            });
+	        } else {
+	            layer.msg(res.msg, { icon: 2, time: 1000 });
+	        }
+        }
+  	});
+	  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+	form.on('select(type)', function(data){
+		if(data.value==1){
+			$("#kammi").show();
+			$("#file").hide();
+		}else if(data.value==2){
+			$("#kammi").hide();
+			$("#file").show();
+		}
+	});
+});
+</script>
+</body>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+    <script type="text/javascript" src="__STATIC__/default/js/jquery.superslide.2.1.1.js"></script>
+<body>
+{include file="header"/}
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+    <div class="crumbs-min">
+        <a href="/" title="首页">首页</a> &gt;
+        <a href="/course" rel="nofollow">全部</a> &gt;
+        <a href="/course/list{$spread['sorts']['id']}" rel="nofollow">{$spread['sorts']['name']}</a> &gt;
+        <a href="/course/show/{$spread['id']}" rel="nofollow">{$spread.title}</a> &gt; 提交订单
+    </div>
+</div>
+<div class="container">
+    <!-- 内容 -->
+    <div class="payorder">
+        <!-- title -->
+        <div class="title">确认订单</div>
+        <div class="spread">
+            <img src="{$spread['thumb']}" alt="">
+            <div class="info">
+                <span>{$spread['title']}</span>
+                <div class="fw">
+                    {if $spread['re_price']>0}
+                        <span class="y1">会员价：￥{$spread['re_price']}</span>
+                    {else/}
+                        <span class="y1">￥{$spread['price']}</span>
+                    {/if}
+                    <span>原价：￥{$spread['dis_price']}</span>
+                </div>
+            </div>
+        </div>
+        <!-- 列表 -->
+        <div class="payTitle">选择套餐</div>
+        <div class="zp-vvip slideTxtBox">
+            <div class="bd">
+                <div class="prev"><i class="icon icon-left"></i></div>
+                <div class="next"><i class="icon icon-right"></i></div>
+                <ul class="payitem">
+                    <li class="on" data-id="{$spread['id']}"  data-type="1" data-price="{$spread['re_price']>0?$spread['re_price']:$spread['price']}">
+                        <div class="item">
+                            <div class="name">单个</div>
+                            <div class="price">￥{$spread['re_price']>0?$spread['re_price']:$spread['price']}</div>
+                            <div class="days">永久</div>
+                            <div class="desc">{$spread['title']}</div>
+                        </div>
+                    </li>
+                    {volist name="svip_list" id="item"}
+                        <li data-id="{$item['id']}" data-type="2" data-price="{$item['price']}">
+                            <div class="item">
+                                <div class="name">{$item['name']}</div>
+                                <div class="price">￥{$item['price']}</div>
+                                <div class="days">{$item['days']}</div>
+                                <div class="desc">{$item['content']}</div>
+                            </div>
+                        </li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+        <!-- 支付方式 -->
+        <div class="payTitle">支付方式</div>
+        <div class="paytype">
+            <ul>
+                {if(config('setting.alipay_open')=='1')}
+                    <!-- 支付宝 -->
+                    <li {eq name="paytype" value="1"} class="on" {/eq} data-type="1">
+                        <!-- 支付宝图标 -->
+                        <i class="icon icon-alipay"></i>
+                        <span>支付宝支付</span>
+                    </li>
+                {/if}
+                {if(config('setting.wechat_open')=='1')}
+                    <!-- 微信支付 -->
+                    <li {eq name="paytype" value="2"} class="on" {/eq} data-type="2">
+                        <!-- 微信图标 -->
+                        <i class="icon icon-wechat"></i>
+                        <span>微信支付</span>
+                    </li>
+                {/if}
+                <!-- 卡密 -->
+                <li class="mi" {eq name="paytype" value="3"} class="on" {/eq} data-type="3">
+                    <!-- 卡密图标 -->
+                    <i class="icon icon-qiamizhifu"></i>
+                    <span>卡密兑换</span>
+                    <input type="text" id="cardno" class="cardno" placeholder="请输入您的卡密">
+                </li>
+            </ul>
+        </div>
+        <input type="hidden" id="type" value="1"/>
+        <input type="hidden" id="rid" value="{$spread['id']}"/>
+        <input type="hidden" id="money" value="{$spread['re_price']>0?$spread['re_price']:$spread['price']}"/>
+        <input type="hidden" id="paytype" value="{$paytype}"/>
+        <!-- 合计 -->
+        <div class="paytotal">
+            <span>合计：</span>
+            <span class="y1 y2 money" style="font-size: 16px;" id="total">￥{$spread['re_price']>0?$spread['re_price']:$spread['price']}</span>
+            <button class="target-element button3" onclick="WCCE.handlePay()">立即支付</button>
+        </div>
+    </div>
+</div>
+{include file="footer"/}
+</body>
+<script>
+    WCCE.Oricle();//支付小圆点
+    jQuery(".slideTxtBox").slide({mainCell: ".bd ul", autoPage: true, effect: "left", vis: 4});
+</script>
+</html>

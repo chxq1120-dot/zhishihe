@@ -1,0 +1,2091 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<link rel="stylesheet" href="__STATIC__/admin/custom/css/index.css?v=1.0.6">
+<link rel="stylesheet" href="__STATIC__/admin/fonts/icon/iconfont.css">
+<link rel="stylesheet" href="__STATIC__/layuiadmin/layui/css/layui.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/js/sortable.min.js"></script>
+<script src="__STATIC__/admin/custom/js/vuedraggable.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<script src="__STATIC__/layuiadmin/layui/layui.js"></script>
+<script>
+    //默认底部导航组
+    var tarbar_path = '{:request()->domain()}__STATIC__/common/images/tabbar/';
+    var linkType = {$link_type|raw};//跳转类型
+    var pageCode = "{$page_code}";//页面编码
+    var pageConfig = {$page_config|raw};//页面默认数据
+    var catList = {$sortList|raw};//资源分类数据 
+    catList.forEach(item => { item.group = item.childlist.slice(0,2); });
+    var topSortList = {$topSortList|raw};//一级资源分类
+    var articleSortList = {$articleSortList|raw};//文章分类数据
+    var YLink = {$linkList|raw};//友情链接
+    var manage_Image = "{:createUrl('Ueditor/index')}";
+    var upload_Image = "{:createUrl('UpFiles/upload')}";
+    var upload_manage ="{:createUrl('UpFiles/index')}";
+    var default_banner = "__STATIC__/admin/custom/images/empty-banner.png";
+    var default_search = "__STATIC__/admin/images/banner.jpg";
+    var default_logo = "__STATIC__/admin/custom/images/logo.png";
+    var default_img = "__STATIC__/admin/custom/images/empty.png";
+    var saveUrl = "{:createUrl('saveTheme')}";
+    var api_ResourceList = "{:createUrl('widget/getResourceList')}";//资源列表
+    var api_ResourceSort = "{:createUrl('widget/getResourceSort')}";//资源分类
+    var api_getArticle = "{:createUrl('widget/getArticle')}";//文章分类
+    var api_getPages = "{:createUrl('widget/getPages')}";//页面路径
+    var api_getArticleSort = "{:createUrl('widget/getArticleSort')}";//文章分类
+    var api_tagNotice = "{:createUrl('widget/tagNotice')}";//公告
+    var api_tagSpread = "{:createUrl('widget/tagSpread')}";//资源
+    var api_tagSorts = "{:createUrl('widget/tagSorts')}";//分类
+    var imgWindowArr = [
+        "__STATIC__/admin/custom/images/image-one-column.png",
+        "__STATIC__/admin/custom/images/image-three-column.png",
+        "__STATIC__/admin/custom/images/image-four-column.png",
+        "__STATIC__/admin/custom/images/image-one-left.png"
+    ]
+</script>
+<div id="app" style="padding:6px;background-color:#f2f2f2;">
+    <home></home>
+    <textarea id="edit_cover" style="display: none;"></textarea>
+</div>
+<template id="home">
+    <div class="itxst">
+        <div class="left">
+            <div class="components-wrap">
+                <div class="components-title">
+                    <div class="top">组件库</div>
+                </div>
+                <div class="components-list">
+                    <div class="component-item">
+                        <div class="component-item-title">工具组件</div>
+                        <draggable element="ul" :list="utilsComponents"
+                            :options="{group: { name: 'widget', pull: 'clone', put: false },sort: false,ghostClass: 'ghost',animation: 150}">
+
+                            <li class="component-item-li" v-for="(item, index) in utilsComponents" :key="index"
+                                @click="selectWidget(item.type, $event)">
+                                <p>
+                                    <i class="icon" :class="item.icon"></i>
+                                </p>
+                                <p class="text">{{ item.name }}</p>
+                            </li>
+
+                        </draggable>
+                        <div class="component-item-title">媒体组件</div>
+                        <draggable element="ul" :list="mediaComponents"
+                            :options="{group: { name: 'widget', pull: 'clone', put: false },sort: false,ghostClass: 'ghost',animation: 150}">
+                            <li class="component-item-li" v-for="(item, index) in mediaComponents" :key="index"
+                                @click="selectWidget(item.type, $event)">
+                                <p>
+                                    <i class="icon" :class="item.icon"></i>
+                                </p>
+                                <p class="text">{{ item.name }}</p>
+                            </li>
+
+                        </draggable>
+                        <div class="component-item-title">资源组件</div>
+                        <draggable element="ul" :list="storeComponents"
+                            :options="{group: { name: 'widget', pull: 'clone', put: false },sort: false,ghostClass: 'ghost',animation: 150}">
+
+                            <li class="component-item-li" v-for="(item, index) in storeComponents" :key="index"
+                                @click="selectWidget(item.type, $event)">
+                                <p>
+                                    <i class="icon" :class="item.icon"></i>
+                                </p>
+                                <p class="text">{{ item.name }}</p>
+                            </li>
+                        </draggable>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+        <div class="center_bottom">
+            <div class="savePageBtn">
+                <p>设计完成后点击"保存页面"，在前端页面点击刷新 " <i class="layui-icon layui-icon-refresh-3"></i> " 即可看到效果。</p>
+                <button class="layui-btn layui-btn-normal layui-btn-sm" @click="savePage">保存页面</button>
+            </div>
+            <div class="center">
+            <Layout ref="layout"></Layout></div>
+        </div>
+
+        <div class="right">
+            <layout-config ref="layout-config"></layout-config>
+        </div>
+    </div>
+</template>
+<!-- 栅格 -->
+<template id="Grid">
+    <draggable class="dragArea list-group"  :list="GridData" group="widget" @add="handleWidgetAdd"
+        @remove="handleDragRemove">
+        <transition-group name="fade" tag="div" class="form-widget-list">
+            <div v-for="(item, index) in GridData" :key="index">
+                <div class="layoutMain" :key="item.key" @click="handleSelectWidget(index, $event)">
+                    <!--常见问题  -->
+                    <div v-if="item.type === 'problem'" class="drags lay-item problem">
+                        <div class="title">{{item.value.title || '常见问题'}}</div>
+                        <draggable class="question">
+                            <transition-group class="faq">
+                                <div v-for="(help, index) in (item.value.List && item.value.List.length >0 ? item.value.List : item.value.list)" :key="index" v-if="help.title "
+                                    class="faqList" style="width: 200px;">
+                                    <li>
+                                        <p>{{help.title}}</p>
+                                    </li>
+                                </div>
+                            </transition-group>
+                        </draggable>
+                    </div>
+                    <!--友情链接  -->
+                    <div v-if="item.type === 'Link'" class="drags lay-link"
+                        :style="{background:`linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                        <div class="title">{{item.value.title || '友情链接'}} :</div>
+                        <draggable class="link">
+                            <div v-for="(link, index) in item.value.list.slice(0,item.value.limit)" :key="index"
+                                :style="{'line-height':item.lineHight+'px'}">
+                              <a href="link.url">{{link.name}}</a>  
+                            </div>
+                        </draggable>
+                    </div>
+                    <!--栅格  -->
+                    <div v-if="item.type === 'grid'" class="drags lay-item grid">
+                        <el-row :gutter="item.value.gutter">
+                            <div v-for=" (row,index) in item.value.rows" :key="index">
+                                <el-col :span="row.col"
+                                    :style="{ 'min-height': row.height + 'px',background:`linear-gradient(to ${row.gradientDirection},${row.startColor},${row.endColor})` }">
+                                    <div class="grid-content bg-purple">
+                                        <Grid ref="Grid" :list="row.list"></Grid>
+                                    </div>
+                                </el-col>
+                            </div>
+                        </el-row>
+                    </div>
+                    <!-- 图片 -->
+                    <div v-if="item.type==='imgSingle'" class="drags lay-imgSingle">
+                        <div class="img-sole" :style="{width:'100%',height:item.value.height+'px'}">
+                            <div v-for="(img,index) in item.value.list" :key="index" :style="{width:'100%',height:item.value.height+'px'}">
+                            <img :src="img.image" alt="" style="width: 100%;height: 100%;">
+                        </div>
+                            <div class="img-btn"
+                                :style="{background: `linear-gradient(to ${item.value.color.gradientDirection}, ${item.value.color.startColor}, ${item.value.color.endColor})`,color:item.value.textColor,width:item.value.color.width+'px',height:item.value.color.height+'px',lineHeight:item.value.color.height+'px'}"
+                                v-show="item.value.buttonShow">{{item.value.buttonText}}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 导航栏 -->
+                    <div v-if="item.type === 'nav'" class="drags lay-item drag-img">
+                        <draggable
+                            :style="{  'background': `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`, color: item.value.color}">
+                            <transition-group class="grid_nav" :style="{ height: item.value.height + 'px' }">
+                                <div v-for="(nav, index) in item.value.list" :key="index">
+                                    <!-- Logo -->
+                                    <img v-if="nav.image" :src="nav.image" alt="logo">
+                                    <!-- 导航项 -->
+                                    <div v-if="nav.hobbies" class="hobbies">
+                                        <el-menu  mode="horizontal" class="el-menu" :active-text-color="item.value.color" :default-active="1" :text-color="item.value.color" @select="handleSelect">
+                                            <template v-for="list in nav.hobbies" :key="list.id">
+                                                <menu-item :item="list" :index="list.url"></menu-item>
+                                            </template>
+                                        </el-menu>
+                                    </div>
+                                    <!-- search -->
+                                    <el-input v-if="nav.input" :placeholder="nav.input.value"
+                                        v-show="nav.input.radio =='1' ">
+                                        <el-button slot="append" icon="el-icon-search"></el-button>
+                                    </el-input><!-- 登录/注册 -->
+                                    <div v-if="nav.login && nav.login.text" class="btn" v-show="nav.login.radio == '1' "
+                                        :style="{ color: nav.login.color1, background: `linear-gradient(to ${nav.login.gradientDirection}, ${nav.login.startColor}, ${nav.login.endColor})`, fontSize: nav.login.size + 'px'}">
+                                        {{ nav.login.text }}
+                                    </div>
+                                </div>
+                            </transition-group>
+                        </draggable>
+                    </div>
+
+                    <!-- 搜索框 -->
+                    <div v-if="item.type === 'search'" class="drags lay-item lay-search">
+                        <div class="Search_input">
+                            <el-input :placeholder="item.value.keywords"  :class="item.value.style">
+                                <el-button slot="append" icon="el-icon-search"></el-button>
+                            </el-input>
+                        </div>
+                    </div>
+                    <!-- 资源组 -->
+                    <div v-if="item.type === 'resource'" class="drags clearfix lay-goods" >
+                        <div class="goods-head" v-if="item.value.show =='1' ">
+                            <div class="name">
+                                <p>{{item.value.title}}</p>
+                                <div class="twolist-hidden">
+                                    <div v-for="option in item.value.radios" v-if="option.label " :key="option.label">
+                                        <span>{{ option.label }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="more" v-if="item.value.lookMore=='1'">更多></div>
+                        </div>
+                        <li class="goods_item">
+                            <div
+                                v-for="(spreads,key) in  (item.value.from === '2' ? item.value.List : item.value.list.slice(0,item.value.limit))" :key="key"
+                                class="list">
+                                <img :src="spreads.thumb ||  default_banner " alt="" >
+                                <div class="goods-detail">
+                                    <p class="goods-name ">
+                                        {{spreads.title||'此处显示资源名称'}}
+                                    </p>
+                                    <div class="collect">
+                                        <div class="btn">
+                                            <p class="text">{{spreads.level_name}}</p>
+                                              <div  v-for="(Sort,index) in spreads.sort_list" :key="index"> 
+                                                <p v-if="spreads.sort_list.length >0"> {{Sort.name}}</p>
+                                            </div>
+                                        </div>
+                                    <div class="goods-info">
+                                        <div class="price">
+                                            <p class="goods-price">￥{{spreads.price||'99.00'}}</p>
+                                            <p class="goods-dprice">￥{{spreads.dis_price||'99.00'}}</p>
+                                        </div>
+                                        <span>{{spreads.sales}}人学习</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </li>
+                    </div>
+                    <!-- 图片轮播 -->
+                    <div v-if="item.type === 'imgSlide'" class="drags lay-item lay-imgSlide drag-img"
+                        :style="{overflow:'hidden' }">
+                        <el-carousel :interval="item.value.duration" autoplay="false" arrow="nerver"
+                            :style="{ width: '100%', height: item.value.height + 'px' }">
+                            <el-carousel-item v-for="(list, key) in item.value.list" :key="key"
+                                :style="{ height: item.value.height + 'px' }">
+                                <img :src="list.image" alt="banner">
+                            </el-carousel-item>
+                        </el-carousel>
+                    </div>
+
+                    <!-- 图片分组 -->
+                    <div v-if="item.type==='imgWindow'" class="drags lay-imgWindow clearfix">
+                        <div class="goods-head" v-if="item.value.radio === '1'">
+                            <p>{{item.value.title || '精选图片'}}</p>
+                            <div class="more" v-if="item.value.lookMore === '1'">更多></div>
+                        </div>
+                        <div class="img">
+                            <div class="image"
+                                :style="{ width: 'calc(100% / ' + item.value.style + ')',padding:item.value.margin+'px' }"
+                                v-for="(i,index) in item.value.list" ::key="index">
+                                <img :src="i.image" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 视频组 -->
+                    <div v-if="item.type==='video'" class="drags lay-item lay-video"
+                        style="width: 100%;overflow: hidden;">
+                        <div class="video-wrap" v-for="(video,key) in item.value.list" :key="key" style="width: 100%;">
+                            <video :src="video.url" :poster="video.image" controls="controls"
+                                :style="{width: '100%',height:item.value.height+'px'}"></video>
+                        </div>
+                    </div>
+                    <!-- 文章组 -->
+
+                    <div v-if="item.type==='article'" class="drags lay-article">
+                        <div class="goods-head" v-if="item.value.radio === '1'">
+                            <p>{{item.value.title || '精选文章'}}</p>
+                            <div class="more" v-if="item.value.lookMore === '1'">更多></div>
+                        </div>
+                        <div class="Wrap">
+                            <div class="ArticleWrap clearfix" style="width: 360px;"
+                                v-for="(article,key) in (item.value.choose === '2' ? item.value.List : item.value.list)" :key="key">
+                                <img :src="article.thumb|| default_banner" alt="">
+                                <div class="article-right">
+                                    <div class="article-title">
+                                        {{article.title||'此处显示文章标题'}}
+                                    </div>
+                                    <p>
+                                        {{article.discrible||'此处显示文章描述'}}
+                                    </p>
+                                    <div class="flex">
+                                        <div>
+                                            <span><i class="icon icon-time"></i> {{ article.ctime ? article.ctime.split(" ")[0] : '2023-11-09' }}</span>
+                                            <span><i class="icon icon-edit"></i>
+                                                {{article.writer || ''}}</span>
+                                        </div>
+                                        <i>{{article.reader || ''}}人已阅读 </i>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 公告组 -->
+                    <div v-if="item.type==='notice'" class="drags lay-item lay-notice"
+                    :style="{ 'line-height': item.value.lineHeight + 'px',fontSize:item.value.FontSize+'px',background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`,color:item.value.color2}">
+                    <i class="icon icon-gonggao" :style="{ fontSize:item.value.FontSize+'px'}"></i>
+                    <el-carousel height="100%" :interval="4000" arrow="never" loop indicator-position="none"
+                        style="width: 100%;" :autoplay="true">
+                        <el-carousel-item v-for="(notice,key) in (item.value.type === 'choose' ? item.value.List :item.value.list)" class="notice-text" :key="key">
+                            <h3 class="medium">{{ notice.title }}</h3>
+                        </el-carousel-item>
+                    </el-carousel>
+                </div>
+                    <!-- 辅助空白 -->
+                    <div v-if="item.type==='blank'" class="drags lay-item lay-blank"
+                        :style="{height:item.value.height+'px', background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                    </div>
+                    <!-- 文本域 -->
+                    <div v-if="item.type==='textarea'" class="drags lay-item lay-textarea">
+                        <div class="editor-container" v-html="item.value">
+                        </div>
+                    </div>
+                    <!--资源分类-->
+                    <div v-if="item.type==='resourceSort'" class="drags lay-navBar  clearfix"
+                        style="overflow: visible;">
+                        <div class="lay-group"
+                            :style="{ minHeight: item.value.L_height + 'px',backgroundColor:item.value.L_Bk_color,color:item.value.L_Txt_color,fontSize:item.value.Size + 'px'}">
+                            <draggable>
+                                <li v-for="(name,index) in item.value.catList.slice(0, item.value.limit)" :key="index">
+                                  <!-- 一级菜单 -->
+                                    <div class="one" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
+                                        :style="{backgroundColor:item.value.L_Bk_color}">
+                                        <div class="name">{{name.name}}</div>
+                                        <div class="Tname">
+                                            <p v-if="name.group.length === 0">请选择</p>
+                                            <p v-for="(Tname, index) in name.group" :key="index">{{ Tname.name }}</p>
+                                        </div>
+                                    </div>
+                                    <!-- 二级菜单  -->
+                                    <div class="child" @mouseenter="handleChildMouseEnter"
+                                        @mouseleave="handleChildMouseLeave"
+                                        :style="{ minHeight: item.value.R_height + 'px',display: 'none',backgroundColor:item.value.R_Bk_color,color:item.value.R_Txt_color}">
+                                        <draggable group="menu">
+                                            <transition-group>
+                                                <div v-for="(child,i) in name.childlist" :key="i" class="childs">
+                                                    <div class="two"> {{child.name}}</div>
+                                                    <draggable class="three">
+                                                        <div v-for="(children,index) in child.childlist" :key="index">
+                                                            {{children.name}}
+                                                        </div>
+                                                    </draggable>
+                                                </div>
+                                            </transition-group>
+                                        </draggable>
+                                    </div>
+                                </li>
+                            </draggable>
+                        </div>
+                    </div>
+                    <!--底部tabbar--->
+                    <div v-if="item.type === 'tabbar'" class="drags tabbar clearfix"  :style="{background:`linear-gradient(to ${item.value.color.gradientDirection}, ${item.value.color.startColor}, ${item.value.color.endColor})`}">
+                        <div  class="tabbar_list">
+                        <draggable class="way">
+                                <!-- 简介 -->
+                                <div v-if="item.value.intro && item.value.intro.radio === '1' "  class="list">
+                                    <div class="bold"> {{item.value.intro.name || '关于'}}</div>
+                                    <div v-for="(list,index) in item.value.intro.list">
+                                        <p class="flex">{{list.value}}</p>
+                                    </div>
+                                </div>
+                                <!-- 合作 -->
+                                <div v-if="item.value.partner && item.value.partner.radio === '1' " class="list">
+                                    <div class="bold">{{item.value.partner.name || '合作'}}</div>
+                                    <div v-for="(list,index) in item.value.partner.list">
+                                        <p class="flex">{{list.value}}</p> 
+                                    </div>
+                                </div>
+                                <!-- 帮助 -->
+                                <div v-if="item.value.help && item.value.help.radio === '1' " class="list">
+                                    <div class="bold">{{item.value.help.name || '帮助'}}</div> 
+                                    <div v-for="(list,index) in item.value.help.list">
+                                        <p class="flex">{{list.value}}</p>
+                                    </div>
+                                </div>
+                                <!-- 联系方式 -->
+                                <div v-if="item.value.contact && item.value.contact.radio === '1' " class="list">
+                                    <div class="bold">{{item.value.contact.name || '联系方式'}}</div>
+                                    <div v-for="(list,index) in item.value.contact.list">
+                                        <div class="flex">
+                                            <div class="phone">
+                                                <h4> {{list.name}}</h4>
+                                                <p>{{list.value}}</p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </draggable>
+                          <!--联系客服  微信公众号-->
+                        <draggable class="connection">
+                            <div v-for="(List,index) in item.value.list">
+                            <div v-if="List.show === '1' "  class="list">
+                                <img :src="List.image" alt="" >
+                                <div class="bold">{{List.name}}</div>
+                            </div>
+                             </div>
+                        </draggable>
+                    </div>
+                        <!-- 版权 -->
+                        <div class="copy"  v-if="item.value.copy">{{item.value.copy.CopyRight}}</div>
+                    </div>
+                    <div @click.stop="handleWidgetDelete(index)" class="btn-delete" v-if="selectWg.key === item.key">
+                        删除
+                    </div>
+                    <div @click.stop="handleWidgetClone(index)" class="btn-clone" v-if="selectWg.key === item.key">
+                        复制
+                    </div>
+                </div>
+            </div>
+        </transition-group>
+    </draggable>
+</template>
+<!-- 中间 -->
+<template id="layout">
+    <draggable v-model="pageData" @add="handleWidgetAdd" class="layout-list" group="widget"
+        style="width:100%;height: 100%;" @remove="handleDragRemove">
+        <div v-for="(item, index) in pageData" :key="index">
+            <div class="layout-main" :key="item.key"
+                :class="{ active: selectWg.key === item.key,npr:item.type=='record'}"
+                @click="handleSelectWidget(index,$event)">
+                <!--常见问题  -->
+                <div v-if="item.type === 'problem'" class="drag lay-item problem">
+                    <div class="title">{{item.value.title || '常见问题'}}</div>
+                    <draggable class="question">
+                        <transition-group class="faq">
+                            <div v-for="(help, index) in (item.value.List && item.value.List.length >0 ? item.value.List : item.value.list)" :key="index"
+                                :style="{ width: 'calc((100% - 40px) / ' + item.value.limit + ')' }" class="faqList">
+                    <li>
+                        <p>{{ help.title }}</p>
+                    </li>
+                </div>
+                        </transition-group>
+                    </draggable>
+                </div>
+                <!--友情链接  -->
+                <div v-if="item.type === 'Link'" class="drag lay-link"
+                    :style="{background:`linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                    <div class="title">{{item.value.title || '友情链接'}} :</div>
+                    <draggable class="link">
+                        <div v-for="(link, index) in item.value.list.slice(0,item.value.limit)" :key="index"
+                        :style="{'line-height':item.lineHight+'px'}">
+                      <a href="link.url">{{link.name}}</a>  
+                    </div>
+                    </draggable>
+                </div>
+                <!--栅格  -->
+                <div v-if="item.type === 'grid'" class="drag lay-item grid">
+                    <el-row :gutter="item.value.gutter">
+                        <div v-for=" (row,index) in item.value.rows" :key="index">
+                            <el-col :span="row.col"
+                                :style="{ 'min-height': row.height + 'px',background:`linear-gradient(to ${row.gradientDirection},${row.startColor},${row.endColor})` }">
+                                <div class="grid-content bg-purple">
+                                    <Grid ref="Grid" :list="row.list"></Grid>
+                                </div>
+                            </el-col>
+                        </div>
+                    </el-row>
+                </div>
+                <!-- 导航栏 -->
+                <div v-if="item.type === 'nav'" class="drag lay-item drag-img">
+                    <draggable
+                    :style="{  'background': `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`, color: item.value.color}">
+                    <transition-group class="grid_nav" :style="{ height: item.value.height + 'px' }">
+                            <div v-for="(nav, index) in item.value.list" :key="index">
+                                <!-- Logo -->
+                                <img v-if="nav.image" :src="nav.image" alt="logo">
+                                <!-- 导航项 -->
+                                <div v-if="nav.hobbies" class="hobbies">
+                                    <el-menu mode="horizontal" class="el-menu" :active-text-color="item.value.color" :default-active="1" :text-color="item.value.color" @select="handleSelect">
+                                        <template v-for="list in nav.hobbies" :key="list.value">
+                                            <menu-item :item="list" :index="list.url"></menu-item>
+                                        </template>
+                                    </el-menu>
+                                </div>
+                                <!-- 搜索框 -->
+                                <el-input v-if="nav.input" :placeholder="nav.input.value"
+                                    v-show="nav.input.radio =='1' ">
+                                    <el-button slot="append" icon="el-icon-search"></el-button>
+                                </el-input><!-- 登录/注册 -->
+                                <div v-if="nav.login && nav.login.text" class="btn" v-show="nav.login.radio == '1' "
+                                    :style="{ color: nav.login.color1, background: `linear-gradient(to ${nav.login.gradientDirection}, ${nav.login.startColor}, ${nav.login.endColor})`, fontSize: nav.login.size + 'px'}">
+                                    {{ nav.login.text }}
+                                </div>
+                            </div>
+                        </transition-group>
+                    </draggable>
+                </div>
+
+                <!-- 搜索框 -->
+                <div v-if="item.type === 'search'" class="drag lay-item">
+                    <div class="lay-search" v-for="(child,index) in item.value.list" :key="index" :style="{ backgroundImage: 'url(' + child.image + ')',backgroundSize: 'cover', backgroundPosition: 'center center' }">
+                    <span v-if="item.value.radio1 === '1' "> {{item.value.title || '标题信息'}} </span>
+                    <p v-if="item.value.radio2 === '1'">{{item.value.describle || '描述信息'}}</p>
+                    <div class="Search_input">
+                        <el-input :placeholder="item.value.keywords" :class="item.value.style"
+                            :style=" {width:`${item.value.width}0%`}">
+                            <el-button slot="append" icon="el-icon-search"></el-button>
+                        </el-input>
+                    </div>
+                </div>
+                </div>
+                <!-- 资源组 -->
+                <div v-if="item.type === 'resource'" class="drag clearfix lay-goods">
+                    <div class="goods-head" v-if="item.value.show =='1' ">
+                        <div class="name">
+                            <p>{{item.value.title}}</p>
+                            <div class="twolist-hidden">
+                                <div v-for="option in item.value.radios" v-if="option.label " :key="option.label">
+                                    <span>{{ option.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="more" v-if="item.value.lookMore=='1'">更多></div>
+                    </div>
+                    <li>
+                        <div :class="item.value.width === '4' ? 'goods-item' : 'goods-items' "
+                            v-for="(spreads,key) in (item.value.from === '2' ? item.value.List : item.value.list.slice(0,item.value.limit))" :key="key"
+                            :style="{ width: `calc((100% - 60px) / ${item.value.width})` }" >
+                            <img :src="spreads.thumb || default_banner " alt="" >
+                            <div class="goods-detail">
+                                <p class="goods-name ">
+                                    {{spreads.title||'此处显示资源名称'}}
+                                </p>
+                                <div class="collect">
+                                    <div class="btn">
+                                        <p class="text">{{spreads.level_name}}</p>
+                                        <div  v-for="(Sort,index) in spreads.sort_list" :key="index"> 
+                                          <p v-if="spreads.sort_list.length >0"> {{Sort.name}}</p>
+                                        </div>
+                                    </div>
+                                <div class="goods-info">
+                                    <div class="price">
+                                        <p class="goods-price">￥{{spreads.price||'99.00'}}</p>
+                                        <p class="goods-dprice">￥{{spreads.dis_price||'99.00'}}</p>
+                                    </div>
+                                    <span>{{spreads.sales}}人学习</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </li>
+                </div>
+                <!-- 图片轮播 -->
+                <div v-if="item.type==='imgSlide'" class="drag lay-item lay-imgSlide drag-img"
+                    :style="{ background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                    <el-carousel :interval="item.value.duration" autoplay="false" arrow="nerver" class="ImgSlide"
+                        :style="{width:item.value.width+'0%',height:item.value.height+'px'}">
+                        <el-carousel-item v-for="(list,key) in item.value.list" :key="key"
+                            :style="{height:item.value.height+'px'}">
+                            <img :src="list.image" alt="banner">
+                        </el-carousel-item>
+                    </el-carousel>
+                </div>
+                <!-- 图片 -->
+                <div v-if="item.type==='imgSingle'" class="drag lay-imgSingle"
+                    :style="{background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                    <div class="img-sole" :style="{width:`${item.value.width}0%`,height:item.value.height+'px'}">
+                        <div v-for="(img,index) in item.value.list" :key="index" :style="{width:'100%',height:item.value.height+'px'}">
+                        <img :src="img.image" alt="" style="width: 100%;height: 100%;"></div>
+                         <div class="img-btn"
+                            :style="{background: `linear-gradient(to ${item.value.color.gradientDirection}, ${item.value.color.startColor}, ${item.value.color.endColor})`,color:item.value.textColor,width:item.value.color.width+'px',height:item.value.color.height+'px',lineHeight:item.value.color.height+'px'}"
+                            v-show="item.value.buttonShow">{{item.value.buttonText}}
+                        </div>
+                    </div>
+                </div>
+                <!-- 图片分组 -->
+                <div v-if="item.type==='imgWindow'" class="drag lay-imgWindow clearfix">
+                    <div class="goods-head" v-if="item.value.radio === '1'">
+                        <p>{{item.value.title || '精选图片'}}</p>
+                        <div class="more" v-if="item.value.lookMore === '1'">更多></div>
+                    </div>
+                    <div class="img">
+                        <div class="image"
+                            :style="{ width: 'calc(100% / ' + item.value.style + ')',padding:item.value.margin+'px' }"
+                            v-for="(i,index) in item.value.list" ::key="index">
+                            <img :src="i.image" alt="">
+                        </div>
+                    </div>
+                </div>
+                <!-- 视频组 -->
+                <div v-if="item.type==='video'" class="drag lay-item lay-video"
+                    :style="{background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                    <div class="video-wrap" :style="{ width: item.value.width + '0%' }"
+                        v-for="(video,key) in item.value.list" :key="key">
+                        <video :src="video.url" :poster="video.image ||  default_banner " controls="controls"
+                            :style="{height: item.value.height + 'px'}"></video>
+                    </div>
+                </div>
+                <!-- 文章组 -->
+                <div v-if="item.type==='article'" class="drag lay-article">
+                    <div class="goods-head" v-if="item.value.radio === '1'">
+                        <p>{{item.value.title || '精选文章'}}</p>
+                        <div class="more" v-if="item.value.lookMore === '1'">更多></div>
+                    </div>
+                    <div class="Wrap">
+                        <div :class="item.value.style === '2' ? 'article-wrap clearfix' : item.value.style === '3' ? 'ArticleWrap clearfix' : '' "
+                            v-for="(article, key) in  (item.value.choose === '2' ? item.value.List : item.value.list)" :key="key">
+                            <img :src="article.thumb|| default_banner" alt="">
+                            <div class="article-right">
+                                <div class="article-title">
+                                    {{article.title||'此处显示文章标题'}}
+                                </div>
+                                <p>
+                                    {{article.discrible||'此处显示文章描述'}}
+                                </p>
+                                <div class="flex">
+                                    <div>
+                                        <span><i class="icon icon-time"></i> {{ article.ctime ? article.ctime.split(" ")[0] : '2023-11-09' }}</span>
+                                        <span><i class="icon icon-edit"></i>
+                                            {{article.writer || '人民日报'}}</span>
+                                    </div>
+                                    <i>{{article.reader || '1599'}}人已阅读 </i>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- 公告组 -->
+                <div v-if="item.type==='notice'" class="drag lay-item lay-notice"
+                    :style="{ 'line-height': item.value.lineHeight + 'px',fontSize:item.value.FontSize+'px',background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`,color:item.value.color2}">
+                    <i class="icon icon-gonggao" :style="{ fontSize:item.value.FontSize+'px'}"></i>
+                    <el-carousel height="100%" :interval="4000" arrow="never" loop indicator-position="none"
+                        style="width: 100%;" :autoplay="true">
+                        <el-carousel-item v-for="(notice,key) in (item.value.type === 'choose' ? item.value.List :item.value.list)" class="notice-text" :key="key">
+                            <h3 class="medium">{{ notice.title }}</h3>
+                        </el-carousel-item>
+                    </el-carousel>
+                </div>
+                <!-- 辅助空白 -->
+                <div v-if="item.type==='blank'" class="drag lay-item lay-blank"
+                    :style="{height:item.value.height+'px', background: `linear-gradient(to ${item.value.gradientDirection}, ${item.value.startColor}, ${item.value.endColor})`}">
+                </div>
+                <!-- 文本域 -->
+                <div v-if="item.type==='textarea'" class="drag lay-item lay-textarea">
+                    <div class="editor-container" v-html="item.value">
+                    </div>
+                </div>
+                <!--资源分类-->
+                <div v-if="item.type==='resourceSort'" class="drag lay-navBar  clearfix" style="overflow: visible;">
+                    <div class="lay-group"
+                        :style="{ minHeight: item.value.L_height + 'px',backgroundColor:item.value.L_Bk_color,color:item.value.L_Txt_color,fontSize:item.value.Size + 'px'}">
+                        <draggable>
+                            <li v-for="(name,index) in item.value.catList.slice(0, item.value.limit)" :key="index">
+                                <!-- 一级菜单 -->
+                                <div class="one" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
+                                    :style="{backgroundColor:item.value.L_Bk_color}">
+                                    <div class="name">{{name.name}}</div>
+                                    <div class="Tname">
+                                        <p v-if="name.group.length === 0">请选择</p>
+                                        <p v-for="(Tname, index) in name.group" :key="index">{{ Tname.name }}</p>
+                                    </div>
+                                </div>
+                                <!-- 二级菜单  -->
+                                <div class="child" @mouseenter="handleChildMouseEnter"
+                                    @mouseleave="handleChildMouseLeave"
+                                    :style="{ minHeight: item.value.R_height + 'px',display: 'none',backgroundColor:item.value.R_Bk_color,color:item.value.R_Txt_color}">
+                                    <draggable group="menu">
+                                        <transition-group>
+                                            <div v-for="(child,i) in name.childlist" :key="i" class="childs">
+                                                <div class="two"> {{child.name}}</div>
+                                                <draggable class="three">
+                                                    <div v-for="(children,index) in child.childlist" :key="index">
+                                                        {{children.name}}
+                                                    </div>
+                                                </draggable>
+                                            </div>
+                                        </transition-group>
+                                    </draggable>
+                                </div>
+                            </li>
+                        </draggable>
+                    </div>
+                </div>
+                <!--底部tabbar--->
+                <div v-if="item.type === 'tabbar'" class="drag tabbar clearfix"  :style="{background:`linear-gradient(to ${item.value.color.gradientDirection}, ${item.value.color.startColor}, ${item.value.color.endColor})`}">
+                    <div  class="tabbar_list">
+                    <draggable class="way">
+                            <!-- 简介 -->
+                            <div v-if="item.value.intro && item.value.intro.radio === '1' "  class="list">
+                                <div class="bold"> {{item.value.intro.name || '关于'}}</div>
+                                <div v-for="(list,index) in item.value.intro.list">
+                                    <p class="flex">{{list.value}}</p>
+                                </div>
+                            </div>
+                            <!-- 合作 -->
+                            <div v-if="item.value.partner && item.value.partner.radio === '1' " class="list">
+                                <div class="bold">{{item.value.partner.name || '合作'}}</div>
+                                <div v-for="(list,index) in item.value.partner.list">
+                                    <p class="flex">{{list.value}}</p> 
+                                </div>
+                            </div>
+                            <!-- 帮助 -->
+                            <div v-if="item.value.help && item.value.help.radio === '1' " class="list">
+                                <div class="bold">{{item.value.help.name || '帮助'}}</div>
+                                <div v-for="(list,index) in item.value.help.list">
+                                    <p class="flex">{{list.value}}</p>
+                                </div>
+                            </div>
+                            <!-- 联系方式 -->
+                            <div v-if="item.value.contact && item.value.contact.radio === '1' " class="list">
+                                <div class="bold">{{item.value.contact.name || '联系方式'}}</div>
+                                <div v-for="(list,index) in item.value.contact.list">
+                                    <div class="flex">
+                                        <div class="phone">
+
+                                            <h4> {{list.name}}</h4>
+                                            <p>{{list.value}}</p>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </draggable>
+                    <!--联系客服  微信公众号-->
+                    <draggable class="connection">
+                        <div v-for="(List,index) in item.value.list">
+                            <div v-if="List.show === '1' "  class="list">
+                                <img :src="List.image" alt="" >
+                                <div class="bold">{{List.name}}</div>
+                            </div>
+                             </div>
+                    </draggable>
+                </div>
+                    <!-- 版权 -->
+                    <div class="copy" v-if="item.value.copy">{{item.value.copy.CopyRight}}</div>
+                </div>
+                <div @click.stop="handleWidgetDelete(index)" class="btn-delete" v-if="selectWg.key === item.key">
+                    删除
+                </div>
+                <div @click.stop="handleWidgetClone(index)" class="btn-clone" v-if="selectWg.key === item.key">
+                    复制
+                </div>
+            </div>
+        </div>
+    </draggable>
+
+</template>
+<!-- 右边 -->
+<template id="layout-config">
+    <el-form ref="form" label-width="100px">
+        <div class="custom-item-t" v-if="selectWg.type">
+            <h1>{{getSelectWgName(selectWg.type)}}</h1>
+        </div>
+        <!-- 栅格 -->
+        <div v-if="selectWg.type=='grid'">
+            <el-form-item label="栅格间隔:">
+                <el-input-number v-model="selectWg.value.gutter" :min="0" size="mini"></el-input-number>
+            </el-form-item>
+            <div v-for=" (row,index) in selectWg.value.rows" :key="index">
+                <el-form-item :label="`栅格${index + 1}：`" class="column">
+                    <div class="problem">
+                        <el-form-item label="栅格宽度:" size="normal">
+                            <el-input-number v-model="row.col" :min="1" size="mini" :max="24"></el-input-number>
+                        </el-form-item>
+                        <el-form-item label="栅格高度：" size="normal">
+                            <el-input-number v-model="row.height" :min="1" size="mini"></el-input-number>
+                        </el-form-item>
+                        <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                            <el-radio v-model="row.gradientDirection" label="right">水平</el-radio>
+                            <el-radio v-model="row.gradientDirection" label="bottom">垂直</el-radio>
+                        </el-form-item>
+                        <div  >
+                        <el-form-item label="起始颜色:">
+                            <el-color-picker v-model="row.startColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="row.startColor = '#fff'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="结束颜色:">
+                            <el-color-picker v-model="row.endColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="row.endColor = '#fff'">重置</a>
+                        </el-form-item>
+                        <i class="el-icon-delete" @click="Movecol(index)"></i>
+                    </div></div>
+                </el-form-item>
+            </div>
+                <el-button type="primary" size="mini" @click="Addcol" style="margin-left: 10px;">添加</el-button>
+        </div>
+        <!-- 友情链接 -->
+        <div v-if="selectWg.type=='Link'">
+            <el-form-item label="显示数量:">
+                <el-input-number v-model="selectWg.value.limit" :min="1" size="mini"></el-input-number>
+            </el-form-item>
+            <el-form-item label="友情链接:">
+                <el-input v-model="selectWg.value.title" value="selectWg.value.title" placeholder="请输入" size="normal" clearable
+                    style="width: 70%;"></el-input>
+            </el-form-item>
+            <el-form-item label="背景颜色:" class="column">
+                <div class="problem">
+                    <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                        <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                        <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                    </el-form-item>
+                    <div  >
+                    <el-form-item label="起始颜色:">
+                        <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.startColor = '#fff'">重置</a>
+                    </el-form-item>
+                    <el-form-item label="结束颜色:">
+                        <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                    </el-form-item></div>
+                </div>
+            </el-form-item>
+
+        </div>
+        <!-- 常见问题 -->
+        <div v-if="selectWg.type=='problem'">
+            <el-form-item label="名称:" size="normal">
+                <el-input v-model="selectWg.value.title" value="selectWg.value.title" placeholder="请输入名称" size="normal" clearable
+                    style="width: 70%;"></el-input>
+            </el-form-item>
+            <el-form-item label="布局方式:" size="normal" class="problem_buju" v-if="selectWg.value.radio === '1' ">
+                <el-radio-group v-model="selectWg.value.limit" size="mini">
+                    <el-radio-button label="1">一排1个</el-radio-button>
+                    <el-radio-button label="2">一排2个</el-radio-button>
+                    <el-radio-button label="3">一排3个</el-radio-button>
+                    <el-radio-button label="4">一排4个</el-radio-button>
+                  </el-radio-group>
+            </el-form-item>
+            <el-form-item label="添加：" size="normal" class="problem_buju">
+                <el-button type="primary" size="mini" @click=" help_list">添加常见问题</el-button>
+            </el-form-item>
+            <el-form-item label="常见问题:" size="normal"  v-if="selectWg.value.List && selectWg.value.List.length > 0" class="column">
+                <div v-for="(item,index) in selectWg.value.List" :key="index" class="problem">
+                    <p class="name">{{item.title}}</p>
+                    <i class="el-icon-delete"  @click="removeProblem(index)"></i>
+                </div>
+                </el-form-item>
+                
+        </div>
+        <!-- 搜索框 -->
+        <div v-if="selectWg.type=='search'">
+            <div v-if="selectWg.radio==='1' ">
+                <div class="content">
+                    <el-form-item label="标题信息：">
+                        <el-input v-model="selectWg.value.title" placeholder="请输入标题信息" size="normal" clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="是否显示：">
+                        <el-radio v-model="selectWg.value.radio1" label="1">显示</el-radio>
+                        <el-radio v-model="selectWg.value.radio1" label="2">不显示</el-radio>
+                    </el-form-item>
+                </div>
+                <div class="content">
+                    <el-form-item label="描述信息：">
+                        <el-input v-model="selectWg.value.describle" placeholder="请输入描述信息" size="normal" clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="是否显示：">
+                        <el-radio v-model="selectWg.value.radio2" label="1">显示</el-radio>
+                        <el-radio v-model="selectWg.value.radio2" label="2">不显示</el-radio>
+                    </el-form-item>
+                </div>
+                <el-form-item label="背景图片：" class="content">
+                    <div v-for="(item,index) in selectWg.value.list" :key="index" >
+                        <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                        <p class="layout-tip">建议尺寸：1920px × 375px</p>
+                    </div>
+                </el-form-item>
+                <el-form-item label="搜索框宽度：">
+                    <el-input-number v-model="selectWg.value.width" size="mini" :min="1" :max="10"
+                        label="描述文字"></el-input-number>
+                </el-form-item>
+            </div>
+            <el-form-item label="搜索框：">
+                <el-input v-model="selectWg.value.keywords" :placeholder="selectWg.placeholder" style="width: 70%;"
+                    clearable></el-input>
+            </el-form-item>
+
+            <el-form-item label="搜索框样式：">
+                <el-radio-group v-model="selectWg.value.style">
+                    <el-radio label="square">方形</el-radio>
+                    <el-radio label="radius">圆角</el-radio>
+                    <el-radio label="round">圆弧</el-radio>
+                </el-radio-group>
+            </el-form-item>
+        </div>
+        <!-- 辅助空白 -->
+        <div v-if="selectWg.type=='blank'"> 
+            <el-form-item label="组件高度:">
+                <el-input-number v-model="selectWg.value.height" size="mini" :min="1" 
+                        label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item label="背景颜色:" class="column">
+                <div class="problem">
+                    <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                        <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                        <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                    </el-form-item>
+                    <div  >
+                    <el-form-item label="起始颜色:">
+                        <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.startColor = '#fff'">重置</a>
+                    </el-form-item>
+                    <el-form-item label="结束颜色:">
+                        <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                    </el-form-item>
+                </div>
+                </div>
+            </el-form-item>
+        </div>
+        <!-- 导航栏 -->
+        <div v-if="selectWg.type=='nav'">
+            <el-form-item label="字体颜色:" class="content">
+                <el-color-picker v-model="selectWg.value.color" size="mini"></el-color-picker>
+                <a class="reset-color" href="javascript:;" @click="selectWg.value.color = '#333'">重置</a>
+            </el-form-item>
+            <el-form-item label="背景颜色:" class="content column">
+                <div class="problem">
+                    <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                        <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                        <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                    </el-form-item>
+                    <div  >
+                    <el-form-item label="起始颜色:">
+                        <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.startColor = '#fff'">重置</a>
+                    </el-form-item>
+                    <el-form-item label="结束颜色:">
+                        <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                    </el-form-item>
+                </div>
+                </div>
+            </el-form-item>
+           
+            <el-form-item label="组件高度:">
+                <el-input-number v-model="selectWg.value.height" :min="1"  label="描述文字"
+                size='mini'></el-input-number>
+            </el-form-item>
+            <div v-for="(nav, index) in selectWg.value.list" :key="index">
+                <el-form-item label="Logo"  v-if="nav.image" class="content">
+                    <upload-img @upload-img="upImage(index,nav,'image')" :index="index" tags="image"
+                        :item="nav"></upload-img>
+                        <p class="layout-tip">建议尺寸：180px × 48px</p>
+                    </el-form-item>
+                <el-form-item label="导航项:" v-if="nav.hobbies" class="column ">
+                    <nested-draggable :tasks="nav.hobbies"></nested-draggable>
+                    <p class="layout-tip" style="margin-left: 15px;">点击 ' + ' 可添加同级，拖动元素可实现下级多层</p>
+                </el-form-item>
+                <div>
+                    <el-form-item label="搜索框:" v-if="nav.input">
+                        <el-input v-model="nav.input.value" size="normal" placeholder="请输入" clearable
+                            style="width: 70%;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="是否显示:" v-if="nav.input">
+                        <el-radio v-model="nav.input.radio" label="1">显示</el-radio>
+                        <el-radio v-model="nav.input.radio" label="2">不显示</el-radio></el-form-item>
+                </div>
+                <el-form-item label="登录/注册:" v-if="nav.login && nav.login.text" class="column">
+                    <div class="problem">
+                        <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                            <el-radio v-model="nav.login.gradientDirection" label="right">水平</el-radio>
+                            <el-radio v-model="nav.login.gradientDirection" label="bottom">垂直</el-radio>
+                        </el-form-item>
+                        <el-form-item label="起始颜色:">
+                            <el-color-picker v-model="nav.login.startColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="nav.login.startColor = '#FF8C00'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="结束颜色:">
+                            <el-color-picker v-model="nav.login.endColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="nav.login.endColor = '#FFA500'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="字体颜色:">
+                            <el-color-picker v-model="nav.login.color1" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="nav.login.color1 = '#FFFFFF'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="字体尺寸:">
+                            <el-input-number v-model="nav.login.size" :min="12" :max="20" label="描述文字"
+                                size='mini'></el-input-number>
+                        </el-form-item>
+                        <el-form-item label="是否显示:">
+                            <el-radio v-model="nav.login.radio" label="1">显示</el-radio>
+                            <el-radio v-model="nav.login.radio" label="2">不显示</el-radio>
+                        </el-form-item>
+                    </div>
+                </el-form-item>
+            </div>
+        </div>
+        <!-- 资源组 -->
+        <div v-if="selectWg.type=='resource' ">
+            <div>
+                <el-form-item label="资源标题:">
+                    <el-input type="text" v-model="selectWg.value.title" clearable style="width: 260px;"></el-input>
+                </el-form-item>
+                <el-form-item label="是否查看更多:">
+                    <el-radio-group v-model="selectWg.value.lookMore">
+                        <el-radio label="1">是</el-radio>
+                        <el-radio label="2">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="是否推荐:">
+                    <el-radio-group v-model="selectWg.value.show">
+                        <el-radio  label="1">推荐</el-radio>
+                        <el-radio  label="2">不推荐</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                 <el-form-item label="布局方式:" v-if="selectWg.value.radio==='1' ">
+                    <el-radio-group v-model="selectWg.value.width" size="mini">
+                        <el-radio-button label="4">一排4个</el-radio-button>
+                        <el-radio-button label="5">一排5个</el-radio-button>
+                      </el-radio-group>
+                </el-form-item>
+                <el-form-item label="资源来源:" size="normal">
+                    <el-radio v-model="selectWg.value.from" label="1">自动获取</el-radio>
+                    <el-radio v-model="selectWg.value.from" label="2">手动选择</el-radio>
+
+                </el-form-item>
+                <div v-if="selectWg.value.from === '1' ">
+                    <el-form-item label="资源分类:">
+                        <el-select v-model="selectWg.value.classifyId" placeholder="请选择分类">
+                            <el-option :value="0" label="不限分类"></el-option>
+                            <template v-for="item in catList">
+                                <el-option :value="item.id" :label="item.name"></el-option>
+                                <template v-if="item.childlist">
+                                    <el-option v-for="second in item.childlist" :key="second.id"
+                                               :label="second.name" :value="second.id" class="second">
+                                    </el-option>
+                                </template>
+                            </template>
+                        </el-select>
+                </el-form-item>
+                    <el-form-item label="显示数量:" size="normal">
+                        <el-input-number v-model="selectWg.value.limit" size="mini" :min="1"
+                            label="描述文字"></el-input-number>
+                    </el-form-item>
+                </div>
+                <el-form-item label="资源:" v-if="selectWg.value.from === '2' ">
+                    <el-button type="primary" size="mini" @click="selectGoods">选择资源</el-button>
+                    <div class="resource">
+                        <div v-for="(item,index) in selectWg.value.List" :key="index">
+                            <img :src="item.thumb" alt="">
+                            <i class="icon icon-shibai" @click="RemoveForm(index)"></i>
+                        </div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="推荐分类:" class="column">
+                    <div class="referrer" v-for="(item, index) in selectWg.value.radios" :key="index">
+                        <div class="problem">
+                            <p class="name">{{item.label}} </p>
+                            <el-form ref="referrerData" :model="referrerData" v-if="referrerIndex === index"
+                                label-width="120px">
+                                <el-form-item label="推荐名称："> <el-input v-model="referrerData.tempName"
+                                        value="referrerData.tempName" placeholder="请输入推荐项" size="normal" clearable
+                                        @change=""></el-input></el-form-item>
+                                <el-form-item label="链接类型:" size="normal">
+                                    <el-select v-model="referrerData.value" placeholder="请选择">
+                                        <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                        :value="index">
+                                    </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="referrerData.value==='1'">
+                                    <el-input v-model="referrerData.url" placeholder="请输入url地址" size="normal"
+                                        clearable></el-input>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="referrerData.value==='2'">
+                                    <el-cascader v-model="referrerData.cat"
+                                    :options="catList" style="width: 100%;" :show-all-levels="false"
+                                    :props="{ checkStrictly: true ,value:'id',label:'name',children:'childlist'}"
+                                    clearable></el-cascader>  
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="referrerData.value==='3'">
+                                    <el-select v-model="referrerData.art" placeholder="请选择">
+                                        <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                        :value="art.id">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-button type="primary" size="mini" @click="CancelReferrer(index)">取消</el-button>
+                                <el-button type="primary" size="mini" @click="SaveReferrer(index)">保存</el-button>
+                            </el-form>
+                            <i :class="index === referrerIndex ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"
+                                @click="ToggleReferrer(index)"></i>
+                            <i class="el-icon-delete" @click="removeRerrer(index)"></i>
+                        </div>
+                    </div>
+                    <el-button type="primary" size="mini" @click="AddReferrer">添加推荐</el-button>
+                    <p class="layout-tip">资源数据请到 推广管理 - 推广列表 中管理</p>
+                </el-form-item>
+            </div>
+        </div>
+        <!-- 文章组 -->
+        <div v-if="selectWg.type=='article'">
+            
+            <el-form-item label="文章分类：" size="normal">
+                <el-radio v-model="selectWg.value.choose" label="1">自动选择</el-radio>
+                <el-radio v-model="selectWg.value.choose" label="2">手动选择</el-radio>
+                </el-form-item>
+                <el-form-item label="文章分类：" size="normal" v-if="selectWg.value.choose === '1' ">
+                <el-select v-model="selectWg.value.art"  placeholder="请选择" style="width: 70%;">
+                    <el-option v-for="art in articleSortList" :key="art.id" :label="art.name" :value="art.id">
+                    </el-option>
+                </el-select>
+            </el-form-item> 
+            <el-form-item label="显示数量:"  v-if="selectWg.value.choose === '1' ">
+                <el-input-number v-model="selectWg.value.limit" :min="1" size="mini" label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item label="文章分类：" size="normal" v-if="selectWg.value.choose === '2' ">
+                <el-button type="primary" size="mini" @click="article_list">添加文章</el-button>
+                <div class="resource" style="margin: 10px 0;">
+                    <div v-for="(item,index) in selectWg.value.List" :key="index">
+                        <img :src="item.thumb || default_banner" alt="" >
+                         <i class="icon icon-shibai" @click="Article(index)"></i>
+                    </div>
+                </div>
+            </el-form-item>
+            <el-form-item label="布局方式:" v-if="selectWg.value.show==='1' ">
+                <el-radio-group v-model="selectWg.value.style" size="mini">
+                    <el-radio-button label="2">一排2个</el-radio-button>
+                    <el-radio-button label="3">一排3个</el-radio-button>
+                  </el-radio-group>
+            </el-form-item>
+            <el-form-item label="文章标题:">
+                <el-input v-model="selectWg.value.title" value="selectWg.value.title" placeholder="请输入标题" clearable
+                    style="width: 70%;"></el-input>
+            </el-form-item>
+            <el-form-item label="是否显示标题:">
+                <el-radio-group v-model="selectWg.value.radio">
+                    <el-radio v-model="selectWg.value.radio" label="1">显示</el-radio>
+                    <el-radio v-model="selectWg.value.radio" label="2">不显示</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="是否查看更多:">
+                <el-radio-group v-model="selectWg.value.lookMore">
+                    <el-radio label="1">是</el-radio>
+                    <el-radio label="2">否</el-radio>
+                </el-radio-group>
+            </el-form-item>
+           
+                <p class="layout-tip">文章数据请到 运营管理 - <a href="javascript:;"
+                        lay-href="{:createUrl('article/index')}">文章列表</a> 中管理
+                </p>
+        </div>
+        <!-- 视频组 -->
+        <div v-if="selectWg.type=='video'">
+            <el-form-item label="自动播放:">
+                <el-switch v-model="selectWg.value.autoplay" active-value="true" inactive-value="false"
+                    active-color="#13ce66" inactive-color="#ff4949">
+                </el-switch>
+            </el-form-item>
+            <li v-for="(item, index) in selectWg.value.list" :key="index">
+                <el-form-item label="视频封面:" size="normal">
+                    <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                    <p class="layout-tip ">建议尺寸 : 1200px × 600px</p>
+                </el-form-item>
+                <el-form-item label="视频宽度:" v-if="selectWg.value.radio==='1' ">
+                    <el-input-number v-model="selectWg.value.width" :min="1" :max="10" size="mini"></el-input-number>
+                </el-form-item>
+                <el-form-item label="视频高度:">
+                    <el-input-number v-model="selectWg.value.height" :min="1" size="mini"></el-input-number>
+                </el-form-item>
+                <el-form-item label="背景颜色:" v-if="selectWg.value.radio==='1' "  class="column">
+                    <div class="problem">
+                        <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                            <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                            <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                        </el-form-item>
+                        <div  >
+                        <el-form-item label="起始颜色:">
+                            <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;"
+                                @click="selectWg.value.startColor = '#fff'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="结束颜色:">
+                            <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                        </el-form-item>
+                    </div>
+                    </div>
+                </el-form-item>
+
+                <el-form-item label="视频类型：" size="normal">
+                    <el-select v-model="item.linkValue" placeholder="请选择" style="width: 70%;" disabled>
+                        <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                        :value="index">
+                    </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="视频地址：" size="normal" v-if="item.linkValue==='1' ">
+                    <el-input placeholder="请输入视频地址" style="width: 70%;" v-model="item.url" clearable></el-input>
+                </el-form-item>
+            </li>
+
+        </div>
+        <!-- 图片轮播 -->
+        <div v-if="selectWg.type=='imgSlide'">
+            <div>
+                <el-form-item label="切换时间：">
+                    <div>
+                        <el-input-number v-model="selectWg.value.duration" value="selectWg.value.duration" :min="0"
+                            step="500" size="mini" label="描述文字"></el-input-number>
+                        <p class="layout-tip">轮播图自动切换的间隔时间，单位：毫秒</p>
+                    </div>
+                </el-form-item>
+                <el-form-item label="图片宽度:" size="normal" v-if="selectWg.value.radio==='1' ">
+                    <el-input-number v-model="selectWg.value.width" value="selectWg.value.width" :min="1" :max="10"
+                        size="mini" label="描述文字"></el-input-number>
+                </el-form-item>
+                <el-form-item label="图片高度:" size="normal">
+                    <el-input-number v-model="selectWg.value.height" value="selectWg.value.height" :min="1" size="mini"
+                        label="描述文字"></el-input-number>
+                </el-form-item>
+                <el-form-item label="背景颜色:" v-if="selectWg.value.radio==='1' " class="column">
+                    <div class="problem">
+                        <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                            <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                            <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                        </el-form-item>
+                        <div  >
+                        <el-form-item label="起始颜色:">
+                            <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;"
+                                @click="selectWg.value.startColor = '#fff'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="结束颜色:">
+                            <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                        </el-form-item>
+                    </div>
+                </div>
+                </el-form-item>
+                <el-form-item label="图片:" size="normal" class="column">
+                    <draggable element="ul" :list="selectWg.value.list"
+                        :options="{group:{ name:'slideList'}, ghostClass: 'ghost',animation: 150,handle:'.drag-block'}">
+                        <li v-for="(item, index) in selectWg.value.list" :key="index" class="problem">
+                            <el-form-item label="图片：">
+                                <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                                <p class="layout-tip ">建议尺寸 : 1200px × 600px</p>
+                            </el-form-item>
+                            <el-form-item label="链接类型:" size="normal">
+                                <el-select v-model="item.linkValue" placeholder="请选择">
+                                    <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                            :value="index">
+                                        </el-option>
+                                </el-select>
+                               
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="item.linkValue==='1'">
+                                <el-input v-model="item.url" placeholder="请输入url地址" size="normal" clearable></el-input>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="item.linkValue==='2'">
+                                    <el-cascader  v-model="item.cat"
+                                    :options="catList" style="width: 100%;" :show-all-levels="false"
+                                    :props="{ checkStrictly: true ,value:'id',label:'name',children:'childlist'}"
+                                    clearable></el-cascader>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="item.linkValue==='3'">
+                                <el-select v-model="item.art" placeholder="请选择">
+                                    <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                    :value="art.id">
+                                </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <i class="el-icon-delete" @click="handleRemove(index)"></i>
+                        </li>
+                        <el-form-item label="" size="normal">
+                            <el-button type="primary" size="mini" @click="handleAddPic">添加一个图片</el-button>
+                        </el-form-item>
+
+                    </draggable>
+                </el-form-item>
+            </div>
+        </div>
+        <!-- 图片 -->
+        <div v-if="selectWg.type=='imgSingle'">
+            <el-form-item label="背景颜色:" class="content column" v-if="selectWg.value.radio==='1' ">
+                <div class="problem">
+                    <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                        <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                        <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                    </el-form-item>
+                    <div  >
+                    <el-form-item label="起始颜色:">
+                        <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.startColor = '#fff'">重置</a>
+                    </el-form-item>
+                    <el-form-item label="结束颜色:">
+                        <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                    </el-form-item>
+                </div>
+                </div>
+            </el-form-item>
+            <el-form-item label="图片:" class="column">
+                <div class="problem">
+                    <el-form-item class="content-item" label="上传图片:">
+                        <div v-for="(item,index) in selectWg.value.list" :key="index">
+                            <upload-img @upload-img="upImage(index,item)" :index="index" :item="item">
+                            </upload-img>
+                            </div>
+                            <p class="layout-tip ">建议尺寸 : 1200px × 600px</p>
+                    </el-form-item>
+                    <el-form-item label="链接类型:" size="normal">
+                        <el-select v-model="selectWg.value.linkValue" placeholder="请选择">
+                            <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                            :value="index">
+                        </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="链接指向:" size="normal" v-if="selectWg.value.linkValue==='1'">
+                        <el-input v-model="selectWg.value.url" placeholder="请输入url地址" size="normal"
+                            clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="链接指向:" size="normal" v-if="selectWg.value.linkValue==='2'">
+                        <el-cascader  v-model="selectWg.value.cat"
+                        :options="catList" style="width: 100%;" :show-all-levels="false"
+                        :props="{ checkStrictly: true ,value:'id',label:'name',children:'childlist'}"
+                        clearable></el-cascader>
+                    </el-form-item>
+                    <el-form-item label="链接指向:" size="normal" v-if="selectWg.value.linkValue==='3'">
+                        <el-select v-model="selectWg.value.art" placeholder="请选择">
+                            <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                            :value="art.id">
+                        </el-option>
+                        </el-select>
+                    </el-form-item>
+                </div>
+            </el-form-item>
+            <el-form-item class="content-item" label="图片宽度:" v-if="selectWg.value.radio==='1' ">
+                <el-input-number v-model="selectWg.value.width" :min="1" :max="10" size="mini"
+                    label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item class="content-item" label="图片高度:">
+                <el-input-number v-model="selectWg.value.height" :min="1" size="mini" label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item label="添加按钮:">
+                <el-switch v-model="selectWg.value.buttonShow" active-color="#13ce66">
+                </el-switch>
+            </el-form-item>
+            <div v-show="selectWg.value.buttonShow">
+                <el-form-item label="按钮颜色:" class="column">
+                    <div class="problem">
+                        <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                                <el-radio v-model="selectWg.value.color.gradientDirection" label="right">水平</el-radio>
+                                <el-radio v-model="selectWg.value.color.gradientDirection" label="bottom">垂直</el-radio>
+                        </el-form-item>
+                        <div  >
+                        <el-form-item label="起始颜色:">
+                            <el-color-picker v-model="selectWg.value.color.startColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;"
+                                @click="selectWg.value.color.startColor = '#fff'">重置</a>
+                        </el-form-item>
+                        <el-form-item label="结束颜色:">
+                            <el-color-picker v-model="selectWg.value.color.endColor" size="mini"></el-color-picker>
+                            <a class="reset-color" href="javascript:;"
+                                @click="selectWg.value.color.endColor = '#fff'">重置</a>
+                        </el-form-item></div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="按钮宽度:">
+                    <el-input-number v-model="selectWg.value.color.width" :min="1" size="mini"
+                        label="描述文字"></el-input-number>
+                </el-form-item>
+                <el-form-item label="按钮高度:">
+                    <el-input-number v-model="selectWg.value.color.height" :min="1" size="mini"
+                        label="描述文字"></el-input-number>
+                </el-form-item>
+                <el-form-item label="按钮文字:">
+                    <el-input type="text" class="selectLinkVal" style="width: 70%;" v-model="selectWg.value.buttonText"
+                        clearable placeholder="请输入内容"></el-input>
+                </el-form-item>
+                <el-form-item label="文字颜色:">
+                    <el-color-picker v-model="selectWg.value.textColor" size="mini"></el-color-picker>
+                    <a class="reset-color" href="javascript:;" @click="selectWg.value.textColor = '#000000'">重置</a>
+                </el-form-item>
+            </div>
+        </div>
+        <!-- 图片分组 -->
+        <div v-if="selectWg.type=='imgWindow'">
+            <div>
+                <el-form-item  label="布局方式:" class="content">
+                        <el-radio-group v-model="selectWg.value.style" size="mini">
+                            <el-radio-button label="2">一排2个</el-radio-button>
+                            <el-radio-button label="3">一排3个</el-radio-button>
+                            <el-radio-button label="4">一排4个</el-radio-button>
+                            <el-radio-button label="5">一排5个</el-radio-button>
+                          </el-radio-group>
+                        </el-form-item>
+                <div>
+                    <el-form-item label="图片间距：">
+                        <el-input-number v-model="selectWg.value.margin" :min="0" size="mini"></el-input-number>
+                    </el-form-item>
+                </div>
+                 <div class="content">
+                    <el-form-item label="图片标题：">
+                        <el-input v-model="selectWg.value.title" value="selectWg.value.title" placeholder="请输入图片标题"
+                            clearable></el-input>
+                    </el-form-item>
+                </div>
+                <el-form-item label="是否显示标题:">
+                    <el-radio-group v-model="selectWg.value.radio">
+                        <el-radio v-model="selectWg.value.radio" label="1">显示</el-radio>
+                        <el-radio v-model="selectWg.value.radio" label="2">不显示</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="是否查看更多:" class="content">
+                    <el-radio-group v-model="selectWg.value.lookMore">
+                        <el-radio label="true">是</el-radio>
+                        <el-radio label="false">否</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="图片:" size="normal" class="column">
+                    <draggable element="ul" :list="selectWg.value.list"
+                        :options="{group:{ name:'slideList'}, ghostClass: 'ghost',animation: 150,handle:'.drag-block'}">
+                        <li v-for="(item, index) in selectWg.value.list" :key="index" class="problem">
+                            <el-form-item label="图片：" class="slider">
+                                <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                                <p class="layout-tip ">建议尺寸 : 460px × 70px</p>
+                            </el-form-item>
+                            <el-form-item label="链接类型:" size="normal">
+                                <el-select v-model="item.linkValue" placeholder="请选择">
+                                    <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                            :value="index">
+                                        </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="item.linkValue==='1'">
+                                <el-input v-model="item.url" placeholder="请输入url地址" size="normal" clearable></el-input>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="item.linkValue==='2'">
+                                <el-cascader v-model="item.cat"
+                                    :options="catList" style="width: 100%;" :show-all-levels="false"
+                                    :props="{ checkStrictly: true ,value:'id',label:'name',children:'childlist'}"
+                                    clearable></el-cascader>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="item.linkValue==='3'">
+                                <el-select v-model="item.art" placeholder="请选择">
+                                    <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                            :value="art.id">
+                                        </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <i class="el-icon-delete" @click="handleSlideRemove(index)"></i>
+                        </li>
+                        <el-form-item label="" size="normal">
+
+                            <el-button type="primary" size="mini" @click="handleAddSlide">添加一个图片</el-button>
+                        </el-form-item>
+                    </draggable>
+                </el-form-item>
+            </div>
+        </div>
+        <!-- 公告组 -->
+        <div v-if="selectWg.type=='notice'">
+            <el-form-item label="公告高度:">
+                <el-input-number v-model="selectWg.value.lineHeight" size="mini" :min="30" label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item label="字体大小:">
+                <el-input-number v-model="selectWg.value.FontSize" size="mini" :min="12" :max="20"
+                    label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item label="背景颜色:" class="content column">
+                <div class="problem">
+                    <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                        <el-radio v-model="selectWg.value.gradientDirection" label="right">水平</el-radio>
+                        <el-radio v-model="selectWg.value.gradientDirection" label="bottom">垂直</el-radio>
+                    </el-form-item>
+                    <div  >
+                    <el-form-item label="起始颜色:">
+                        <el-color-picker v-model="selectWg.value.startColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.startColor = '#fff'">重置</a>
+                    </el-form-item>
+                    <el-form-item label="结束颜色:">
+                        <el-color-picker v-model="selectWg.value.endColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.endColor = '#fff'">重置</a>
+                    </el-form-item>
+                </div>
+                </div>
+            </el-form-item>
+            <el-form-item label="字体颜色:">
+                <el-color-picker v-model="selectWg.value.color2" size="mini"></el-color-picker>
+                <a class="reset-color" href="javascript:;" @click="selectWg.value.color2 = '#333'">重置</a>
+            </el-form-item>
+            <el-form-item label="是否弹窗:">
+                <el-radio-group v-model="selectWg.value.pope">
+                    <el-radio label="yes">弹窗</el-radio>
+                    <el-radio label="no">不弹窗</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="公告获取:">
+                <el-radio-group v-model="selectWg.value.type">
+                    <el-radio label="auto">自动获取</el-radio>
+                    <el-radio label="choose">手动选择</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <div v-if="selectWg.value.type=='choose'">
+                <el-form-item>
+                    <input type="hidden" name="notice" id="n15578855354" value="" />
+                </el-form-item>
+                <el-form-item label="公告标题：">
+                        <li v-for="(notice,key) in selectWg.value.List" :key="key">
+                            <div class="Notice">
+                                <p>{{notice.title}}</p>
+                                <i class="el-icon-delete" @click="handleDeleteNotice(key)"></i>
+                            </div>
+                        </li>
+                    <el-button type="primary" size="mini" @click="selectNotice">选择公告</el-button>
+                </el-form-item>
+            </div>
+            <el-form-item class="pl25">
+                <p>
+                    公告数据请到 网站功能 -
+                    <a href="javascript:;" lay-href="{:createUrl('article/index')}">文章列表</a> 中管理
+                </p>
+            </el-form-item>
+        </div>
+        <!-- 底部-->
+        <div v-if="selectWg.type=='tabbar'">
+            <el-form-item label="背景颜色:" class="column">
+                <div class="problem">
+                    <el-form-item label="渐变方向:" style="margin-bottom: 10px;">
+                        <el-radio v-model="selectWg.value.color.gradientDirection" label="right">水平</el-radio>
+                        <el-radio v-model="selectWg.value.color.gradientDirection" label="bottom">垂直</el-radio>
+                    </el-form-item>
+                    <div  >
+                    <el-form-item label="起始颜色:">
+                        <el-color-picker v-model="selectWg.value.color.startColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.color.startColor = '#fff'">重置</a>
+                    </el-form-item>
+                    <el-form-item label="结束颜色:">
+                        <el-color-picker v-model="selectWg.value.color.endColor" size="mini"></el-color-picker>
+                        <a class="reset-color" href="javascript:;" @click="selectWg.value.color.endColor = '#fff'">重置</a>
+                    </el-form-item></div>
+                </div>
+            </el-form-item>
+                <!--联系方式  -->
+                <el-form-item label="联系方式:" size="normal" class="column"> 
+                    <div class="problem">
+                        <el-form-item label="标题:" size="normal">
+                            <el-input v-model="selectWg.value.contact.name" value="selectWg.value.contact.name" placeholder="请输入标题" size="normal"
+                                clearable></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否显示:" size="normal">
+                            <el-radio v-model="selectWg.value.contact.radio" label="1">显示</el-radio>
+                            <el-radio v-model="selectWg.value.contact.radio" label="2">不显示</el-radio>
+                        </el-form-item>
+                    </div>
+                    <div v-for="(ContactItem, index) in selectWg.value.contact.list" :key="index" class="column">
+                        <div class="problem">
+                            <p class="name">{{ContactItem.name}} </p>
+                            <el-form ref="contactData" :model="contactData" 
+                                label-width="120px"  v-show="index === contactIndex">
+                                <el-form-item label="联系方式:" size="normal">
+                                    <el-input v-model="contactData.tempName" value="contactData.tempName"
+                                        placeholder="请输入联系方式" size="normal" clearable></el-input>
+
+                                </el-form-item>
+
+                                <el-form-item label="内容:" size="normal">
+                                    <el-input v-model="contactData.value" placeholder="请输入内容" size="normal"
+                                        clearable></el-input>
+                                </el-form-item>
+
+                                <el-form-item label="链接类型:" size="normal">
+                                    <el-select v-model="contactData.linkValue" disabled placeholder="请选择">
+                                        <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                            :value="index">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+
+                                <el-form-item label="链接指向:" size="normal" v-if="contactData.linkValue === '1'">
+                                    <el-input v-model="contactData.url" value="contactData.url" placeholder="请输入url地址"
+                                        size="normal" clearable></el-input>
+                                </el-form-item>
+
+                                <el-form-item label="链接指向:" size="normal" v-if="contactData.linkValue === '2'">
+                                        <el-select v-model="contactData.cat" placeholder="请选择分类">
+                                            <el-option :value="0" label="不限分类"></el-option>
+                                            <template v-for="item in catList">
+                                                <el-option :value="item.id" :label="item.name"></el-option>
+                                                <template v-if="item.childlist">
+                                                    <el-option v-for="second in item.childlist" :key="second.id"
+                                                               :label="second.name" :value="second.id" class="second">
+                                                    </el-option>
+                                                </template>
+                                            </template>
+                                        </el-select>
+                                </el-form-item>
+
+                                <el-form-item label="链接指向:" size="normal" v-if="contactData.linkValue === '3'">
+                                    <el-select v-model="ContactItem.art" placeholder="请选择">
+                                        <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                            :value="art.id">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-button type="primary" size="mini"
+                                    @click="CancelContact(index)">取消</el-button>
+                                <el-button type="primary" size="mini" @click=" SaveContact(index)">保存</el-button>
+                            </el-form>
+                            <!-- 切换 -->
+                            <i :class="index == contactIndex  ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"
+                                @click=" ToggleContact(index)"></i>
+                                <!-- 删除 -->
+                            <i class="el-icon-delete" @click="RemoveContact(index)"></i>
+                        </div>
+
+                    </div>
+                    <el-button type="primary" size="mini" @click="AddContact">添加联系方式</el-button>
+                </el-form-item>
+                <!--简介  -->
+                <el-form-item label="简介:" size="normal" class="column">
+                    <div class="problem">
+                        <el-form-item label="标题:" size="normal">
+                            <el-input v-model="selectWg.value.intro.name" value="selectWg.value.intro.name" placeholder="请输入标题" size="normal"
+                                clearable></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否显示:" size="normal">
+                            <el-radio v-model="selectWg.value.intro.radio" label="1">显示</el-radio>
+                            <el-radio v-model="selectWg.value.intro.radio" label="2">不显示</el-radio>
+                        </el-form-item>
+                    </div>
+                    <div v-for="(introItem, index) in selectWg.value.intro.list" :key="index" class="column">
+                        <div class="problem">
+                            <p class="name">{{introItem.value}} </p>
+                            <el-form ref="introItemData" :model="introItemData" v-show="index === introIndex"
+                                label-width="120px">
+                                <el-form-item label="简介信息:" size="normal">
+                                    <el-input v-model="introItemData.value" value="introItemData.value"
+                                        placeholder="请输入简介信息" size="normal" clearable></el-input>
+                                </el-form-item>
+                                <el-form-item label="链接类型:" size="normal">
+                                    <el-select v-model="introItemData.linkValue" disabled placeholder="请选择">
+                                        <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                            :value="index">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="introItemData.linkValue==='1'">
+                                    <el-input v-model="introItemData.url" placeholder="请输入url地址" size="normal"
+                                        clearable></el-input>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="introItemData.linkValue==='2'">
+                                        <el-select v-model="introItemData.cat" placeholder="请选择分类">
+                                            <el-option :value="0" label="不限分类"></el-option>
+                                            <template v-for="item in catList">
+                                                <el-option :value="item.id" :label="item.name"></el-option>
+                                                <template v-if="item.childlist">
+                                                    <el-option v-for="second in item.childlist" :key="second.id"
+                                                               :label="second.name" :value="second.id" class="second">
+                                                    </el-option>
+                                                </template>
+                                            </template>
+                                        </el-select>     
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="introItemData.linkValue==='4'">
+                                    <el-select v-model="item.art" placeholder="请选择">
+                                        <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                        :value="art.id">
+                                    </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-button type="primary" size="mini" @click="CancelIntro(index)">取消</el-button>
+                                <el-button type="primary" size="mini" @click="SaveIntro(index)">保存</el-button>
+                            </el-form>
+                            <i :class="index === introIndex ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"
+                                @click="ToggleIntro(index)"></i>
+                            <i class="el-icon-delete" @click="RemoveIntro()"></i>
+                        </div>
+                    </div>
+                    <el-button type="primary" size="mini" @click="AddIntro">添加简介</el-button>
+                </el-form-item>
+                <!--合作  -->
+                <el-form-item label="合作:" size="normal"  class="column">
+                    <div class="problem">
+                        <el-form-item label="标题:" size="normal">
+                            <el-input v-model="selectWg.value.partner.name" value="selectWg.value.partner.name" placeholder="请输入标题" size="normal"
+                                clearable></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否显示:" size="normal">
+                            <el-radio v-model="selectWg.value.partner.radio" label="1">显示</el-radio>
+                            <el-radio v-model="selectWg.value.partner.radio" label="2">不显示</el-radio>
+                        </el-form-item>
+                    </div>
+                    <div v-for="(partnerItem, index) in selectWg.value.partner.list" :key="index" class="column">
+                        <div class="problem">
+                            <p class="name">{{partnerItem.value}} </p>
+                            <el-form ref="partnerData" :model="partnerData"  v-show="index === partnerIndex"
+                                label-width="120px">
+                                <el-form-item label="合作信息:" size="normal"><el-input v-model="partnerData.value"
+                                        value="partnerData.value" placeholder="请输入合作信息" size="normal"
+                                        clearable></el-input></el-form-item>
+
+                                <el-form-item label="链接类型:" size="normal">
+                                    <el-select v-model="partnerData.linkValue" disabled placeholder="请选择">
+                                        <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                            :value="index">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="partnerData.linkValue==='1'">
+                                    <el-input v-model="partnerData.url" placeholder="请输入url地址" size="normal"
+                                        clearable></el-input>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="partnerData.linkValue==='2'">
+                                        <el-select v-model="partnerData.cat" placeholder="请选择分类">
+                                            <el-option :value="0" label="不限分类"></el-option>
+                                            <template v-for="item in catList">
+                                                <el-option :value="item.id" :label="item.name"></el-option>
+                                                <template v-if="item.childlist">
+                                                    <el-option v-for="second in item.childlist" :key="second.id"
+                                                               :label="second.name" :value="second.id" class="second">
+                                                    </el-option>
+                                                </template>
+                                            </template>
+                                        </el-select>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="partnerData.linkValue==='3'">
+                                    <el-select v-model="item.art" placeholder="请选择">
+                                        <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                            :value="art.id">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-button type="primary" size="mini"
+                                    @click="CancelPartner(index)">取消</el-button>
+                                <el-button type="primary" size="mini" @click="SavePartner(index)">保存</el-button>
+                            </el-form>
+                            <i :class="index === partnerIndex ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"
+                                @click="TogglePartner(index)"></i>
+                            <i class="el-icon-delete" @click="RemovePartner(index)"></i>
+                        </div>
+                    </div>
+                    <el-button type="primary" size="mini" @click="AddPartner">添加合作</el-button>
+                </el-form-item>
+                <!--帮助  -->
+                <el-form-item label="帮助:" size="normal"  class="column">
+                    <div class="problem">
+                        <el-form-item label="标题:" size="normal">
+                            <el-input v-model="selectWg.value.help.name" value="selectWg.value.help.name" placeholder="请输入标题" size="normal"
+                                clearable></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否显示:" size="normal">
+                            <el-radio v-model="selectWg.value.help.radio" label="1">显示</el-radio>
+                            <el-radio v-model="selectWg.value.help.radio" label="2">不显示</el-radio>
+                        </el-form-item>
+                    </div>
+                    <div v-for="(helpItem, index) in selectWg.value.help.list" :key="index" class="column">
+                        <div class="problem">
+                            <p class="name">{{helpItem.value}} </p>
+                            <el-form ref="helpItemData" :model="helpItemData"  v-show="index === helpIndex"
+                                label-width="120px">
+                                <el-form-item label="帮助信息:" size="normal"> <el-input v-model="helpItemData.value"
+                                        value="helpItemData.value" placeholder="请输入帮助信息" size="normal"
+                                        clearable></el-input></el-form-item>
+                                <el-form-item label="链接类型:" size="normal">
+                                    <el-select v-model="helpItemData.linkValue" disabled placeholder="请选择">
+                                        <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                        :value="index">
+                                    </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="helpItemData.linkValue==='1'">
+                                    <el-input v-model="helpItemData.url" placeholder="请输入url地址" size="normal"
+                                        clearable></el-input>
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="helpItemData.linkValue==='2'">
+                                        <el-select v-model="helpItemData.cat" placeholder="请选择分类">
+                                            <el-option :value="0" label="不限分类"></el-option>
+                                            <template v-for="item in catList">
+                                                <el-option :value="item.id" :label="item.name"></el-option>
+                                                <template v-if="item.childlist">
+                                                    <el-option v-for="second in item.childlist" :key="second.id"
+                                                               :label="second.name" :value="second.id" class="second">
+                                                    </el-option>
+                                                </template>
+                                            </template>
+                                        </el-select>   
+                                </el-form-item>
+                                <el-form-item label="链接指向:" size="normal" v-if="helpItemData.linkValue==='3'">
+                                    <el-select v-model="item.art" placeholder="请选择">
+                                        <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                            :value="art.id">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-button type="primary" size="mini" @click="CancelHelp(index)">取消</el-button>
+                                <el-button type="primary" size="mini" @click="SaveHelp(index)">保存</el-button>
+                            </el-form>
+                            <i :class="index === helpIndex ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"
+                                @click="ToggleHelp(index)"></i>
+                            <i class="el-icon-delete" @click="RemoveHelp(index)"></i>
+                        </div>
+                    </div>
+                    <el-button type="primary" size="mini" @click="AddHelp">添加帮助</el-button>
+                </el-form-item>
+                <!-- 联系客服 微信公众号 -->
+                <el-form-item :label="item.name" size="normal"  class="column"  v-for="(item,index) in selectWg.value.list" :key="index">
+                    <div class="problem"  >
+                        <el-form-item label="图片：" size="normal">
+                            <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                            <div class="layout-tip" style="line-height: 24px;">建议尺寸：320px × 320px</div>
+                        </el-form-item>
+                        <el-form-item label="名称：" size="normal">
+                            <el-input v-model="item.name" value="item.name" placeholder="请输入名称" size="normal" clearable
+                                @change=""></el-input>
+                        </el-form-item>
+                        <el-form-item label="是否显示：" size="normal">
+                            <el-radio v-model="item.show" label="1">显示</el-radio>
+                            <el-radio v-model="item.show" label="2">不显示</el-radio>
+                        </el-form-item>
+                    </div>
+                </el-form-item>
+               
+            <!-- 版权 -->
+            <el-form-item label="版权:" size="normal">
+                <el-input v-model="selectWg.value.copy.CopyRight" placeholder="请输入版权信息" size="normal" clearable
+                    value="selectWg.value.copy.CopyRight"></el-input>
+            </el-form-item>
+        </div>
+        <!-- 文本域 -->
+        <div v-if="selectWg.type=='textarea'">
+            <textarea id="container"></textarea>
+        </div>
+        <!--资源分类-->
+        <div v-if="selectWg.type=='resourceSort'">
+            <!-- 资源 -->
+            <el-form-item label="资源分类：" size="normal" class="column">
+                <draggable>
+                    <div v-for="(item, index) in selectWg.value.catList" :key="index" class="tabbar_flex">
+                        <div class="Resource">
+                            <p>{{ item.name }}</p>
+                            <div @click="ResourceBtn(index)" class="choose">
+                                <i :class="activeIndex ===index ? 'el-icon-caret-top' : 'el-icon-caret-bottom' "></i>
+                            </div>
+                        </div>
+                        <div v-if="activeIndex === index">
+                            <el-form-item label="推荐分类:" size="normal">
+                                <el-select v-model="selectedValue[index]" multiple placeholder="请选择推荐分类">
+                                    <el-option v-for="label in item.childlist" :key="label.id" :label="label.name"
+                                        :value="label.id"></el-option>
+                                </el-select>
+                            </el-form-item>
+                                <el-button type="primary" size="mini" @click="CancelResource(index)">取消</el-button>
+                                <el-button type="primary" size="mini" @click=" selectResource(index)">保存</el-button>
+                        </div>
+                    </div>
+                </draggable>
+            </el-form-item>
+            <el-form-item label="显示数量：" size="normal">
+                <el-input-number v-model="selectWg.value.limit" :min="1"  size="mini"
+                    label="描述文字"></el-input-number>
+            </el-form-item>
+            <el-form-item label="字体大小：" size="normal">
+                <el-input-number v-model="selectWg.value.Size" :min="12" :max="20" size="mini"
+                    label="描述文字"></el-input-number>
+            </el-form-item>
+            <!-- 左边： -->
+            <el-form-item label="左边：" size="normal" class=" column">
+                <div class="problem">
+                <el-form-item label="左边高度：" size="normal">
+                    <el-input-number v-model="selectWg.value.L_height" size="mini" value="selectWg.value.L_height"
+                        :min="1"></el-input-number>
+                </el-form-item>
+                <el-form-item label="左边背景：" size="normal">
+                    <el-color-picker v-model="selectWg.value.L_Bk_color" size="mini"></el-color-picker>
+                    <a class="reset-color" href="javascript:;" @click="selectWg.value.L_Bk_color = '#fff'">重置</a>
+                </el-form-item>
+                <el-form-item label="左边字体：" size="normal">
+                    <el-color-picker v-model="selectWg.value.L_Txt_color" size="mini"></el-color-picker>
+                    <a class="reset-color" href="javascript:;" @click="selectWg.value.L_Txt_color = '#333'">重置</a>
+                </el-form-item>
+                <el-form-item label="悬停背景：" size="normal">
+                    <el-color-picker v-model="selectWg.value.L_Hover_bk" size="mini"></el-color-picker>
+                    <a class="reset-color" href="javascript:;" @click="selectWg.value.L_Hover_bk = '#E8F2FE'">重置</a>
+                </el-form-item></div>
+            </el-form-item>
+            <!-- 右边： -->
+            <el-form-item label="右边：" size="normal" class=" column">
+                <div class="problem">
+                <el-form-item label="右边高度：" size="normal">
+                    <el-input-number v-model="selectWg.value.R_height" size="mini" value="selectWg.value.R_height"
+                        :min="1"></el-input-number>
+                </el-form-item>
+                <el-form-item label="右边背景：" size="normal">
+                    <el-color-picker v-model="selectWg.value.R_Bk_color" size="mini"></el-color-picker>
+                    <a class="reset-color" href="javascript:;" @click="selectWg.value.R_Bk_color = '#fff'">重置</a>
+                </el-form-item>
+                <el-form-item label="右边字体：" size="normal">
+                    <el-color-picker v-model="selectWg.value.R_Txt_color" size="mini"></el-color-picker>
+                    <a class="reset-color" href="javascript:;" @click="selectWg.value.R_Txt_color = '#333'">重置</a>
+                </el-form-item></div>
+            </el-form-item>
+        </div>
+    </el-form>
+</template>
+<!-- 导航项 -->
+<template id="menu-item">
+    <!-- 有tasks时进入子级 -->
+    <el-submenu :index="item.url" v-if="item.tasks && item.tasks.length > 0">
+        <!-- slot -->
+        <template slot="title">{{ item.name }}</template>
+        <!-- 循环子级 -->
+        <template v-for="subItem in item.tasks">
+            <template v-if="subItem.tasks && subItem.tasks.length > 0">
+                <menu-item :item="subItem"></menu-item>
+            </template>
+            <el-menu-item v-else :index="subItem.url" :key="subItem.name">{{ subItem.name }}</el-menu-item>
+        </template>
+    </el-submenu>
+    <!-- 否则直接显示name -->
+    <el-menu-item v-else :index="item.url" :key="item.url">
+        {{ item.name }}
+    </el-menu-item>
+</template>
+<!-- 拖拽嵌套 -->
+<template id="nested-draggable-template">
+    <draggable class="dragArea" tag="ul" :list="tasks" :group="{ name: 'g1' }" item-key="name">
+        <li v-for="(element, index) in tasks" :key="element.id">
+            <div class="tasks">
+                <div class="name">
+                    <div class="icon_plus" @click="AddName(index)"> <i class="el-icon-plus"></i>{{ element.name }}
+                    </div>
+                    <!-- 添加同级 -->
+                    <el-dialog title="添加同级" :visible.sync="dialogVisible" width="50%" :before-close="canceled">
+                        <el-form :model="form" ref="form" label-width="80px" :inline="false" size="normal"
+                            class="AddName">
+                            <el-form-item label="导航标签">
+                                <el-input v-model="form.name" value="form.name" placeholder="请输入标签名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="链接类型:" size="normal">
+                                <el-select v-model="form.value" disabled  placeholder="请选择">
+                                    <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                    :value="index">
+                                </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="form.value==='1'">
+                                <el-input v-model="form.url" placeholder="请输入url地址" size="normal" clearable></el-input>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="form.value==='2'">
+                                    <el-select v-model="form.cat" placeholder="请选择分类">
+                                        <el-option :value="0" label="不限分类"></el-option>
+                                        <template v-for="item in catList">
+                                            <el-option :value="item.id" :label="item.name"></el-option>
+                                            <template v-if="item.childlist">
+                                                <el-option v-for="second in item.childlist" :key="second.id"
+                                                           :label="second.name" :value="second.id" class="second">
+                                                </el-option>
+                                            </template>
+                                        </template>
+                                    </el-select>
+                            </el-form-item>
+                            <el-form-item label="链接指向:" size="normal" v-if="form.value==='3'">
+                                <el-select v-model="form.art" placeholder="请选择">
+                                    <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                            :value="art.id">
+                                        </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="onSubmit(index)">立即添加</el-button>
+                                <el-button @click="canceled()">取消</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-dialog>
+                    <div class="edit">
+                        <i :class="activeIndex === index ? 'el-icon-caret-top' : 'el-icon-caret-bottom'"
+                            @click="toggleInput(index)"></i>
+                        <i class="el-icon-delete" @click="removeName(index)"></i>
+                    </div>
+                </div>
+                <el-form class="Input" v-if="activeIndex === index" ref="formData" :model="formData">
+                    <el-form-item label="导航标签:" size="normal">
+                        <el-input v-model="formData.name" value="formData.name" placeholder="请输入导航项" size="normal"
+                            clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="链接类型:" size="normal">
+                        <el-select v-model="formData.value" disabled placeholder="请选择">
+                            <el-option v-for="(option,index) in linkType" :key="index" :label="option"
+                                            :value="index">
+                                        </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="链接指向:" size="normal" v-if="formData.value==='1'">
+                        <el-input v-model="formData.url" placeholder="请输入url地址" size="normal" clearable></el-input>
+                    </el-form-item>
+                    <el-form-item label="链接指向:" size="normal" v-if="formData.value==='2'">
+                        <el-select v-model="formData.cat" placeholder="请选择分类">
+                            <el-option :value="0" label="不限分类"></el-option>
+                            <template v-for="item in catList">
+                                <el-option :value="item.id" :label="item.name"></el-option>
+                                <template v-if="item.childlist">
+                                    <el-option v-for="second in item.childlist" :key="second.id"
+                                               :label="second.name" :value="second.id" class="second">
+                                    </el-option>
+                                </template>
+                            </template>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="链接指向:" size="normal" v-if="formData.value==='3'">
+                        <el-select v-model="formData.art" placeholder="请选择">
+                            <el-option v-for="art in articleSortList" :key="art.id" :label="art.name"
+                                            :value="art.id">
+                                        </el-option>
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item size="normal">
+                        <div>
+                            <el-button type="primary" size="mini" @click="cancel(index)">取消</el-button>
+                            <el-button type="primary" size="mini" @click="save(index)">保存</el-button>
+
+                        </div>
+                    </el-form-item>
+
+                </el-form>
+            </div>
+            <nested-draggable :tasks="element.tasks"></nested-draggable>
+        </li>
+    </draggable>
+
+</template>
+<!-- 上传图片 -->
+<template id="upload-img">
+    <div class="UploadImage">
+        <button type="button" class="layui-btn layui-btn-sm" @click="uploadImg">上传图片</button>
+        <div class="layui-upload-list" v-if="tags">
+            <img class="layui-upload-img" :src="[tags=='image'?item.image:item.image_on]" 
+                 style="width:auto;max-width:200px;height:60px;">
+        </div>
+        <div class="layui-upload-list" v-else>
+            <img class="layui-upload-img" :src="item.image"
+                 style="width:auto;max-width:200px;height:60px;">
+                 </div>
+    </div>
+</template>
+{include file="common/foot"/}
+<script src="__STATIC__/ueditor/ueditor.config.js?v=2.0.11"></script>
+<script src="__STATIC__/ueditor/ueditor.all.js?v=2.0.9"></script>
+<script src="__STATIC__/admin/custom/js/pc.main.js"></script>
+<style>
+.Picture {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.Picture div {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #c0ccda;
+    position: relative;
+}
+
+.Picture div i {
+    position: absolute;
+    display: inline-block;
+    color: rgba(0, 0, 0, 0.25);
+    font-size: 16px;
+    right: -8px;
+    top: -8px;
+}
+
+.Picture div img {
+    width: 100%;
+    height: 100%;
+}
+.el-upload-list--picture-card .el-upload-list__item,
+.el-upload--picture-card {
+    width: 60px !important;
+    height: 60px !important;
+}
+
+.el-upload--picture-card {
+    line-height: 70px !important;
+}
+</style>

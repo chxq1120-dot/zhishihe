@@ -1,0 +1,466 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<div id="app">
+    <el-container>
+        <el-aside>
+            <el-tree :data="pageSort" :highlight-current="true" default-expand-all :default-checked-keys="[26]" :current-node-key="26" icon-class="el-icon-arrow-right" node-key="id" ref="tree" :props="defaultProps" @node-click="handleNodeClick">
+                <template v-slot="{ node, data }">
+                    <span class="custom-node">
+                        <span>{{data.name}}</span>
+                    </span>
+                </template>
+            </el-tree>
+        </el-aside>
+        <el-main>
+            <!--常规连接-->
+            <div v-if="activeIndex===26 && pageList">
+                <div class="pagelist">
+                    <span :class="selectPageId==item.id?'on item':'item'" @click="selectLink(item)" v-for="(item,index) in pageList" :key="index">
+                        {{item.name}}
+                    </span>
+                </div>
+            </div>
+            <!--专题页面 -->
+            <div v-if="activeIndex===27 && topicList">
+                <el-table :data="topicList" style="width: 100%;font-size: 12px;"
+                          @row-click="singleElection" highlight-current-row :row-key="row => row.id" :header-cell-style="{background:'#f3f8fe',fontSize:'12px'}">
+                    <el-table-column label="选择" width="60" align="left">
+                        <template slot-scope="scope">
+                            <el-radio v-model="selectPageId" :label="scope.row.id"></el-radio>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="id" label="ID" width="50"></el-table-column>
+                    <el-table-column prop="name" label="名称" width="150" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="code" label="编码" width="100"></el-table-column>
+                    <el-table-column prop="url" label="链接" show-overflow-tooltip></el-table-column>
+                </el-table>
+                <el-pagination background :page-size="query5.limit" @current-change="handleTopicChange" :pager-count="query5.page"
+                               layout="total, prev, pager, next" :total="query5.total">
+                </el-pagination>
+            </div>
+            <!-- 资源分类 -->
+            <div v-if="activeIndex ===29 && sortList">
+                <el-table :data="sortList" style="width: 100%;font-size: 12px;"
+                    @row-click="singleElection" highlight-current-row :row-key="row => row.id" :indent="4" :tree-props="{children:'children'}" :load="true" :header-cell-style="{background:'#f3f8fe',fontSize:'12px'}">
+                    <el-table-column type="index" label="选择" width="60" align="left">
+                        <template slot-scope="scope">
+                            <el-radio v-model="selectPageId" :label="scope.row.id"></el-radio>
+                        </template>
+                    </el-table-column>
+                    <el-table-column type="index" label="ID" width="60">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.id }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="name" label="名称" width="150" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="thumb" label="图标" width="80">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.thumb" min-width="40" height="40" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="url" label="链接" show-overflow-tooltip></el-table-column>
+                </el-table>
+            </div>
+            <!-- 资源列表 -->
+            <div v-if="activeIndex ===30 && spreadList">
+                <el-table :data="spreadList" style="width: 100%;font-size: 12px;"
+                          @row-click="singleElection" :row-key="row => row.id"
+                          highlight-current-row :header-cell-style="{background:'#f3f8fe',fontSize:'12px'}">
+                    <el-table-column label="选择" width="50" align="center">
+                        <template slot-scope="scope">
+                            <el-radio v-model="selectPageId" :label="scope.row.id"></el-radio>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="id" label="ID" width="60"></el-table-column>
+                    <el-table-column prop="thumb" label="封面" width="90">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.thumb" min-width="40" height="40" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="title" label="标题" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="type" label="类型" width="80" show-overflow-tooltip>
+                        <template slot-scope="scope">
+                           <span v-if="scope.row.type == '1'">网盘资源</span>
+                           <span v-if="scope.row.type == '2'">视频资源</span>
+                           <span v-if="scope.row.type == '3'">文章资源</span>
+                           <span v-if="scope.row.type == '4'">视频课程</span>
+                           <span v-if="scope.row.type == '5'">音频课程</span>
+                           <span v-if="scope.row.type == '6'">卡密资源</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination background :page-size="query2.limit"
+                    @current-change="handleSpreadChange" :pager-count="query2.page"
+                    layout="total, prev, pager, next" :total="query2.total">
+                </el-pagination>
+            </div>
+            <!-- 文章分类 -->
+            <div v-if="activeIndex ===32 && articleSort">
+                <el-table :data="articleSort" style="width: 100%;font-size: 12px;" 
+                    @row-click="singleElection" highlight-current-row :row-key="row => row.id" :header-cell-style="{background:'#f3f8fe',fontSize:'12px'}">
+                    <el-table-column label="" width="80" align="center">
+                        <template slot-scope="scope">
+                            <el-radio v-model="selectPageId" :label="scope.row.id"></el-radio>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="id" label="ID" width="60"></el-table-column>
+                    <el-table-column prop="name" label="名称"  show-overflow-tooltip>
+                        <template slot-scope="scope"><span>{{scope.row.name}}</span></template>
+                    </el-table-column>
+                    <el-table-column prop="url" label="链接" show-overflow-tooltip></el-table-column>
+                </el-table>
+                <el-pagination background :page-size="query3.limit"
+                    @current-change="handleArticleSort" :pager-count="query3.page"
+                    layout="total,prev, pager, next" :total="query3.total">
+                </el-pagination>
+            </div>
+             <!-- 文章列表 -->
+             <div v-if="activeIndex ===33 && articleList">
+                <el-table :data="articleList" style="width: 100%;font-size: 12px;"
+                    @row-click="singleElection" highlight-current-row :row-key="row => row.id" :header-cell-style="{background:'#f3f8fe',fontSize:'12px'}">
+                    <el-table-column label="选择" width="80" align="center">
+                        <template slot-scope="scope">
+                            <el-radio v-model="selectPageId" :label="scope.row.id"></el-radio>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="id" label="ID" width="60">
+                    </el-table-column>
+                    <el-table-column prop="thumb" label="封面" width="80">
+                        <template slot-scope="scope">
+                            <img :src="scope.row.thumb||'__STATIC__/admin/images/default.png'" min-width="40" height="40" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="title" label="标题" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="url" label="链接" show-overflow-tooltip></el-table-column>
+                </el-table>
+                <el-pagination background :page-size="query4.limit" @current-change="handleArticle" :pager-count="query4.page"
+                    layout="total,prev, pager, next" :total="query4.total">
+                </el-pagination>
+            </div>
+        </el-main>
+        <input type="hidden" name="pageLinkVal" id="pageLinkVal" value="" />
+    </el-container>
+</div>
+{include file="common/foot"/}
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            defaultProps:[],
+            selectPageId:0,
+            radio: '',
+            activeIndex: 26,
+            pageSort:null,
+            topicList:null,//专题页面连接
+            pageList: null,//常规链接
+            sortList: null,//资源分类
+            spreadList: null,//资源列表
+            articleSort: null,//文章分类
+            articleList: null,//文章列表
+            api_topicList:"{:createUrl('cuscom/index')}",//专题页面链接
+            api_pageChild:"{:createUrl('widget/tagPageChild')}",//普通页面链接
+            api_pageSorts: "{:createUrl('widget/tagPages')}",//前端页面分类
+            api_tagSorts: "{:createUrl('widget/tagSorts')}",//资源分类
+            api_tagSpread: "{:createUrl('widget/tagSpread')}",//资源列表
+            api_getArticle: "{:createUrl('widget/tagNotice')}",//文章列表
+            api_getArticleSort: "{:createUrl('widget/tagNoticeSort')}",//文章分类
+            query1: {
+                page: 1,
+                limit: 10,
+                total: 0,
+            },
+            query2: {
+                page: 1,
+                limit: 10,
+                total: 0,
+            },
+            query3: {
+                page: 1,
+                limit: 10,
+                total: 0,
+            },
+            query4: {
+                page: 1,
+                limit: 10,
+                total: 0,
+            },
+            query5: {
+                page: 1,
+                limit: 10,
+                total: 0,
+            }
+        },
+        created:function (){
+            this.getPageList();
+            this.getChildPages(26);
+        },
+        methods: {
+            getThemeList(){
+                let self=this;
+                $.get(self.api_topicList,{filter: '{"layout":2}',page:self.query5.page,limit:self.query5.limit},function(res){
+                    if (res.status===200) {
+                        self.topicList=res.data;
+                        self.query5.total=res.total;
+                        self.topicList.forEach(item=>{
+                            item.url=`/custom/subject/index?id=${item.id}`
+                        });
+                    }else{
+                        self.$message.error(res.msg);
+                    }
+                },'json');
+            },
+            selectLink(item){
+                let self = this;
+                self.selectPageId=item.id;
+                $('#pageLinkVal').val(item.path);
+            },
+            //获取普通页面
+            getChildPages(pid){
+                let self = this;
+                $.get(self.api_pageChild,{id:pid}, function (res) {
+                    if (res.status === 200) {
+                        self.pageList=res.data;
+                    }else{
+                        console.log(res.msg);
+                    }
+                });
+            },
+            handleNodeClick(node, e){
+                let self = this;
+                self.activeIndex=node.id;
+                self.topicList=null;//专题页面连接
+                self.sortList=null;//资源分类
+                self.spreadList=null;//资源列表
+                self.articleSort=null;//文章分类
+                self.articleList=null;//文章列表
+                switch (self.activeIndex) {
+                    case 26://页面链接
+                        self.getChildPages(self.activeIndex);
+                        break;
+                    case 27://专题页
+                        self.getThemeList();
+                        break;
+                    case 29://资源分类
+                        self.getSpreadSort();
+                        break;
+                    case 30://课程资源
+                        self.getSpreadList();
+                        break;
+                    case 32://文章分类
+                        self.getArticleSort();
+                        break;
+                    case 33://文章列表
+                        self.getArticleList();
+                        break;
+                }
+            },
+            //获取页面分类
+            getPageList(){
+                let self = this;
+                $.get(self.api_pageSorts, {}, function (res) {
+                    if (res.status === 200) {
+                        self.pageSort=res.data;
+                    }else{
+                        console.log(res.msg);
+                    }
+                });
+            },
+            // 获取资源分类
+            getSpreadSort() {
+                let self = this;
+                $.get(self.api_tagSorts, {}, function (res) {
+                    if (res.status === 200) {
+                        self.query1.total = res.total;
+                        self.sortList = res.data;
+                        self.sortList.forEach(item=>{
+                            item.url=`/pages/resource/index?id=${item.id}`
+                        });
+                    }
+                });
+            },
+            //专题
+            handleTopicChange(val){
+                this.query5.page = val;
+                this.getThemeList();
+            },
+            // 获取资源列表
+            getSpreadList() {
+                let self = this;
+                $.get(self.api_tagSpread, { page: self.query2.page, limit: self.query2.limit }, function (res) {
+                    if (res.status === 200) {
+                        self.spreadList = res.data;
+                        self.query2.total = res.total;
+                        self.spreadList.forEach((item)=>{
+                            if(item.type===1){
+                                item.url=`/pages/resource/resource?id=${item.id}`
+                            }else if(item.type===2){
+                                item.url=`/pages/resource/video?id=${item.id}`
+                            }
+                            else if(item.type===3){
+                                item.url=`/pages/resource/normal?id=${item.id}`
+                            }
+                            else if(item.type===4){
+                                item.url=`/pages/resource/coursevideo?id=${item.id}`
+                            }
+                            else if(item.type===5){
+                                item.url=`/pages/resource/courseaudio?id=${item.id}`
+                            }
+                            else if(item.type===6){
+                                item.url=`/pages/resource/cdkey?id=${item.id}`
+                            }
+                        })
+                    }
+                })
+            },
+            handleSpreadChange(val) {
+                this.query2.page = val;
+                this.getSpreadList();
+            },
+            //文章分类
+            getArticleSort() {
+                let self = this;
+                $.post(self.api_getArticleSort, {page: self.query3.page, limit: self.query3.limit}, function (res) {
+                    if (res.status === 200) {
+                        self.articleSort = res.data;
+                        self.query3.total = res.total;
+                        self.articleSort.forEach((item)=>{
+                            item.url=`/pages/article/list?sort_id=${item.id}`
+                        });
+                    }
+                })
+            },
+            handleArticleSort(val) {
+                this.query3.page = val;
+                this.getArticleSort();
+            },
+            //文章列表
+            getArticleList() {
+                let self = this;
+                $.get(self.api_getArticle, {page: self.query4.page, limit: self.query4.limit}, function (res) {
+                    if (res.status === 200) {
+                        self.articleList = res.data;
+                        self.query4.total = res.total;
+                        self.articleList.forEach((item)=>{
+                            item.url=`/pages/article/show?id=${item.id}`
+                        });
+                    }
+                })
+            },
+            handleArticle(val) {
+                this.query4.page = val;
+                this.getArticleList();
+            },
+            // 单选
+            singleElection(row) {
+                this.selectPageId = row.id;
+                $('#pageLinkVal').val(row.url);
+            },
+        },
+    })
+</script>
+<style lang="scss">
+    html{
+        background-color:#fff;
+    }
+    .el-container{
+        display: flex;
+        justify-content: space-between;
+    }
+    .el-aside {
+        width: 200px !important;
+    }
+    .el-aside .el-tree {
+        padding:10px 15px;
+        font-size: 14px;
+    }
+    .el-tree .el-tree-node__content{
+        height:36px;
+    }
+    .el-tree--highlight-current .el-tree-node>.el-tree-node__content {
+        background-color:inherit;
+    }
+    .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+        background-color:inherit;
+        color:#0f7ae5;
+    }
+    .el-main {
+        width: calc(100% - 210px);
+        border-left: #eee 1px solid;
+        height: 100vh;
+        background-color: #fff;
+        padding: 10px;
+    }
+    .el-main .cell.el-tooltip{
+        position: relative;
+    }
+    .el-main .el-table [class*="el-table__row--level"] .el-table__expand-icon {
+        margin-left:-6px;
+        margin-right: 0;
+    }
+    .el-table [class*="el-table__row--level"] .el-table__expand-icon .el-icon-arrow-right:before{
+        font-weight: 700;
+    }
+    .pagelist{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .pagelist .item{
+        width:20%;
+        padding:8px 0;
+        background-color:#f8f8f8;
+        color:#4c4c4c;
+        font-size:12px;
+        margin:5px 10px 5px 0;
+        text-align: center;
+        border-radius:5px;
+        cursor: pointer;
+    }
+    .pagelist .on{
+        background-color:#0f7ae5;
+        color:#fff;
+    }
+    .pagelist .on:hover{
+        background-color:#0f7ae5;
+    }
+    .pagelist .item:hover{
+        background-color:#eee;
+    }
+    .el-radio-button__inner {
+        font-size: 13px;
+        margin-right: 15px;
+        margin-bottom: 18px;
+        padding: 7px 30px;
+        background: #eee;
+        border: none;
+        color: #333;
+        border-radius: 4px;
+    }
+
+    .el-radio-button__orig-radio:checked+.el-radio-button__inner {
+        font-size: 13px;
+        outline: none;
+        box-shadow: none;
+        background: #66b1ff;
+        border-color: #66b1ff;
+        color: #FFF;
+        padding: 7px 30px;
+    }
+    .el-radio .el-radio__label{
+        display: none;
+    }
+    /deep/ .el-radio__original {
+        display: none !important;
+    }
+
+    /deep/.el-radio:focus:not(.is-focus):not(:active):not(.is-disabled)
+    .el-radio__inner {
+        box-shadow: none !important;
+    }
+    .el-pagination {
+        margin-top: 20px;
+    }
+</style>

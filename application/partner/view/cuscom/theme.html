@@ -1,0 +1,903 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/css/style.css?v3.1.3">
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/js/sortable.min.js"></script>
+<script src="__STATIC__/admin/custom/js/vuedraggable.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<script>
+    //默认底部导航组
+    var tarbar_path = '{:request()->domain()}__STATIC__/common/images/tabbar/';
+    var linkType = {$link_type|raw};//跳转类型
+    var pageCode = "{$page_code}";//页面编码
+    var pageTitle= "{$page_title}";//页面名称
+    var pageLayout={$layout};//页面类型
+    var pageConfig = {$page_config|raw};//页面默认数据
+    var catList = {$sortList|raw};//分类数据
+    var topSortList = {$topSortList|raw};//资源分类
+    var articleSortList = {$articleSortList|raw};//文章分类数据
+    var manage_Image = "{:createUrl('Ueditor/index')}";
+    var upload_Image = "{:createUrl('UpFiles/upload')}";
+    var upload_manage ="{:createUrl('attachment/index')}";
+    var default_banner = "__STATIC__/admin/custom/images/empty-banner.png";
+    var default_img = "__STATIC__/admin/custom/images/empty.png";
+    var saveUrl = "{:createUrl('saveTheme')}";
+    var api_ResourceList = "{:createUrl('widget/getResourceList')}";
+    var api_ResourceSort = "{:createUrl('widget/getResourceSort')}";
+    var api_getArticle = "{:createUrl('widget/getArticle')}";
+    var api_getPages = "{:createUrl('widget/getPages')}";
+    var api_getArticleSort = "{:createUrl('widget/getArticleSort')}";
+    var api_tagNotice = "{:createUrl('widget/tagNotice')}";
+    var api_tagSpread = "{:createUrl('widget/tagSpread')}";
+    var api_tagSorts = "{:createUrl('widget/tagSorts')}";
+    var imgWindowArr = [
+        "__STATIC__/admin/custom/images/image-one-column.png",
+        "__STATIC__/admin/custom/images/image-three-column.png",
+        "__STATIC__/admin/custom/images/image-four-column.png",
+        "__STATIC__/admin/custom/images/image-one-left.png"
+    ]
+</script>
+<div id="app">
+    <home ref="homeLayout"></home>
+    <textarea id="edit_cover" style="display: none;"></textarea>
+</div>
+<template id="home">
+    <div class="home">
+        <div class="savePageBtn" style="background-color:#fff;display: flex;align-items: center;justify-content: space-between;">
+            <el-button type="primary" size="mini" plain="true" @click="goToBack">返回</el-button>
+            <div class="custom-tip">1.设计完成后点击"保存页面"，在前端端页面下拉刷新即可看到效果。</div>
+            <button class="layui-btn layui-btn-normal layui-btn-md" @click="savePage">保存页面</button>
+        </div>
+        <div class="form-edit-wrapper">
+            <div class="nav-aside">
+                <div class="components-wrap">
+                    <div class="components-title">
+                        <div class="text">组件库</div>
+                    </div>
+                    <div class="recycle">
+                        <draggable element="ul" :options="{
+							group: 'widget',ghostClass: 'ghost',filter:'.recycle-content',}">
+                            <div class="recycle-content">
+                                <p>
+                                    <i class="icon icon-delete"></i>
+                                </p>
+                                <p class="text">垃圾桶</p>
+                            </div>
+                        </draggable>
+                    </div>
+
+                    <div class="components-list">
+                        <div class="component-item">
+                            <div class="component-item-title">媒体组件</div>
+                            <draggable element="ul" :list="mediaComponents"
+                                       :options="{group: { name: 'widget', pull: 'clone', put: false },sort: false,ghostClass: 'ghost',animation: 150}">
+                                <li class="component-item-li" v-for="(item, index) in mediaComponents" :key="index"
+                                    @click="selectWidget(item.type)">
+                                    <p>
+                                        <i class="icon " :class="item.icon"></i>
+                                    </p>
+                                    <p class="text">{{ item.name }}</p>
+                                </li>
+                            </draggable>
+                            <div class="component-item-title">资源组件</div>
+                            <draggable element="ul" :list="storeComponents"
+                                       :options="{group: { name: 'widget', pull: 'clone', put: false },sort: false,ghostClass: 'ghost',animation: 150}">
+                                <li class="component-item-li" v-for="(item, index) in storeComponents" :key="index"
+                                    @click="selectWidget(item.type)">
+                                    <p>
+                                        <i class="icon " :class="item.icon"></i>
+                                    </p>
+                                    <p class="text">{{ item.name }}</p>
+                                </li>
+                            </draggable>
+                            <div class="component-item-title">工具组件</div>
+                            <draggable element="ul" :list="utilsComponents"
+                                       :options="{group: { name: 'widget', pull: 'clone', put: false },sort: false,ghostClass: 'ghost',animation: 150}">
+                                <li class="component-item-li" v-for="(item, index) in utilsComponents" :key="index"
+                                    @click="selectWidget(item.type)">
+                                    <p>
+                                        <i class="icon " :class="item.icon"></i>
+                                    </p>
+                                    <p class="text">{{ item.name }}</p>
+                                </li>
+                            </draggable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="center-container">
+
+                <div class="model-title active" @click="handlePage">
+                    <img src="__STATIC__/admin/custom/images/model-title.png">
+                    <span class="page-title">{{pageTitle}}</span>
+                </div>
+                <Layout ref="layout"></Layout>
+            </div>
+
+            <div class="edit-body">
+                <layout-config ref="LayoutConfig"></layout-config>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="layout">
+    <div class="layout-container">
+        <draggable v-model="pageData" :options="{group: { name: 'widget'},sort: true,ghostClass: 'ghost',dragClass:'dragItem',filter:'.lay-record',scroll: true,scrollSensitivity:100,scrollSpeed:1000,animation: 100}" @add="handleWidgetAdd" class="layout-list" :class="{ 'widget-empty': pageData.length === 0 }" @update="datadragEnd" @remove="handleDragRemove">
+            <template v-for="(item, index) in pageData">
+                <div class="layout-main" :key="item.key" :class="{active: selectWg.key === item.key,npr:item.type=='record'}" @click="handleSelectWidget(index)">
+                    <!-- 搜索框 -->
+                    <div v-if="item.type === 'search'" class="drag lay-item lay-search">
+                        <div class="lay-search-c">
+                            <input v-model="item.value.keywords" class="lay-search-input" :class="item.value.style"/>
+                            <i class="iconfont icon-sousuokuang"></i>
+                        </div>
+                    </div>
+                    <!-- 资源组 -->
+                    <div v-if="item.type === 'resource'" class="drag clearfix lay-goods" :class="item.value.display">
+                        <div class="goods-head">
+                            <div class="name">{{item.value.title}}</div>
+                            <div class="more" v-if="item.value.lookMore=='true'">更多></div>
+                        </div>
+                        <div class="goods-item" v-for="(spreads,key) in  item.value.list" :key="key" :class="'column'+item.value.column">
+                            <div class="goods-image">
+                                <img :src="spreads.thumb || default_banner" alt="">
+                            </div>
+                            <div class="goods-detail">
+                                <p class="goods-name twolist-hidden">
+                                    {{spreads.title||'此处显示资源名称'}}
+                                </p>
+                                <div class="goods-info">
+                                    <p class="goods-price">{{spreads.price||'99.00'}}</p>
+                                    <p class="goods-dprice">{{spreads.dis_price||'99.00'}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 图片轮播 -->
+                    <div v-if="item.type==='imgSlide'" class="drag lay-item lay-imgSlide">
+                        <el-carousel :interval="item.value.duration" arrow="never" :autoplay="false">
+                            <el-carousel-item v-for="(list,key) in item.value.list" :key="key">
+                                <img :src="list.image" alt="banner" style="width:100%;height:100%">
+                            </el-carousel-item>
+                        </el-carousel>
+                    </div>
+                    <!-- 单图组 -->
+                    <div v-if="item.type==='imgSingle'" class="drag lay-imgSingle">
+                        <div class="img-wrap" v-for="(img,key) in item.value.list" :key="key">
+                            <img :src="img.image" alt="">
+                            <div class="img-btn" :style="{backgroundColor:img.buttonColor,color:img.textColor}"
+                                 v-show="img.buttonShow">{{img.buttonText}}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 图片橱窗 -->
+                    <div v-if="item.type==='imgWindow'" class="drag lay-imgWindow clearfix" :class="'row'+item.value.style" :style="{}">
+                        <template v-if="item.value.style==0">
+                            <div class="display">
+                                <div class="display-left" v-if="item.value.list.length>0"
+                                     :style="{padding:item.value.margin+'px'}">
+                                    <img :src="item.value.list[0].image" alt="">
+                                </div>
+                                <div class="display-right">
+                                    <div class="display-right1" v-if="item.value.list.length>1"
+                                         :style="{padding:item.value.margin+'px'}">
+                                        <img :src="item.value.list[1].image" alt="">
+                                    </div>
+                                    <div class="display-right2">
+                                        <div class="left" v-if="item.value.list.length>2"
+                                             :style="{padding:item.value.margin+'px'}">
+                                            <img :src="item.value.list[2].image" alt="">
+                                        </div>
+                                        <div class="right" v-if="item.value.list.length>3"
+                                             :style="{padding:item.value.margin+'px'}">
+                                            <img :src="item.value.list[3].image" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="img-wrap" v-for="(img,key) in item.value.list" :key="key"
+                                 :style="{padding:item.value.margin+'px'}">
+                                <img :src="img.image" alt="">
+                            </div>
+                        </template>
+                    </div>
+                    <!-- 视频组 -->
+                    <div v-if="item.type==='video'" class="drag lay-item lay-video">
+                        <div class="video-wrap" v-for="(video,key) in item.value.list">
+                            <video :src="video.url" :poster="video.image" controls="controls" height="200px;"></video>
+                        </div>
+                    </div>
+                    <!-- 文章组 -->
+                    <div v-if="item.type==='article'" class="drag lay-article">
+                        <div class="article-wrap clearfix" v-for="(article,key) in item.value.list">
+                            <div class="article-left">
+                                <div class="article-left-title">
+                                    {{article.title||'此处显示文章标题'}}
+                                </div>
+                                <div class="article-left-ctime">
+                                    {{article.ctime}}
+                                </div>
+                            </div>
+                            <div class="article-img">
+                                <img :src="article.thumb||'__STATIC__/admin/custom/images/empty-banner.png'" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 文章列表 -->
+                    <div v-if="item.type==='articleList'" class="drag lay-article">
+                        <div class="article-wrap clearfix" v-for="(article,index) in item.value.list" :key="index">
+                            <div class="article-left">
+                                <div class="article-left-title">
+                                    {{article.title || '此处显示文章标题'}}
+                                </div>
+                                <div class="article-left-ctime">
+                                    <div class="views">
+                                        <i class="icon icon-liulan"></i>
+                                        <span class="name">{{article.views}}</span>
+                                    </div>
+                                    <div class="ctime">
+                                        <i class="icon icon-jixin2"></i>
+                                        <span class="name">{{article.ctime}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="article-img">
+                                <img :src="article.thumb || '__STATIC__/admin/custom/images/empty-banner.png'" alt="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 公告组 -->
+                    <div v-if="item.type==='notice'" class="drag lay-item lay-notice">
+                        <i class="icon icon-gonggao"></i>
+                        <div class="notice-right">
+                            <div v-for="(notice,key) in item.value.list" class="notice-text">{{notice.title}}</div>
+                        </div>
+                    </div>
+                    <!-- 导航组 -->
+                    <div v-if="item.type==='navBar'" class="drag lay-navBar clearfix" :class="'row'+item.value.limit">
+                        <div class="item" v-for="(nav,key) in item.value.list" :key="key">
+                            <div class="item-image">
+                                <img :src="nav.image" alt="" :class="'head-'+item.value.style">
+                            </div>
+                            <p class="item-text">{{nav.text}}</p>
+                        </div>
+                    </div>
+                    <!-- 辅助空白 -->
+                    <div v-if="item.type==='blank'" class="drag lay-item lay-blank"
+                         :style="{height:item.value.height+'px',backgroundColor:item.value.backgroundColor}">
+                    </div>
+                    <!-- 文本域 -->
+                    <div v-if="item.type==='textarea'" class="drag lay-item lay-textarea">
+                        <div class="lay-search-c">
+                            <el-input type="textarea" autosize v-html="item.value" resize="none"></el-input>
+                        </div>
+                    </div>
+                    <!--资源分类-->
+                    <div v-if="item.type==='resourceSort'" class="drag lay-navBar lay-goods clearfix"
+                         :class="'row'+item.value.limit">
+                        <div class="goods-head" v-if="item.value.is_title==='true'">
+                            <div class="name">{{item.value.title}}</div>
+                            <div class="more" v-if="item.value.lookMore==='true'">更多></div>
+                        </div>
+                        <div class="goods-item">
+                            <div class="item" v-for="(sorts,key) in item.value.list" :key="key">
+                                <div class="item-image">
+                                    <img :src="sorts.thumb || default_img" :class="'head-'+item.value.style">
+                                </div>
+                                <p class="item-text">{{sorts.name}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--底部tabbar导航组--->
+                    <div v-if="item.type==='tabbar'" class="drag lay-tabbar clearfix">
+                        <div class="nav-item" v-for="(menus,key) in item.value.list" :key="key">
+                            <div class="nav-ico">
+                                <img :src="menus.image" width="32px" height="32px">
+                            </div>
+                            <div class="nav-name">{{menus.text}}</div>
+                        </div>
+                    </div>
+                    <div @click.stop="handleWidgetDelete(index)" class="btn-delete" v-if="selectWg.key === item.key">
+                        删除
+                    </div>
+                    <div @click.stop="handleWidgetClone(index)" class="btn-clone" v-if="selectWg.key === item.key">复制
+                    </div>
+                </div>
+            </template>
+        </draggable>
+    </div>
+</template>
+<template id="layout-config">
+    <template v-if="showWidget">
+        <div v-if="selectWg&& Object.keys(selectWg).length > 0">
+            <div class="custom-item main-body" id="editbody">
+                <el-form ref="form" label-width="100px" label-position="left">
+                    <div class="custom-item-t">
+                        <div class="custom-item-t-c">{{getSelectWgName(selectWg.type)}}</div>
+                    </div>
+                    <template v-if="selectWg.type=='search'">
+                        <el-form-item label="提示内容">
+                            <el-input v-model="selectWg.value.keywords" :placeholder="selectWg.placeholder"></el-input>
+                        </el-form-item>
+                        <el-form-item label="搜索框样式">
+                            <el-radio-group v-model="selectWg.value.style">
+                                <el-radio label="square">方形</el-radio>
+                                <el-radio label="radius">圆角</el-radio>
+                                <el-radio label="round">圆弧</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                    </template>
+                    <!-- 辅助空白 -->
+                    <template v-if="selectWg.type=='blank'">
+                        <el-form-item label="背景颜色">
+                            <el-color-picker v-model="selectWg.value.backgroundColor"></el-color-picker>
+                            <a class="reset-color" href="javascript:;" @click="resetColor">重置</a>
+                        </el-form-item>
+                        <el-form-item label="组件高度">
+                            <el-slider v-model="selectWg.value.height" :min="1" :max="200"></el-slider>
+                        </el-form-item>
+                    </template>
+                    <!-- 资源组 -->
+                    <template v-if="selectWg.type=='resource'">
+                        <div>
+                            <el-form-item label="资源来源">
+                                <el-radio-group v-model="selectWg.value.type" @change="changeGoodsType">
+                                    <el-radio label="auto">自动获取</el-radio>
+                                    <el-radio label="choose">手动选择</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <div v-show="selectWg.value.type=='auto'">
+                                <el-form-item label="资源分类">
+                                    <el-select v-model="selectWg.value.classifyId" placeholder="请选择分类">
+                                        <el-option :value="0" label="不限分类"></el-option>
+                                        <template v-for="item in catList">
+                                            <el-option :value="item.id" :label="item.name"></el-option>
+                                            <template v-if="item.child">
+                                                <el-option v-for="second in item.child" :key="second.id"
+                                                           :label="second.name" :value="second.id" class="second">
+                                                </el-option>
+                                            </template>
+                                        </template>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="是否推荐">
+                                    <el-radio-group v-model="selectWg.value.is_top">
+                                        <el-radio label="1">推荐</el-radio>
+                                        <el-radio label="0">不推荐</el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <el-form-item label="显示数量">
+                                    <input type="number" v-model.number="selectWg.value.limit" :min="1"
+                                           class="number-input">
+                                </el-form-item>
+                            </div>
+                            <div v-show="selectWg.value.type=='choose'">
+                                <div class="select_seller_goods_box">
+                                    <input type="hidden" name="params[goods_id]" value="">
+                                    <ul id="selectGoods" class="sellect_seller_goods_list clearfix">
+                                        <draggable element="ul" :list="selectWg.value.list"
+                                                   :options="{group:{ name:'selectGoodsList'}, ghostClass: 'ghost',animation: 150}">
+                                            <li v-for="(spread,key) in selectWg.value.list" :key="key">
+                                                <i class="icon icon-close"
+                                                   style="position: absolute;right:-5px;top:-5px;z-index:99;"
+                                                   @click="handleDeleteGoods(key)"></i>
+                                                <img :src="spread.thumb || default_banner" alt="">
+                                            </li>
+                                        </draggable>
+                                    </ul>
+                                    <div class="addImg" @click="selectGoods">
+                                        <i class="icon icon-add1"></i>
+                                        <span>选择商品</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="divider"/>
+                            <el-form-item label="显示类型">
+                                <el-radio-group v-model="selectWg.value.display">
+                                    <el-radio label="list">列表平铺</el-radio>
+                                    <el-radio label="slide" :disabled="selectWg.value.column==1">横向滚动</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="分列数量">
+                                <el-radio-group v-model="selectWg.value.column">
+                                    <el-radio label="1" :disabled="selectWg.value.display=='slide'">单列</el-radio>
+                                    <el-radio label="2">两列</el-radio>
+                                    <el-radio label="3">三列</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="资源组名称">
+                                <input type="text" v-model="selectWg.value.title" class="selectLinkVal">
+                            </el-form-item>
+                            <el-form-item label="是否查看更多">
+                                <el-radio-group v-model="selectWg.value.lookMore" @change="changeSMore">
+                                    <el-radio label="true">是</el-radio>
+                                    <el-radio label="false">否</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <div class="pl25">
+                                <p class="layout-tip">资源数据请到 推广管理 - <a href="javascript:;" lay-href="{:createUrl('spread/index')}">推广列表</a> 中管理
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- 文章组 -->
+                    <template v-if="selectWg.type=='article'">
+                        <div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">添加文章：</label>
+                                <div class="layui-input-inline seller-inline-5">
+                                    <input type="text" v-model="selectWg.value.list[0].title" placeholder="请选择文章"
+                                           readonly="readonly"
+                                           class="layui-input" @click="article_list">
+                                </div>
+                            </div>
+                            <div class="pl25">
+                                <p class="layout-tip">文章数据请到 网站功能 - <a href="javascript:;"
+                                                                       lay-href="{:createUrl('article/index')}">文章列表</a> 中管理
+                                </p>
+                            </div>
+
+                        </div>
+                    </template>
+                    <!-- 文章分类 -->
+                    <template v-if="selectWg.type=='articleList'">
+                        <div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">文章分类：</label>
+                                <div class="layui-input-inline seller-inline-5">
+                                    <el-select v-model="selectWg.value.articleSortId" placeholder="请选择分类">
+                                        <template v-for="item in articleSortList">
+                                            <el-option :value="item.id" :label="item.name"></el-option>
+                                        </template>
+                                    </el-select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">显示数量：</label>
+                                <div class="layui-input-inline seller-inline-5">
+                                    <input type="number" v-model.number="selectWg.value.limit" :min="1" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="pl25">
+                                <p class="layout-tip">文章数据请到 网站功能 - <a href="javascript:;"
+                                                                       lay-href="{:createUrl('article/index')}">文章列表</a> 中管理
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                    <!-- 视频组 -->
+                    <template v-if="selectWg.type=='video'">
+                        <el-form-item label="自动播放">
+                            <el-switch v-model="selectWg.value.autoplay" active-value="true" inactive-value="false"
+                                       active-color="#13ce66" inactive-color="#ff4949">
+                            </el-switch>
+                        </el-form-item>
+                        <li v-for="(item, index) in selectWg.value.list" :key="index">
+                            <div class="content">
+                                <div class="content-item">
+                                    <span class="item-label">视频封面:</span>
+                                    <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                                </div>
+                                <div class="content-item">
+                                    <span class="item-label">视频地址：</span>
+                                    <el-input size="mini" placeholder="请输入视频地址" v-model="item.url"></el-input>
+                                </div>
+                            </div>
+                        </li>
+
+                    </template>
+                    <!-- 轮播图 -->
+                    <template v-if="selectWg.type=='imgSlide'">
+                        <div>
+                            <div class="content-item">
+                                <span class="item-label">切换时间：</span>
+                                <div class="number-content ml20">
+                                    <input type="number" :step="500" v-model.number="selectWg.value.duration" :min="0"
+                                           class="number-input">
+                                    <p class="layout-tip">轮播图自动切换的间隔时间，单位：毫秒</p>
+                                </div>
+                            </div>
+                            <draggable element="ul" :list="selectWg.value.list"
+                                       :options="{group:{ name:'slideList'}, ghostClass: 'ghost',animation: 150,handle:'.drag-block'}">
+                                <li v-for="(item, index) in selectWg.value.list" :key="index">
+                                    <div class="drag-block">
+                                        <div class="handle-icon" title="删除这一项">
+                                            <i class="icon icon-close" @click="handleSlideRemove(index)"></i>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="content-item">
+                                            <el-form-item label="图片：">
+                                                <upload-img @upload-img="upImage(index,item)" :index="index"
+                                                            :item="item"></upload-img>
+
+                                            </el-form-item>
+
+                                        </div>
+                                        <select-link @choose-link="chooseLink(index,item.linkType)" :index="index"
+                                                     :type.sync="item.linkType"
+                                                     :id.sync="item.linkValue"></select-link>
+                                    </div>
+                                </li>
+                            </draggable>
+                            <div class="addImg" @click="handleAddSlide">
+                                <i class="icon icon-add1"></i>
+                                <span>添加一个图片</span>
+                            </div>
+                        </div>
+                    </template>
+                    <!-- 单图组 -->
+                    <template v-if="selectWg.type=='imgSingle'">
+                        <li v-for="(item, index) in selectWg.value.list" :key="index">
+                            <div class="content">
+                                <div class="content-item">
+                                    <span class="item-label">图片:</span>
+                                    <upload-img @upload-img="upImage(index,item)" :index="index" :item="item"></upload-img>
+                                </div>
+                                <select-link @choose-link="chooseLink(index,item.linkType)" :index="index"
+                                             :type.sync="item.linkType"
+                                             :id.sync="item.linkValue"></select-link>
+                                <div class="content-item">
+                                    <el-form-item label="添加按钮：">
+                                        <el-switch v-model="item.buttonShow" active-color="#13ce66">
+                                        </el-switch>
+                                    </el-form-item>
+                                </div>
+                                <div class="content-item" v-show="item.buttonShow">
+                                    <el-form-item label="按钮颜色：">
+                                        <el-color-picker v-model="item.buttonColor"></el-color-picker>
+                                    </el-form-item>
+                                </div>
+                                <div class="content-item" v-show="item.buttonShow">
+                                    <el-form-item label="按钮文字：">
+                                        <input type="text" class="selectLinkVal" v-model="item.buttonText">
+                                    </el-form-item>
+                                </div>
+                                <div class="content-item" v-show="item.buttonShow">
+                                    <el-form-item label="文字颜色：">
+                                        <el-color-picker v-model="item.textColor"></el-color-picker>
+                                    </el-form-item>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                    <!-- 图片橱窗 -->
+                    <template v-if="selectWg.type=='imgWindow'">
+                        <div>
+                            <div class="content-item">
+                                <span class="item-label">布局方式:</span>
+                                <div class="tpl-block">
+                                    <div class="tpl-item" v-for="(item,i) in imgWindowStyle" :key="i"
+                                         @click="slectTplStyle(item)"
+                                         :class="{active:selectWg.value.style==item.value}">
+                                        <div class="tpl-item-image">
+                                            <img :src="item.image" alt="">
+                                        </div>
+                                        <div class="tpl-item-text">
+                                            {{item.title}}
+                                        </div>
+                                    </div>
+                                    <p class="layout-tip">建议添加比例/尺寸一致的图片</p>
+                                </div>
+                            </div>
+                            <div class="content-item">
+                                <el-form-item label="图片间距：">
+                                    <el-slider v-model="selectWg.value.margin" :min="0" :max="30"></el-slider>
+                                </el-form-item>
+                                <span style="display:inline-block;height:30px;line-height:30px;font-size:12px;margin-left:10px;">{{selectWg.value.margin}}px</span>
+                            </div>
+                            <draggable element="ul" :list="selectWg.value.list"
+                                       :options="{group:{ name:'slideList'}, ghostClass: 'ghost',animation: 150,handle:'.drag-block'}">
+                                <li v-for="(item, index) in selectWg.value.list" :key="index">
+                                    <div class="drag-block">
+                                        <div class="handle-icon" title="删除这一项">
+                                            <i class="icon icon-delete" @click="handleSlideRemove(index)"></i>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="content-item">
+                                            <el-form-item label="图片：">
+                                                <upload-img @upload-img="upImage(index,item)" :index="index"
+                                                            :item="item"></upload-img>
+                                            </el-form-item>
+                                        </div>
+                                        <select-link @choose-link="chooseLink(index,item.linkType)" :index="index"
+                                                     :type.sync="item.linkType" :id.sync="item.linkValue"></select-link>
+                                    </div>
+                                </li>
+                            </draggable>
+                            <div class="addImg" @click="handleAddSlide">
+                                <i class="icon icon-add1"></i>
+                                <span>添加一个图片</span>
+                            </div>
+                        </div>
+                    </template>
+                    <!-- 公告 -->
+                    <template v-if="selectWg.type=='notice'">
+                        <el-form-item label="公告获取">
+                            <el-radio-group v-model="selectWg.value.type">
+                                <el-radio label="auto">自动获取</el-radio>
+                                <el-radio label="choose">手动选择</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="是否弹窗">
+                            <el-radio-group v-model="selectWg.value.pope">
+                                <el-radio label="yes">弹窗</el-radio>
+                                <el-radio label="no">不弹窗</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <div v-if="selectWg.value.type=='choose'">
+                            <div id="n15578855354_box" class="select_seller_notice_box">
+                                <input type="hidden" name="notice" id="n15578855354" value=""/>
+                                <ul id="n15578855354_list" class="sellect_seller_brands_list">
+                                    <draggable element="ul" :list="selectWg.value.list"
+                                               :options="{group:{ name:'noticeList'}, ghostClass: 'ghost',animation: 150}">
+                                        <li v-for="(notice,key) in selectWg.value.list" :key="key">
+                                            <span>
+                                                <i class="layui-icon layui-icon-close" @click="handleDeleteNotice(key)"></i>
+                                            </span>
+                                            {{notice.title}}
+                                        </li>
+                                    </draggable>
+                                </ul>
+                            </div>
+                            <div>
+                                <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs"
+                                   @click="selectNotice">
+                                    <i class="iconfont icon-choose1"></i>选择公告
+                                </a>
+                            </div>
+                        </div>
+                        <div class="pl25">
+                            <p class="layout-tip">
+                                公告数据请到 网站功能 -
+                                <a href="javascript:;" lay-href="{:createUrl('article/index')}">文章列表</a> 中管理
+                            </p>
+                        </div>
+                    </template>
+                    <!-- 导航组-->
+                    <template v-if="selectWg.type=='navBar'">
+                        <div>
+                            <el-form-item label="每行数量">
+                                <el-radio-group v-model="selectWg.value.limit">
+                                    <el-radio label="3">3个</el-radio>
+                                    <el-radio label="4">4个</el-radio>
+                                    <el-radio label="5">5个</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="图标样式">
+                                <el-radio-group v-model="selectWg.value.style" @change="changeStyle">
+                                    <el-radio label="square">方形</el-radio>
+                                    <el-radio label="radius">圆角</el-radio>
+                                    <el-radio label="round">圆弧</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <draggable element="ul" :list="selectWg.value.list"
+                                       :options="{group:{ name:'slideList'}, ghostClass: 'ghost',animation: 150,handle:'.drag-block'}">
+                                <li v-for="(item, index) in selectWg.value.list" :key="index">
+                                    <div class="drag-block">
+                                        <div class="handle-icon" title="删除这一项">
+                                            <i class="icon icon-delete" @click="handleSlideRemove(index)"></i>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="content-item">
+                                            <el-form-item label="图片：">
+                                                <upload-img @upload-img="upImage(index,item)" :index="index"
+                                                            :item="item"></upload-img>
+                                            </el-form-item>
+                                        </div>
+                                        <div class="content-item">
+                                            <el-form-item label="按钮文字：">
+                                                <input type="text" class="selectLinkVal" v-model="item.text">
+
+                                            </el-form-item>
+                                        </div>
+                                        <select-link @choose-link="chooseLink(index,item.linkType)" :index="index"
+                                                     :type.sync="item.linkType" :id.sync="item.linkValue"></select-link>
+                                    </div>
+                                </li>
+                            </draggable>
+                            <div class="addImg" @click="handleAddNav">
+                                <i class="icon icon-add1"></i>
+                                <span>添加一个导航组</span>
+                            </div>
+                        </div>
+                    </template>
+                    <!-- 底部导航组-->
+                    <template v-if="selectWg.type=='tabbar'">
+                        <div>
+                            <draggable element="ul" :list="selectWg.value.list"
+                                       :options="{group:{ name:'slideList'}, ghostClass: 'ghost',animation: 150,handle:'.drag-block'}">
+                                <li v-for="(item, index) in selectWg.value.list" :key="index">
+                                    <div class="drag-block">
+                                        <div class="handle-icon" title="删除这一项">
+                                            <i class="icon icon-delete" @click="handleSlideRemove(index)"></i>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="content-item">
+                                            <el-form-item label="默认图标：">
+                                                <upload-img @upload-img="upImage(index,item,'image')" :index="index" tags="image" :item="item"></upload-img>
+                                            </el-form-item>
+                                        </div>
+                                        <div class="content-item">
+                                            <el-form-item label="选中图标：">
+                                                <upload-img @upload-img="upImage(index,item,'image_on')" :index="index" tags="image_on" :item="item"></upload-img>
+                                            </el-form-item>
+                                        </div>
+                                        <div class="content-item">
+                                            <el-form-item label="导航文字：">
+                                                <input type="text" class="selectLinkVal" v-model="item.text">
+
+                                            </el-form-item>
+                                        </div>
+                                        <select-link @choose-link="chooseLink(index,item.linkType)" :index="index"
+                                                     :type.sync="item.linkType" :id.sync="item.linkValue"></select-link>
+                                    </div>
+                                </li>
+                            </draggable>
+                            <div class="addImg" @click="handleAddNav">
+                                <i class="icon icon-add1"></i>
+                                <span>添加一个导航</span>
+                            </div>
+                        </div>
+                    </template>
+                    <!-- 文本域 -->
+                    <template v-if="selectWg.type=='textarea'">
+                        <div>
+                            <textarea id="container"></textarea>
+                        </div>
+                    </template>
+                    <!--资源分类-->
+                    <template v-if="selectWg.type=='resourceSort'">
+                        <div>
+                            <el-form-item label="显示标题栏">
+                                <el-radio-group v-model="selectWg.value.is_title" @change="changeNavTitle">
+                                    <el-radio label="true">显示</el-radio>
+                                    <el-radio label="false">不显示</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="标题名称">
+                                <input type="text" class="selectLinkVal" v-model="selectWg.value.title">
+                            </el-form-item>
+                            <el-form-item label="数据来源">
+                                <el-radio-group v-model="selectWg.value.type" @change="changeSort">
+                                    <el-radio label="auto">自动获取</el-radio>
+                                    <el-radio label="choose">手动选择</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <div v-show="selectWg.value.type=='auto'">
+                                <el-form-item label="显示数量">
+                                    <input type="number" v-model.number="selectWg.value.limit" :min="1" @change="inputLimit"
+                                           class="number-input">
+                                </el-form-item>
+                            </div>
+                            <div v-show="selectWg.value.type=='choose'">
+                                <div class="select_seller_goods_box">
+                                    <input type="hidden" name="params[sorts_id]" value="">
+                                    <ul id="selectSorts" class="sellect_sorts_list clearfix">
+                                        <draggable element="ul" :list="selectWg.value.List"
+                                                   :options="{group:{ name:'selectSortsList'}, ghostClass: 'ghost',animation: 150}">
+                                            <li v-for="(spread,key) in selectWg.value.list" :key="key">
+                                                <i class="icon icon-close"
+                                                   style="position: absolute;right:-5px;top:-5px;z-index:99;"
+                                                   @click="handleDeleteSorts(key)"></i>
+                                                <img :src="spread.thumb || default_img" alt="">
+                                                <span class="name">{{spread.name}}</span>
+                                            </li>
+                                        </draggable>
+                                    </ul>
+                                    <div class="addImg" @click="selectSorts">
+                                        <i class="icon icon-add1"></i>
+                                        <span>选择分类</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <el-form-item label="列表样式">
+                                <el-radio-group v-model="selectWg.value.style" @change="changeStyle">
+                                    <el-radio label="square">方形</el-radio>
+                                    <el-radio label="radius">圆角</el-radio>
+                                    <el-radio label="round">圆弧</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="显示更多">
+                                <el-radio-group v-model="selectWg.value.lookMore" @change="changeSMore">
+                                    <el-radio label="true">是</el-radio>
+                                    <el-radio label="false">否</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </div>
+                    </template>
+                </el-form>
+            </div>
+        </div>
+    </template>
+    <template v-else>
+        <div class="main-config">
+            <div class="custom-item main-body">
+                <el-form ref="formConfig" label-width="100px" label-position="left">
+                    <div class="custom-item-t">
+                        <div class="custom-item-t-c">页面设置</div>
+                    </div>
+                    <el-form-item label="模板名称">
+                        <el-input v-model="mainConfig.name" maxlength="15" placeholder="模板名称不超过15个字"></el-input>
+                    </el-form-item>
+                    <el-form-item label="模板编码">
+                        <el-input v-model="mainConfig.code" disabled="true" placeholder="请输入模板编码"></el-input>
+                    </el-form-item>
+
+                </el-form>
+            </div>
+        </div>
+    </template>
+</template>
+<template id="upload-img">
+    <div class="UploadImage">
+        <button type="button" class="layui-btn layui-btn-sm "  @click="uploadImg">上传图片</button>
+        <div class="layui-upload-list" v-if="tags">
+            <img class="layui-upload-img" :src="[tags=='image'?item.image:item.image_on]"
+                style="width:auto;max-width:200px;height:60px;">
+        </div>
+        <div class="layui-upload-list" v-else>
+            <img class="layui-upload-img" :src="item.image" style="width:auto;max-width:200px;height:60px;">
+        </div>
+    </div>
+</template>
+<template id="select-link">
+    <div>
+        <el-form-item label="链接类型：">
+            <el-select v-model="selectType" placeholder="请选择" @change="changeSelect">
+                <el-option v-for="(val,key,i) in linkType" :key="i" :label="val" :value="key">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="链接指向：">
+            <div v-if="selectType==1">
+                <el-input type="textarea" autosize placeholder="http开头为webview跳转，其他为站内页面跳转" v-model="linkUrl"
+                          @change="updateLinkValue"></el-input>
+            </div>
+            <div v-if="selectType==2">
+                <input type="text" v-model="id" class="selectLinkVal el-input__inner" :readonly="true" @click="selectLink" placeholder="请选择">
+            </div>
+            <div v-if="selectType==3">
+                <el-select v-model="id" placeholder="请选择分类" class="updateSelect" @change="updateSelect">
+                    <template v-for="item in catList">
+                        <el-option :value="item.id" :label="item.name"></el-option>
+                        <template v-if="item.child">
+                            <el-option v-for="second in item.child" :key="second.id" :label="second.name"
+                                       :value="second.id" class="second">
+                            </el-option>
+                        </template>
+                    </template>
+                </el-select>
+            </div>
+            <div v-if="selectType==4">
+                <input type="text" v-model="id" class="selectLinkVal el-input__inner" :readonly="true" @click="selectLink" placeholder="请选择">
+            </div>
+            <div v-if="selectType==5">
+                <el-select v-model="id" placeholder="请选择分类" class="updateSelect" @change="updateSelect">
+                    <template v-for="item in articleSortList">
+                        <el-option :value="''+item.id+''" :label="item.name"></el-option>
+                    </template>
+                </el-select>
+            </div>
+            <div v-if="selectType==6" style="position: relative;">
+                <input type="text" v-model="id" class="selectLinkVal el-input__inner" :readonly="true" placeholder="选择页面" @click="selectLink">
+                <span style="position: absolute;right:5px;top:2px;color:#9c9c9c;"><i class="icon icon-right"></i></span>
+            </div>
+            <div v-if="selectType==7">
+                <input type="text" class="selectLinkVal el-input__inner" placeholder="appid@小程序页面" v-model="linkUrl"
+                       @change="updateLinkValue">
+                <div style="font-size:11px;color:#9c9c9c;">小程序appid@小程序页面路径</div>
+            </div>
+        </el-form-item>
+    </div>
+</template>
+{include file="common/foot"/}
+<script src="__STATIC__/ueditor/ueditor.config.js?v=2.0.11"></script>
+<script src="__STATIC__/ueditor/ueditor.all.js?v=2.0.9"></script>
+<script src="__STATIC__/admin/custom/js/main.js?v=8.9.15"></script>

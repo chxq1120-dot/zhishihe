@@ -1,0 +1,132 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">权限规则</li>
+        </ul>
+        <div class="admin-btn">
+            <a href="{:createUrl('ruleadd')}" class="layui-btn layui-bg-blue layui-btn-small">
+                <i class="layui-icon layui-icon-addition"></i>
+                {:lang('add')}规则
+            </a>
+        </div>
+    </div>
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+<script type="text/html" id="auth">
+    {{# if(d.open==1){ }}
+        <span class="green_block">验证</span>
+    {{# }else{  }}
+        <span class="red_block">不验证</span>
+    {{# } }}
+</script>
+<script type="text/html" id="menu_type">
+    {{# if(d.is_menu==1){ }}
+        菜单
+    {{# }else{  }}
+        接口
+    {{# } }}
+</script>
+<script type="text/html" id="status">
+    <input type="checkbox" name="status" id="{{d.id}}" lay-filter="status" value="{{d.status}}" lay-skin="switch" lay-text="启用|禁用" {{ d.status==1 ? 'checked':'' }}>
+</script>
+<script type="text/html" id="order">
+    <input name="{{d.id}}" data-id="{{d.id}}" class="list_order layui-input" value="{{d.sort}}" size="10"/>
+</script>
+<script type="text/html" id="icon">
+    <span class="icon {{d.icon}}"></span>
+</script>
+<script type="text/html" id="action">
+    <a href="{:createUrl('ruleEdit')}?id={{d.id}}" class="layui-btn layui-btn-xs">
+        <i class="layui-icon layui-icon-edit"></i>
+        {:lang('edit')}
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i>
+        {:lang('del')}
+    </a>
+</script>
+{include file="common/foot"/}
+<script>
+    layui.config({
+        base:'/static/layuiadmin/mods/'
+    }).extend({
+        treeTable:'treeTable'
+    });
+    layui.use(['table','form','treeTable'],function(){
+        var table = layui.table, $ = layui.jquery,treeTable=layui.treeTable,form=layui.form;
+        var tableIn = treeTable.render({
+            elem: '#list',
+            url: '{:createUrl("adminrule")}',
+            method:'get',
+            tree:{
+                iconIndex:1,
+                isPidData:true,
+                idName:'id',
+                pidName:'pid',
+                openName: 'close',
+                getIcon: function (d) {
+                    return '';
+                }
+            },
+            cols: [[
+                {field: 'id', title: 'ID',align:'center',width:60},
+                {field: 'title', title: '权限名称', width: 280},
+                {field: 'icon', align: 'center',title: '{:lang("icon")}', width: 60,templet: '#icon'},
+                {field: 'href', title: '控制器/方法', width: 200},
+                {field: 'open',align: 'center', title: '是否验证', width: 100,toolbar: '#auth'},
+                {field: 'is_menu',align: 'center',title: '权限类型', width: 100,toolbar: '#menu_type'},
+                {field: 'status',align: 'center',title: '是否显示', width: 150,toolbar: '#status'},
+                {field: 'sort',align: 'center', title: '排序', width: 100, edit: 'text'},
+                {align: 'center', title: '操作',toolbar: '#action'}
+            ]]
+        });
+        treeTable.on('edit(list)', function (obj) { //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:createUrl('setUp')}", {ids: obj.data.id,params: '{"' + obj.field + '":"' + obj.value + '"}'}, function (res) {
+                layer.close(loading);
+                if (res.status === 200) {
+                    layer.msg('操作成功', {time: 1000, icon: 1});
+                } else {
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        });
+        treeTable.on('tool(list)', function(obj){
+            var data = obj.data;
+           if(obj.event === 'del'){
+                layer.confirm('您确定要删除该记录吗？', function(index){
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('ruleDel')}",{id:data.id},function(res){
+                        layer.close(loading);
+                        if(res.status==200){
+                            layer.msg(res.msg,{time:1000,icon:1});
+                            obj.del();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+        //启用禁用
+        form.on('switch(status)',function(data){
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            var status=data.elem.value==1 ? 0 : 1;
+            $.post('{:createUrl("setUp")}',{'ids':data.elem.id,'params':'{"status":"'+status+'"}'},function(res){
+                layer.close(loading);
+                if(res.status ===200){
+                    data.elem['value']=status;
+                    return false;
+                }else{
+                    layer.msg('操作失败！', {time: 1000, icon: 2});
+                    return false;
+                }
+            });
+        });
+    })
+</script>

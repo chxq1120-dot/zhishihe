@@ -1,0 +1,55 @@
+{include file="common/head"/}
+<style>
+    html,body{
+        background-color: #fff;
+    }
+    .layui-form-item{
+        margin-bottom:0;
+    }
+    .layui-form-item .layui-form-label{
+        color:#9c9c9c;
+    }
+    .layui-version{
+        font-size:12px;
+        padding-top:8px;
+        line-height: 20px;
+    }
+    .layui-version.name{
+        font-weight: bold;
+        font-size:14px;
+    }
+    .layui-version.desc{
+        line-height:200%;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <form class="layui-form layui-form-pane">
+            <div class="layui-form-item">
+                <label class="layui-form-label">版本名称</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-version name">{$row['versions']}</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发布时间</label>
+                <div class="layui-input-inline from-inline-5">
+                    <div class="layui-version">{$row['ptime_text']}</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">更新日志</label>
+                <div class="layui-input-inline from-inline-8">
+                    <div class="layui-version desc">{$row['content']|raw}</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">更新时间:</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-version">{$row['ctime']}</div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}

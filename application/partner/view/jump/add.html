@@ -1,0 +1,107 @@
+{include file="common/head"/}
+<body>
+	<div class="layui-fluid">
+		<div class="table-body">
+			<form class="layui-form layui-form-pane">
+			<div class="layui-form-item">
+				<label class="layui-form-label">跳转名称</label>
+				<div class="layui-input-inline from-inline-5">
+				  <input autocomplete="off" class="layui-input" lay-verify="required" lay-reqText="请输入跳转名称" placeholder="{:lang('pleaseEnter')}跳转名称" name="name" type="text">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">跳转简介</label>
+				<div class="layui-input-inline from-inline-5">
+				  <input autocomplete="off" class="layui-input" lay-verify="required" lay-reqText="请输入跳转简介" placeholder="{:lang('pleaseEnter')}跳转简介" name="desc" type="text">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">封面</label>
+				<div class="layui-input-inline from-inline-5">
+					<input  type="hidden" value="" id="thumb" lay-verify="required" lay-reqText="请上传封面" name="thumb">
+					<div class="layui-upload">
+						<div class="layui-upload-list" id="uploadImg" style="cursor: pointer;">
+							<img class="layui-upload-img" height="86" id="Image" src="__ADMIN__/images/default.png" width="86">
+							<p id="preview"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">跳转类型</label>
+				<div class="layui-input-block">
+					<input type="radio" lay-filter="type" name="type" title="外部链接" checked value="1">
+					<input type="radio" lay-filter="type" name="type" title="小程序" value="2">
+				</div>
+			</div>
+			<div class="layui-form-item" id="appid" style="display:none;">
+				<label class="layui-form-label">APPID</label>
+				<div class="layui-input-inline from-inline-5">
+				  <input autocomplete="off" class="layui-input" name="appid" type="text" placeholder="{:lang('pleaseEnter')}小程序APPID">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">链接地址</label>
+				<div class="layui-input-inline from-inline-5">
+				  <input autocomplete="off" class="layui-input" name="url" type="text" placeholder="{:lang('pleaseEnter')}链接地址">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">状态</label>
+				<div class="layui-input-block">
+					<input name="status" title="启用" type="radio" checked value="1">
+					<input name="status" title="禁用" type="radio" value="0">
+				</div>
+			</div>
+            <div class="layui-form-item" style="padding-top: 10px;">
+				<div class="layui-input-block">
+				  <button class="layui-btn" lay-filter="sub" lay-submit="" type="submit">立即提交</button>
+				  <button class="layui-btn layui-btn-primary" type="reset">重置</button>
+				</div>
+			</div>
+		</form>
+		</div>
+	</div>
+{include file="common/foot"/}   
+<script>
+layui.use(['element','form','upload','layedit','laydate'], function(){
+   var $ = layui.jquery,element = layui.element,form = layui.form,laydate=layui.laydate; //Tab的切换功能，切换事件监听等，需要依赖element模块
+   form.on('submit(sub)', function(data){
+		loading = layer.load(1, { shade: [0.1, '#fff'] });
+		$.post('',data.field,function(res) {
+			layer.close(loading);
+			if (res.status == 200){
+				layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+					parent.layer.close(index);//再执行关闭
+				});
+			} else {
+				layer.msg(res.msg, { icon: 2, time: 1000 });
+			}
+		});
+	  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+	$("#uploadImg").on('click',function(){
+		layer.open({
+			title:'上传封面',
+			type:2,
+			maxmin: true,
+			area:['80%','500px'],
+			content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image',
+		});
+	});
+	form.on('radio(type)', function(data){
+		if(data.value==1){
+			$("#appid").hide();
+		}else{
+			$("#appid").show();
+		}
+		form.render();
+	});
+	laydate.render({
+		elem: '#test1',
+		type: 'datetime'
+	});
+});
+</script>
+</body>

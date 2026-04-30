@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "wcce": "/components/wcce/wcce"
+  }
+}

@@ -1,0 +1,126 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">资源分类</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <input type="text" class="layui-input" placeholder="分类名称" id="search" style="width:200px;" />
+                    <span class="item-icon" id="onsearch"><i class="icon icon-search"></i></span>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn">
+                <a href="javascript:;" class="add layui-btn layui-bg-blue layui-btn-small">
+                    <i class="layui-icon layui-icon-addition"></i>
+                    {:lang('add')}分类
+                </a>
+            </div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm" lay-event="edit">
+        <i class="layui-icon layui-icon-edit"></i>{:lang('edit')}
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i>{:lang('del')}
+    </a>
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status==1){ }}
+    <span class="green">启用</span>
+    {{# }else{ }}
+    <span class="gray">禁用</span>
+    {{# } }}
+</script>
+<script>
+    layui.config({
+        base:'/static/layuiadmin/mods/'
+    }).extend({
+        treeTable:'treeTable'
+    });
+    var dateVal='',statusVal='',searchVal='',onlineVal='';
+    layui.use(['table','form','treeTable'],function(){
+        var table = layui.table, $ = layui.jquery,form=layui.form,treeTable=layui.treeTable;
+        var tableIn = treeTable.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("sort")}',
+            height: '550px',
+            method:'get',
+            tree:{
+                iconIndex:1,
+                isPidData:true,
+                idName:'id',
+                pidName:'pid'
+            },
+            cols: [[
+                {field: 'id',title: 'ID',align:'center'},
+                {field: 'name',title: '名称',align:'left',width:360},
+                {field: 'thumb',title: '图标',align:'center',templet:function(d){
+                   return '<a href="'+d.thumb+'" target="_blank"><img  src="'+d.thumb+'" width="32" height="32"/></a>';
+                }},
+                {field: 'indexid',title: '排序',align:'center'},
+                {field:'status',title: '状态',align:'center',templet:'#statusTpl'},
+                {field: 'ctime', align: 'center',title: '添加时间',width:180},
+                {align: 'center',toolbar:'#action',width:280}
+            ]]
+        });
+        //搜索关键字
+        $('#onsearch').on('click',function(e){
+            searchVal=$('#search').val();
+            treeTable.reload('list',{
+                where:{
+                    search:searchVal
+                }
+            });
+        });
+        //监听添加
+        $('#func-btn .add').on('click',function () {
+            layer.open({
+                title:'添加分类',
+                type:2,
+                maxmin: true,
+                content:'{:createUrl("addsort")}',
+                area:['90%','580px'],
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+        //行列表操作项事件
+        treeTable.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('你确定要删除吗？', {icon: 3}, function (index) {
+                    $.post("{:createUrl('delsort')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg('删除成功',{time:1000,icon:1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if(obj.event === 'edit'){
+                layer.open({
+                    title:'编辑分类',
+                    type:2,
+                    maxmin: true,
+                    content:'{:createUrl("editsort")}?ids='+data.id,
+                    area:['90%','580px'],
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }
+        });
+    })
+</script>

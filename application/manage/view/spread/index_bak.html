@@ -1,0 +1,1141 @@
+{include file="common/head"/}
+<style>
+    .layui-table, .layui-table-view{
+        margin:0 0 10px 0;
+    }
+    .layui-form-item{
+        margin-bottom:10px;
+    }
+    .layui-table-cell{height: inherit;}
+    .layui-btn-container .layui-btn{
+        margin-right:5px!important;
+        height:30px;
+        line-height:30px;
+    }
+    .layui-form-item .layui-inline{
+        margin-right:0;
+    }
+    .layui-card{
+        border:#ededed 1px solid;
+        border-radius:5px;
+        overflow: hidden;
+    }
+    .spread-tool{
+        padding:10px 0 5px 0;
+    }
+    .icon-mini{
+        color:#0bb20c;
+        font-size:18px;
+    }
+    .icon-h5{
+        color:#ff5600;
+        font-size:18px;
+    }
+    .icon-douyin{
+        color:#000;
+        font-size:18px;
+    }
+    .icon-ziyuan1{
+        color:#ff8a00;
+        font-size:18px;
+    }
+    .spread-button{
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding:20px 10px;
+        flex-wrap: wrap;
+    }
+    .spread-button .spread-item{
+        flex: 1;
+        margin:0 0 10px 0;
+        padding:0;
+        display: flex;
+        align-items: center;
+    }
+    .spread-button button{
+        background-color:#1E9FFF;
+        border-radius:3px;
+        padding:0 15px;
+        flex:1;
+        margin:0 5px;
+        height:36px;
+        line-height:36px;
+    }
+    .layui-card-header{
+        height:50px;
+        line-height:50px;
+        position: relative;
+    }
+    .layui-card-header .quick-button{
+        position: absolute;
+        right:10px;
+        top:20%;
+    }
+    .layui-card-header .update_code{
+        font-size:12px;
+        background-color:#f8f8f8;
+        color: #3c3c3c;
+        padding: 2px 15px;
+        border-radius:3px;
+        display: flex;
+        align-items: center;
+        height:30px;
+        line-height: 30px;
+        cursor: pointer;
+    }
+    .layui-card-header .update_code i{
+        color: #409EFF;
+    }
+    .layui-btn-group .layui-btn-primary:hover{
+        color:#409EFF;
+    }
+    .spread-btn-group{
+        display: flex;
+        align-items: center;
+    }
+    .spread-btn-item{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #f3f7fa;
+        border-radius:5px;
+        padding:10px 10px 10px 10px;
+        margin-right:4px;
+        line-height: normal;
+        cursor: pointer;
+        border: #d9e8f3 1px solid;
+        height:60px;
+        color:#409EFF;
+    }
+    .spread-btn-item .icon{
+        color:#409EFF;
+        font-size:22px;
+    }
+    .spread-btn-item .layui-icon{
+        color:#409EFF;
+        font-size:20px;
+    }
+    .spread-btn-item .name{
+        font-size:11px;
+        padding-top:4px;
+        color:#666;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">推广列表</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="spread-tool">
+            <div class="layui-row layui-col-space10">
+                {volist name="platform" id="list"}
+                    <div class="{$list['app_grid']}">
+                        <div class="layui-card">
+                            <div class="layui-card-header">
+                                <i class="icon {$list['app_icon']}"></i>
+                                {$list['app_desc']}
+                                {if $list['app_name'] == 'wechat'}
+                                    <div class="quick-button">
+                                        <a class="update_code">
+                                            <i class="icon icon-kuaijie"></i>
+                                            上传小程序代码
+                                        </a>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="layui-card-body spread-button">
+                                <div class="spread-item">
+                                    <button class="layui-btn spread_link" data-type="{$list['app_name']}">
+                                        <i class="layui-icon layui-icon-link"></i>
+                                        推广链接
+                                    </button>
+                                </div>
+                                {if $list['app_name'] !== 'pc'}
+                                <div class="spread-item">
+                                    <button class="layui-btn spread_poster" data-type="{$list['app_name']}">
+                                        <i class="layui-icon layui-icon-picture"></i>
+                                        推广海报
+                                    </button>
+                                </div>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                {/volist}
+            </div>
+        </div>
+        <div class="search-tool" style="padding-top:20px;position: relative;">
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <input type="text" class="layui-input" placeholder="检索日期" id="ondate" style="width:200px;">
+                         <span class="item-icon"><i class="layui-icon layui-icon-date"></i></span>
+                     </div>
+                    <div class="layui-inline" style="width: 100px;">
+                        <select id="onstatus" lay-filter="onstatus">
+                            <option value="">状态</option>
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline" style="width: 140px;">
+                        <select id="onsort" lay-filter="onsort" lay-search>
+                            <option value="">选择分类</option>
+                            {$sortSelect|raw}
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <input type="text" class="layui-input" placeholder="标题" id="search" style="width:200px;" />
+                        <span class="item-icon" id="onsearch"><i class="icon icon-search"></i></span>
+                    </div>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn">
+
+            </div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm" lay-event="edit" title="{:lang('edit')}">
+        <i class="layui-icon layui-icon-edit"></i>{:lang('edit')}
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del" title="{:lang('del')}">
+        <i class="layui-icon layui-icon-delete"></i>{:lang('del')}
+    </a>
+</script>
+<script type="text/html" id="spreadTpl">
+    <div class="spread-btn-group">
+        {volist name="platform" id="list"}
+            {if $list['app_name']!=='pc'}
+                <div class="spread-btn-item"  lay-event="{$list['app_name']}-poster" title="{$list['app_desc']}推广海报">
+                    <i class="icon icon-qrcode"></i>
+                    <span class="name">{$list["app_desc"]}</span>
+                </div>
+                <div class="spread-btn-item" lay-event="{$list['app_name']}-link" title="{$list['app_desc']}推广链接">
+                    <i class="layui-icon layui-icon-link"></i>
+                    <span class="name">{$list["app_desc"]}</span>
+                </div>
+            {/if}
+        {/volist}
+    </div>
+</script>
+<script type="text/html" id="statusTpl">
+    {{# if(d.status==1){ }}
+    <span class="green">启用</span>
+    {{# }else{ }}
+    <span class="gray">禁用</span>
+    {{# } }}
+</script>
+
+
+<script type="text/html" id="table-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="openAll"><i class="icon icon-qiyong"></i> 批量启用</button>
+        <button class="layui-btn layui-btn-sm layui-bg-orange" lay-event="closeAll"><i class="icon icon-jinyong"></i>
+            批量禁用
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delAll"><i
+                class="layui-icon layui-icon-delete"></i>批量删除
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="openTop"><i class="icon icon-qiyong"></i> 批量推荐</button>
+        <button class="layui-btn layui-btn-sm layui-bg-orange" lay-event="closeTop"><i class="icon icon-jinyong"></i> 取消推荐</button>
+        <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="openGroups"><i class="icon icon-qiyong"></i> 挂载社群</button>
+        <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="openJumps"><i class="icon icon-qiyong"></i> 挂载跳转</button>
+        <button class="layui-btn layui-btn-sm layui-bg-blue" id="moreMemu"><i class="icon icon-down"></i> 更多操作</button>
+    </div>
+</script>
+<script>
+    var dateVal='',statusVal='',searchVal='',sortVal='';
+    layui.use(['table', 'element', 'form', 'laydate','dropdown'], function () {
+        var table = layui.table, $ = layui.jquery, laydate = layui.laydate, form = layui.form,dropdown=layui.dropdown;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            toolbar: '#table-toolbar',
+            method: 'get',
+            page: true,
+            response: {
+                statusName: 'status',
+                statusCode: 200,
+                msgName: 'msg',
+                countName: 'total',
+                dataName: 'data',
+            },
+            cols: [[
+                {type: 'checkbox', title: 'ID', align: 'center', width: 50},
+                {field: 'id', title: 'ID', align: 'center', width: 70},
+                {
+                    field: 'thumb', title: '封面', align: 'center', width: 80, event: 'viewPhoto', templet: function (d) {
+                        return '<img  src="' + d.thumb + '" width="32" height="auto"/>';
+                    }
+                },
+                {field: 'title', title: '标题', width: 300, edit: true},
+                {field: 'spread', width: 340, title: '推广', align: 'center', templet: '#spreadTpl'},
+                {field: 'status', width: 70, title: '状态', align: 'center', templet: '#statusTpl'},
+                {field: 'price', title: '价格', align: 'center', width: 70, edit: true},
+                {field: 'dis_price', title: '原价', align: 'center', width: 70, edit: true},
+                {
+                    field: 'is_top', align: 'center', title: '推荐', width: 70, templet: function (d) {
+                        if (d.is_top === 1) {
+                            return '<span class="green_block">是</span>';
+                        } else {
+                            return '<span class="orange_block">否</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'svip', title: '会员专享', align: 'center', width:150, templet: function (d) {
+                        if (d.is_vip === -1) {
+                            return '<span class="orange_block">否</span>';
+                        } else if(d.is_vip === 0) {
+                            return '<span class="green_block">会员专享</span>';
+                        }else{
+                            return '<span class="blue_block">'+d.svip.name+'专享</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'exc_video', title: '开启激励', align: 'center', width: 80, templet: function (d) {
+                        if (d.exc_video === 1) {
+                            return '<span class="green_block">是</span>';
+                        } else {
+                            return '<span class="orange_block">否</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'invite', title: '开启邀请', align: 'center', width: 80, templet: function (d) {
+                        if (d.invite === 1) {
+                            return '<span class="green_block">是</span>';
+                        } else {
+                            return '<span class="orange_block">否</span>';
+                        }
+                    }
+                },
+
+                {field: 'invite_num', title: '邀请数', align: 'center', width: 70, edit: true},
+                {field: 'is_fenxiao',title:'是否分销',align:'center',width:80,templet:function(d){
+                    if(d.is_fenxiao===1){
+                        return '<span class="green_block">是</span>';
+                    }else{
+                        return '<span class="orange_block">否</span>';
+                    }
+                }},
+                {field: 'sales', title: '销量', align: 'center', width: 70, edit: true},
+                {field: 'try_see', align: 'center',title: '试看时间',width:80,edit:true},
+                {field: 'level', align: 'center', title: '资源等级', width: 80,templet:function(d){
+                    if(d.level){
+                        return d.level.name;
+                    }else{
+                        return ' - ';
+                    }
+                }},
+                {field: 'views', align: 'center', title: '浏览', width: 70},
+                {
+                    field: 'type', align: 'center', title: '资源类型', width: 80, templet: function (d) {
+                        if (d.type == 1) {
+                            return '网盘资源';
+                        } else if (d.type == 2) {
+                            return '视频资源';
+                        } else if (d.type == 3) {
+                            return '文章资源';
+                        } else if (d.type == 4) {
+                            return '视频课程';
+                        } else if (d.type == 5) {
+                            return '音频课程';
+                        } else if (d.type == 6) {
+                            return '卡密资源';
+                        }
+                    }
+                },
+                {field: 'ctime', align: 'center', title: '发布时间', width: 150},
+                {align: 'center', toolbar: '#action', width: 240}
+            ]],
+            done:function(res, curr, count){
+                dropdown.render({
+                    elem: '#moreMemu', //可绑定在任意元素中，此处以上述按钮为例
+                    data: [
+                        {
+                            title: '修改现价', id: 3,
+                        },
+                        {
+                            title: '修改原价', id: 4,
+                        },
+                        {
+                            title: '修改销量', id: 5,
+                        },
+                        {
+                            title: '试看时间', id: 7,
+                        },
+                        {
+                            title: '资源等级', id: 8,
+                        },
+                        {
+                            title: '会员专享', id: 9,
+                        },
+                        {type: '-'},
+                        {
+                            title: '资源分销', id: 6,
+                            //type: 'group',
+                            child:[
+                                {
+                                    title: '开启分销', id: 61,
+                                },
+                                {
+                                    title: '关闭分销', id: 62,
+                                },
+                                {
+                                    title: '分配方式', id: 63,
+                                },
+                            ],
+                        },
+                        {type: '-'},
+                        {
+                            title: '邀请任务', id: 1,
+                            //type: 'group',
+                            child:[
+                                {
+                                    title: '开启邀请', id: 11,
+                                },
+                                {
+                                    title: '关闭邀请', id: 12,
+                                },
+                                {
+                                    title: '邀请人数', id: 13,
+                                }
+                            ],
+                        },
+                        {
+                            title: '激励视频', id: 2,
+                            //type: 'group',
+                            child:[
+                                {
+                                    title: '开启激励', id: 21,
+                                },
+                                {
+                                    title: '关闭激励', id: 22,
+                                }
+                            ],
+                        },
+
+                    ],
+                    click: function(data, othis){
+                        var checkStatus = table.checkStatus('list');
+                        var ids = [];
+                        $(checkStatus.data).each(function (i, o){
+                            ids.push(o.id);
+                        });
+                        switch (data.id) {
+                            case 3://修改现价
+                                layer.open({
+                                    title:'修改现价',
+                                    type:2,
+                                    content:'{:createUrl("batchMoney")}?type=1&ids='+ids.join(','),
+                                    area:['50%','270px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 4://修改原价
+                                layer.open({
+                                    title:'修改原价',
+                                    type:2,
+                                    content:'{:createUrl("batchMoney")}?type=2&ids='+ids.join(','),
+                                    area:['50%','270px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 5://修改销量
+                                layer.open({
+                                    title:'修改销量',
+                                    type:2,
+                                    content:'{:createUrl("batchSales")}?ids='+ids.join(','),
+                                    area:['50%','270px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 7://试看时间
+                                layer.open({
+                                    title:'试看时间(视频资源有效)',
+                                    type:2,
+                                    content:'{:createUrl("batchTrysee")}?ids='+ids.join(','),
+                                    area:['50%','270px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 8://资源等级
+                                layer.open({
+                                    title:'资源等级',
+                                    type:2,
+                                    content:'{:createUrl("batchLevel")}?ids='+ids.join(','),
+                                    area:['50%','auto'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 9://会员专享
+                                layer.open({
+                                    title:'设置会员专享',
+                                    type:2,
+                                    content:'{:createUrl("batchSvip")}?ids='+ids.join(','),
+                                    area:['50%','300px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 11://开启邀请
+                                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                                $.post("{:createUrl('setUp')}",{ids:ids,params:'{"invite":1}'},function (res){
+                                    layer.close(loading);
+                                    if (res.status === 200){
+                                        layer.msg('操作成功', {time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    } else {
+                                        layer.msg(res.msg, {time: 1000, icon: 2});
+                                    }
+                                });
+                                break;
+                            case 12://关闭邀请
+                                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                                $.post("{:createUrl('setUp')}",{ids:ids,params:'{"invite":0}'},function (res){
+                                    layer.close(loading);
+                                    if (res.status === 200){
+                                        layer.msg('操作成功', {time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    } else {
+                                        layer.msg(res.msg, {time: 1000, icon: 2});
+                                    }
+                                });
+                                break;
+                            case 13://邀请人数
+                                layer.open({
+                                    title:'邀请人数',
+                                    type:2,
+                                    content:'{:createUrl("batchInvites")}?ids='+ids.join(','),
+                                    area:['50%','270px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                            case 21://开启激励
+                                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                                $.post("{:createUrl('setUp')}",{ids:ids,params:'{"exc_video":1}'},function (res){
+                                    layer.close(loading);
+                                    if (res.status === 200){
+                                        layer.msg('操作成功', {time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    } else {
+                                        layer.msg(res.msg, {time: 1000, icon: 2});
+                                    }
+                                });
+                                break;
+                            case 22://关闭激励
+                                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                                $.post("{:createUrl('setUp')}",{ids:ids,params:'{"exc_video":0}'},function (res){
+                                    layer.close(loading);
+                                    if (res.status === 200){
+                                        layer.msg('操作成功', {time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    } else {
+                                        layer.msg(res.msg, {time: 1000, icon: 2});
+                                    }
+                                });
+                                break;
+                            case 61://开启分销
+                                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                                $.post("{:createUrl('setUp')}",{ids:ids,params:'{"is_fenxiao":1}'},function (res){
+                                    layer.close(loading);
+                                    if (res.status === 200){
+                                        layer.msg('操作成功', {time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    } else {
+                                        layer.msg(res.msg, {time: 1000, icon: 2});
+                                    }
+                                });
+                                break;
+                            case 62://关闭分销
+                                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                                $.post("{:createUrl('setUp')}",{ids:ids,params:'{"is_fenxiao":0}'},function (res){
+                                    layer.close(loading);
+                                    if (res.status === 200){
+                                        layer.msg('操作成功', {time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    } else {
+                                        layer.msg(res.msg, {time: 1000, icon: 2});
+                                    }
+                                });
+                                break;
+                            case 63://分配方式
+                                layer.open({
+                                    title:'分销分配方式',
+                                    type:2,
+                                    content:'{:createUrl("batchRetail")}?ids='+ids.join(','),
+                                    area:['50%','350px'],
+                                    end:function(){
+                                        tableIn.reload();
+                                    }
+                                });
+                                break;
+                        }
+                        console.log(data); //得到当前所点击的菜单项对应的数据
+                        console.log(othis); //得到当前所点击的菜单项 DOM 对象
+                        console.log(this.elem); //得到当前组件绑定的原始 DOM 对象，批量绑定中常用。
+                    }
+                });
+            }
+        });
+        
+        //选择日期
+        laydate.render({
+            elem: '#ondate',
+            range: '-',
+            done:function(value, date, endDate){
+                dateVal=value, statusVal=$('#onstatus').val(),sortVal=$('#onsort').val(),searchVal=$('#search').val();
+                var params={};
+                if(statusVal){
+                    params['status']=statusVal
+                }
+                if(sortVal){
+                    params['sort']=sortVal
+                }
+                table.reload('list',{
+                    where:{
+                        date:dateVal,
+                        search:searchVal,
+                        filter:JSON.stringify(params)
+                    },
+                    page: {
+                        curr: 1
+                    }
+                });
+            }
+        });
+        //下拉选项
+        form.on('select(onstatus)', function(data){
+            dateVal=$('#ondate').val(),statusVal=data.value,sortVal=$('#onsort').val(),searchVal=$('#search').val();
+            var params={};
+            if(statusVal){
+                params['status']=statusVal
+            }
+            if(sortVal){
+                params['sort']=sortVal
+            }
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:JSON.stringify(params)
+                },
+                page: {
+                    curr: 1
+                }
+            });
+        });
+        //分类下拉选项
+        form.on('select(onsort)', function(data){
+            dateVal=$('#ondate').val(),statusVal=$('#onstatus').val(),sortVal=data.value,searchVal=$('#search').val();
+            var params={};
+            if(statusVal){
+                params['status']=statusVal
+            }
+            if(sortVal){
+                params['sort']=sortVal
+            }
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:JSON.stringify(params)
+                },
+                page: {
+                    curr: 1
+                }
+            });
+        });
+        //搜索关键字
+        $('#onsearch').on('click',function(e){
+            dateVal=$('#ondate').val(),statusVal=$('#onstatus').val(),sortVal=$('#onsort').val(),searchVal=$('#search').val();
+            var params={};
+            if(statusVal){
+                params['status']=statusVal
+            }
+            if(sortVal){
+                params['sort']=sortVal
+            }
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:JSON.stringify(params)
+                },
+                page: {
+                    curr: 1
+                }
+            });
+        });
+        //小程序搜索推广
+        $('#func-btn .submitPages').on('click', function () {
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:createUrl('submitpages')}", function (res) {
+                layer.close(loading);
+                layer.msg(res.msg);
+            });
+        });
+        //获取推广链接
+        $('.spread_link').on('click', function () {
+            var type = $(this).data('type');
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:createUrl('shortUrl')}", {type: type}, function (res) {
+                layer.close(loading);
+                if (res.status == 200) {
+                    layer.prompt({title:'推广链接',value:res.data,btn: ['复制','取消'],yes:function(index,val){
+                        $(".layui-layer-btn0").attr("data-clipboard-text",res.data);
+                        var clipboard = new Clipboard('.layui-layer-btn0');
+                        clipboard.on('success', function(e) {
+                            layer.msg('复制成功',{time:1000,icon:1});
+                            layer.close(index);
+                        });
+                        clipboard.on('error', function(e) {
+                            layer.msg('复制失败',{time:1000,icon:2});
+                            layer.close(index);
+                        });
+                    }});
+                } else {
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        });
+        //获取二维码推广
+        $('.spread_poster').on('click', function () {
+            var type = $(this).data('type');
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:createUrl('posterUrl')}", {type: type}, function (res) {
+                layer.close(loading);
+                if (res.status == 200){
+                    layer.open({
+                        title: '推广海报',
+                        type: 1,
+                        content: "<img src='" + res.data + "' style='margin:0 auto;display:block;' width='260px' height='auto'/>",
+                        area: ['300px', '550px'],
+                    });
+                } else {
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        });
+
+        //上传小程序代码
+        $('.update_code').on('click', function () {
+            layer.open({
+                title: '上传微信小程序代码',
+                type: 2,
+                maxmin: true,
+                content: '{:createUrl("config/issue")}',
+                area: ['60%', '450px'],
+                end: function () {
+                    tableIn.reload();
+                }
+            });
+        });
+        //模板切换
+        $('#func-btn .layout').on('click', function () {
+            layer.open({
+                title: '切换首页布局',
+                type: 2,
+                maxmin: true,
+                content: '{:createUrl("changeTemp")}',
+                area: ['90%', '500px'],
+                end: function () {
+                    tableIn.reload();
+                }
+            });
+        });
+        table.on('edit(list)', function (obj) { //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:createUrl('setUp')}", {
+                ids: obj.data.id,
+                params: '{"' + obj.field + '":"' + obj.value + '"}'
+            }, function (res) {
+                layer.close(loading);
+                if (res.status === 200) {
+                    layer.msg('操作成功', {time: 1000, icon: 1});
+                } else {
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        });
+        //行列表操作项事件
+        table.on('tool(list)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('确定删除吗', {icon: 3}, function (index) {
+                    $.post("{:createUrl('del')}", {ids: data.id}, function (info) {
+                        if (info.status == 200) {
+                            layer.msg(info.msg, {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(info.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {
+                var edit = layer.open({
+                    title: '编辑资源',
+                    type: 2,
+                    maxmin: true,
+                    content: '{:createUrl("edit")}?ids=' + data.id,
+                    area: ['100%', '100%'],
+                    end: function () {
+                        tableIn.reload();
+                    }
+                });
+            } else if (obj.event === 'viewPhoto') {
+                layer.open({
+                    type: 1,
+                    title: '封面图片',
+                    area: ['50%', '450px'],
+                    content: '<img src="' + data.thumb + '" width="100%" height="100%"/>'
+                });
+            } else if (obj.event === 'wechat-poster') {
+                var loading = layer.load(1, {shade: [0.1, '#fff']});
+                $.post("{:createUrl('coursePoster')}", {type:'wechat',id:data.id}, function (res) {
+                    layer.close(loading);
+                    if (res.status === 200) {
+                        layer.open({
+                            title: '小程序资源海报',
+                            type: 1,
+                            content: "<img src='" + res.data + "' style='margin:0 auto;display:block;' width='260px' height='auto'/>",
+                            area: ['300px', '450px'],
+                        });
+                    } else {
+                        layer.msg(res.msg, {time: 1000, icon: 2});
+                    }
+                });
+            }else if (obj.event === 'wechat-link') {
+                var loading = layer.load(1, {shade: [0.1, '#fff']});
+                $.post("{:createUrl('courseUrl')}", {type: 'wechat',id:data.id}, function (res) {
+                    layer.close(loading);
+                    if (res.status === 200){
+                        layer.prompt({title:'小程序资源链接',value:res.data,btn: ['复制','取消'],yes:function(index,val){
+                            $(".layui-layer-btn0").attr("data-clipboard-text",res.data);
+                            var clipboard = new Clipboard('.layui-layer-btn0');
+                            clipboard.on('success', function(e) {
+                                layer.msg('复制成功',{time:1000,icon:1});
+                                layer.close(index);
+                            });
+                            clipboard.on('error', function(e) {
+                                layer.msg('复制失败',{time:1000,icon:2});
+                                layer.close(index);
+                            });
+                        }});
+
+                    } else {
+                        layer.msg(res.msg, {time: 1000, icon: 2});
+                    }
+                });
+            }else if (obj.event === 'h5-poster') {
+                var loading = layer.load(1, {shade: [0.1, '#fff']});
+                $.post("{:createUrl('coursePoster')}", {type:'h5',id:data.id}, function (res) {
+                    layer.close(loading);
+                    if (res.status === 200) {
+                        layer.open({
+                            title: '公众号H5资源海报',
+                            type: 1,
+                            content: "<img src='" + res.data + "' style='margin:0 auto;display:block;' width='260px' height='auto'/>",
+                            area: ['300px', '450px'],
+                        });
+                    } else {
+                        layer.msg(res.msg, {time: 1000, icon: 2});
+                    }
+                });
+            }else if (obj.event === 'h5-link') {
+                var loading = layer.load(1, {shade: [0.1, '#fff']});
+                $.post("{:createUrl('courseUrl')}", {type: 'h5',id:data.id}, function (res) {
+                    layer.close(loading);
+                    if (res.status === 200){
+                        layer.prompt({title:'公众号H5资源链接',value:res.data,btn: ['复制','取消'],yes:function(index,val){
+                            $(".layui-layer-btn0").attr("data-clipboard-text",res.data);
+                            var clipboard = new Clipboard('.layui-layer-btn0');
+                            clipboard.on('success', function(e) {
+                                layer.msg('复制成功',{time:1000,icon:1});
+                                layer.close(index);
+                            });
+                            clipboard.on('error', function(e) {
+                                layer.msg('复制失败',{time:1000,icon:2});
+                                layer.close(index);
+                            });
+                        }});
+                    } else {
+                        layer.msg(res.msg, {time: 1000, icon: 2});
+                    }
+                });
+            }
+        });
+
+        //头工具栏事件批量操作
+        table.on('toolbar(list)', function (obj) {
+            var checkStatus = table.checkStatus('list');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {
+                ids.push(o.id);
+            });
+            switch (obj.event) {
+                case 'openGroups':
+                    $.ajax({
+                        type: "get",
+                        url: '{:createUrl("selectgroup")}',
+                        data: "",
+                        success: function (e) {
+                            layer.open({
+                                type: 1,
+                                content: e,
+                                area: ['70%', '500px'],
+                                title: "批量挂载社群",
+                                btn: ["完成", "关闭"],
+                                yes: function (index, layero) {
+                                    var arr = [];
+                                    for (let i in id_s) {
+                                        arr.push(id_s[i].id);
+                                    }
+                                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                                    $.post("{:createUrl('selectgroup')}", {
+                                        'ids': ids,
+                                        'group_ids': arr
+                                    }, function (res) {
+                                        layer.close(loading);
+                                        if (res.status === 200) {
+                                            layer.msg('操作成功', {time: 1000, icon: 1});
+                                            layer.close(index);
+                                        } else {
+                                            layer.msg(res.msg, {time: 1000, icon: 2});
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }, 'html');
+                    break;
+                case 'openJumps':
+                    $.ajax({
+                        type: "get",
+                        url: '{:createUrl("selectjump")}',
+                        data: "",
+                        success: function (e) {
+                            layer.open({
+                                type: 1,
+                                content: e,
+                                area: ['70%', '500px'],
+                                title: "批量挂载跳转",
+                                btn: ["完成", "关闭"],
+                                yes: function (index, layero) {
+                                    var arr = [];
+                                    for (let i in id_s) {
+                                        arr.push(id_s[i].id);
+                                    }
+                                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                                    $.post("{:createUrl('selectjump')}", {'ids': ids, 'jump_ids': arr}, function (res) {
+                                        layer.close(loading);
+                                        if (res.status === 200) {
+                                            layer.msg('操作成功', {time: 1000, icon: 1});
+                                            layer.close(index);
+                                        } else {
+                                            layer.msg(res.msg, {time: 1000, icon: 2});
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }, 'html');
+                    break;
+                case 'editAll':
+                    layer.open({
+                        title: '修改金额',
+                        type: 2,
+                        content: '{:createUrl("batchMoney")}?ids=' + ids.join(','),
+                        area: ['90%', '320px'],
+                        end: function () {
+                            tableIn.reload();
+                        }
+                    });
+                    break;
+                case 'trySee':
+                    layer.open({
+                        title:'试看时间(视频资源有效)',
+                        type:2,
+                        content:'{:createUrl("batchTrysee")}?ids='+ids.join(','),
+                        area:['90%','270px'],
+                        end:function(){
+                            tableIn.reload();
+                        }
+                    });
+                    break;
+                case 'openInvite':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要开启邀请任务的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"invite":1}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'closeInvite':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要关闭邀请任务的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"invite":0}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'openAds':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要开启激励广告的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"exc_video":1}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'closeAds':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要关闭激励广告的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"exc_video":0}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'openTop':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要推荐的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"is_top":1}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'closeTop':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要推荐的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"is_top":0}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'openAll':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要开启的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"status":1}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'closeAll':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要禁用的资源', {time: 1500});
+                        return false;
+                    }
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}", {ids: ids, params: '{"status":0}'}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'delAll':
+                    if (ids.length === 0) {
+                        layer.msg('请选择要删除的资源', {time: 1500});
+                        return false;
+                    }
+                    layer.confirm('确定删除吗', {icon: 3}, function (index) {
+                        $.post("{:createUrl('del')}", {ids: ids}, function (info) {
+                            if (info.status === 200) {
+                                layer.msg(info.msg, {time: 1000, icon: 1});
+                                tableIn.reload();
+                            } else {
+                                layer.msg(info.msg, {time: 1000, icon: 2});
+                            }
+                        });
+                    });
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    break;
+            }
+        });
+    })
+
+</script>

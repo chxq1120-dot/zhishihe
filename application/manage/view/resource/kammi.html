@@ -1,0 +1,102 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-bottom:0;">
+                    <div class="layui-inline">
+                        <input type="text" name="search" class="layui-input" placeholder="卡密">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn" lay-submit="" lay-filter="search">
+                            <i class="layui-icon">&#xe615;</i>
+                        </button>
+                    </div>
+                    <div class="layui-inline">
+                        <a href="javascript:;" class="addkammi layui-btn layui-bg-blue layui-btn-small">
+                            <i class="layui-icon layui-icon-addition"></i>
+                            {:lang('add')}卡密
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i>
+        {:lang('del')}
+    </a>
+</script>
+<script>
+    layui.use(['table','element','form'],function(){
+        var table = layui.table, $ = layui.jquery,element = layui.element,form=layui.form;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("kammi",["ids"=>input("get.ids")])}',
+            toolbar:'#table-toolbar',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id',title: 'ID',width:60,align:'center'},
+                {field: 'cdkey',title: '卡密',width:260,align:'center'},
+                {title: '是否查看',align:'center',templet:function(d){
+                    if(d.status==0){
+                        return '<span class="blue_block">否</span>';
+                    }else if(d.status==1){
+                        return '<span class="green_block">是</span>';
+                    }
+                }},
+                {field: 'nickname',title: '获得者',align:'center'},
+                {field: 'ctime', align: 'center',title: '添加时间'},
+                {align: 'center',toolbar:'#action'}
+            ]]
+        });
+        form.on('submit(search)', function(data){
+            table.reload('list', {
+                url: "{:createUrl('kammi')}?ids={:input('get.ids')}",
+                method:'post',
+                where:data.field,
+            });
+            return false;
+        });
+        //监听添加
+        $('.addkammi').on('click',function () {
+            layer.open({
+                title:'添加卡密',
+                type:2,
+                maxmin: true,
+                content:'{:createUrl("addkammi",["rid"=>input("get.ids")])}',
+                area:['70%','400px'],
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('你确定要删除吗？', {icon: 3}, function (index) {
+                    $.post("{:createUrl('delkammi')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg('删除成功',{time:1000,icon:1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+    })
+</script>

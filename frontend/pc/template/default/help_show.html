@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+{include file="header"/}
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+  <div class="crumbs-min"><a href="/" title="首页">首页</a> &gt; <a href="/" title="help">帮助中心</a> &gt; {$article.title}</div>
+</div>
+<!-- 面包削 End -->
+<div class="about-main container">
+  <!-- 详情页 -->
+  <div class="col-md-9">
+    <h1>{$article.title}</h1>
+    <div class="gb-markdown">
+      {$article.content|raw}
+    </div>
+  </div>
+  <!-- 详情页 End -->
+</div>
+{include file="footer"/}
+  <!-- 网站导航 End -->
+</body>
+
+</html>

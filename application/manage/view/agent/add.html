@@ -1,0 +1,178 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <form class="layui-form layui-form-pane" lay-filter="agent">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline from-inline-5">
+                    <input type="text" name="row[username]" lay-verify="required" lay-reqText="请输入用户名"
+                        autocomplete="off" placeholder="{:lang('pleaseEnter')}用户名" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-inline from-inline-5">
+                    <input type="password" name="row[password]" lay-verify="required" lay-reqText="请输入密码"
+                        autocomplete="off" placeholder="{:lang('pleaseEnter')}密码" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户头像</label>
+                <div class="layui-input-inline from-inline-5">
+                    <input type="hidden" name="row[avatar]" id="thumb" value="">
+                    <div class="layui-upload">
+                        <div class="layui-upload-list" id="uploadImg" style="cursor: pointer;">
+                            <img class="layui-upload-img" width="76" height="76" src="__ADMIN__/images/default.png" id="Image">
+                            <p id="preview"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">到期日期</label>
+                <div class="layui-input-inline from-inline-3">
+                    <input type="input" id="exp_time" name="row[exp_time]" lay-verify="required" lay-reqText="请选择到期日期" autocomplete="off" placeholder="选择到期日期" class="layui-input">
+                    <div class="layui-word-aux" style="color:#f90!important;">【账号到期日期】</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">初始权限</label>
+                <div class="layui-input-inline from-inline-3">
+                    <input type="radio" name="row[auto_spread]" value="1" checked title="无权限设置">
+                    <input type="radio" name="row[auto_spread]" value="2" title="有权限设置">
+                    <div class="layui-word-aux">设置此代理开设下级代理时是否有初始同步资源设置权限</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">卡密权限</label>
+                <div class="layui-input-inline from-inline-3">
+                    <input type="radio" name="row[kammi_type]" value="0" checked title="不允许创建">
+                    <input type="radio" name="row[kammi_type]" value="1" title="允许自行创建">
+                    <div class="layui-word-aux">设置此代理是否可以自行创建卡密，选择允许自行创建前，请在【系统设置-全局设置-业务设置】-卡密计算收益 配置项，将此配置关闭</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">抽成比例</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-inline">
+                        <input type="number" name="row[min_take]" lay-verify="required"
+                            value="{:config('setting.agent_min_take')}" lay-reqText="请输入抽成比例"
+                            placeholder="{:lang('pleaseEnter')}抽成比例" class="layui-input">
+                    </div>
+                    <div class="layui-inline">%</div>
+                    <div class="layui-word-aux" style="color:#f90!important;">【设置此代理被抽成比例:百分之几】</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">资源最低现价:</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-inline">
+                        <input type="number" name="row[min_pub]" lay-verify="required"
+                            value="{:config('setting.agent_min_pub')}" lay-reqText="请输入最低发布售价"
+                            placeholder="{:lang('pleaseEnter')}最低发布金额" class="layui-input">
+                    </div>
+                    <div class="layui-inline">元</div>
+                    <div class="layui-word-aux" style="color:#f90!important;">【设置此代理资源最低现价（元）】</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">资源最低原价:</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-inline">
+                        <input type="number" name="row[dis_pub]" lay-verify="required"
+                            value="{:config('setting.agent_dis_pub')}" lay-reqText="请输入最低发布原价"
+                            placeholder="{:lang('pleaseEnter')}最低发布原价" class="layui-input">
+                    </div>
+                    <div class="layui-inline">元</div>
+                    <div class="layui-word-aux" style="color:#f90!important;">【设置此代理资源最低原价（元）】</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">提现手续费</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-inline">
+                        <input type="number" name="row[cash_fee]" lay-verify="required"
+                            value="{:config('setting.agent_min_take')}" lay-reqText="请输入提现手续费"
+                            placeholder="{:lang('pleaseEnter')}提现手续费" class="layui-input">
+                    </div>
+                    <div class="layui-inline">%</div>
+                    <div class="layui-word-aux" style="color:#f90!important;">【提现金额的:百分之几】</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">最低提现金额</label>
+                <div class="layui-input-inline from-inline-3">
+                    <div class="layui-inline">
+                        <input type="number" name="row[min_cash]" lay-verify="required"
+                            value="{:config('setting.agent_min_cash')}" lay-reqText="请输入最低提现金额"
+                            placeholder="{:lang('pleaseEnter')}最低提现金额" class="layui-input">
+                    </div>
+                    <div class="layui-inline">元</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">订单扣量</label>
+                <div class="layui-input-inline from-inline-5">
+                    <div class="layui-inline">
+                        <input type="number" name="row[take_num]" lay-verify="required" value="0"
+                            lay-reqText="请输入提现手续费" placeholder="{:lang('pleaseEnter')}提现手续费" class="layui-input">
+                    </div>
+                    <div class="layui-inline">笔</div>
+                    <div class="layui-word-aux" style="color:#f90!important;">【表示几笔扣一，例如20笔扣1笔】</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">开启广告</label>
+                <div class="layui-input-inline from-inline-5">
+                    <input type="radio" name="row[is_ad]" value="1" checked="" title="开启">
+                    <input type="radio" name="row[is_ad]" value="0" title="关闭">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" lay-submit=""
+                        lay-filter="submit">{:lang('submit')}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.config({
+        base: '__STATIC__/layuiadmin/mods/',
+        version: '1.0'
+    });
+    layui.use(['form', 'upload','laydate'], function () {
+        var form = layui.form, $ = layui.jquery, laydate = layui.laydate;
+        $("#uploadImg").on('click',function(){
+            layer.open({
+                title:'选择头像',
+                type:2,
+                maxmin: true,
+                area:['80%','500px'],
+                content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image',
+            });
+        });
+        laydate.render({
+            elem: '#exp_time',
+            type:'date',
+            value:'{$exp_date}'
+        });
+        form.on('submit(submit)', function (data) {
+            loading = layer.load(1, { shade: [0.1, '#fff'] });
+            $.post("", data.field, function (res) {
+                layer.close(loading);
+                if (res.status === 200) {
+                    layer.msg('代理添加成功', { time: 1000, icon: 1 }, function () {
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, { time: 1000, icon: 2 });
+                }
+            });
+        })
+    });
+</script>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+{include file="header"/}
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+    <div class="crumbs-min"><a href="/" title="首页">首页</a> {$navPath|raw}</div>
+</div>
+<!-- 面包削End -->
+<!-- top头部 End -->
+<div class="container">
+    <div class="zp-article-card">
+        <h2 class="article-nav" style="color:#333;font-size:18px;padding:0 20px;line-height:50px;font-weight:700;overflow:hidden;border-bottom:1px #eee solid;">
+            最新文章</h2>
+        <ul class="clearfix">
+            {volist name="article_list" id="item"}
+            <li class="article-card">
+                <a href="/article/show/{$item['id']}.html" target="_blank" class="figure">
+                    <img class="zp-line-img lazy-img" ata-original="{$item['thumb']}" title="{$item['title']}" src="{$item['thumb']}" style="display: block;"></a>
+                <div class="article-text">
+                    <h2>
+                        <a href="/article/show/{$item['id']}.html" target="_blank" title="{$item['title']}" class="article-title">{$item['title']}</a>
+                    </h2>
+                    <p class="desc">{$item['desc']}</p>
+                    <div class="info">
+                        <span class="time">{$item['ctime_text']}</span>
+                        <span class="read">{$item['views']}人看过</span>
+                    </div>
+                </div>
+            </li>
+            {/volist}
+        </ul>
+        <!-- 分页 -->
+        <div id="showpage_min">
+            {$page|raw}
+        </div>
+        <!-- 分页 End -->
+    </div>
+
+
+    <!-- 资讯推荐右 -->
+    <div class="star-article-r">
+        <div class="article-hot-l">
+            <h2 class="clear-fix">精选推荐</h2>
+            <ul>
+                {zhi:list table="article" order="ctime desc" limit="10" where="is_top=1 and sort_id=6 and status=1" id="item" key="k"}
+                    <li><em {if $k<3}class="top"{/if}>{$k+1}</em><a href="/article/show/{$item['id']}.html" title="{$item['title']}">{$item['title']}</a></li>
+                {/zhi:list}
+            </ul>
+        </div>
+        <div class="article-hot-l">
+            <h2 class="clear-fix">热门文章</h2>
+            <ul>
+                {zhi:list table="article" order="views desc,ctime desc" limit="10" where="sort_id=6 and status=1" id="item" key="k"}
+                <li><em {if $k<3}class="top"{/if}>{$k+1}</em><a href="/article/show/{$item['id']}.html" title="{$item['title']}">{$item['title']}</a></li>
+                {/zhi:list}
+            </ul>
+        </div>
+    </div>
+    <!-- 资讯推荐右 End -->
+</div>
+{include file="footer"/}
+</body>
+</html>

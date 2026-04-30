@@ -1,0 +1,498 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<script type="text/javascript" src="__STATIC__/common/js/jquery.min.js"></script>
+<div id="app">
+	<!-- tabs切换 -->
+	<el-tabs v-model="activeName">
+		<!-- 设置前端资源海报 -->
+		<el-tab-pane label="前端资源海报" name="first">
+			<div class="first">
+				<div class="left">
+					<div class="user-bar" :style="'background:'+poster1.row.bg_color+';'">
+						<div class="user-head">
+							<div class="user-avatar"></div>
+							<div class="user-info">
+								<div class="user-nickname">用户昵称</div>
+								<div class="user-maintext">{{poster1.row.main_text}}</div>
+							</div>
+						</div>
+						<div class="user-poster" :style="'background:'+poster1.row.bg_main_color+';'">
+							<div class="thumb">资源封面</div>
+							<div class="price">
+								<span class="pre">&yen;</span>
+								<span class="nums">88</span>
+							</div>
+							<div class="title">资源标题2025抖音数据化运营系列课，最新的抖音直播间起爆算法</div>
+							<div class="subtext">{{poster1.row.sub_text}}</div>
+							<div class="sales">286人观看</div>
+							<div class="mini-qrcode"></div>
+						</div>
+					</div>
+				</div>
+				<div class="right">
+					<el-form label-width="140px" size="small" :model="poster1" ref="poster1" class="demo-ruleForm">
+						<el-form-item label="背景颜色:" prop="">
+							<el-color-picker v-model="poster1.row.bg_color" color-format="rgb"></el-color-picker>
+							<div class="layui-word-aux">建议设置为深色背景</div>
+						</el-form-item>
+						<el-form-item label="分享文案:">
+							<el-input class="input" placeholder="请输入分享文案" v-model="poster1.row.main_text" maxlength="25" />
+							<div class="layui-word-aux">分享文案字数不超过25个字</div>
+						</el-form-item>
+						<el-form-item label="主图背景颜色:" prop="">
+							<el-color-picker v-model="poster1.row.bg_main_color" color-format="rgb"></el-color-picker>
+							<div class="layui-word-aux">建议设置为浅色背景或白色背景</div>
+						</el-form-item>
+						<el-form-item label="副标题推广文案:">
+							<el-input class="input" placeholder="请输入分享文案" v-model="poster1.row.sub_text" maxlength="20" />
+							<div class="layui-word-aux">副标题推广文案字数不超过20个字</div>
+						</el-form-item>
+						<el-form-item>
+							<el-button type="primary" @click="submitForm1('poster1')">立即保存</el-button>
+						</el-form-item>
+					</el-form>
+				</div>
+			</div>
+		</el-tab-pane>
+		<!--设置用户推广海报  -->
+		<el-tab-pane label="用户推广海报" name="second">
+			<div class="second">
+				<div class="left">
+					<img :src="poster2.row.url" />
+					<span class="avatar">头像</span>
+					<span class="nickname">用户昵称</span>
+					<span class="main_text" :style="'font-size:'+poster2.row.main_text_size+'px;color:'+poster2.row.main_text_color+';'">{{poster2.row.main_text}}</span>
+					<span class="sub_text" v-for="(item,index) in poster2.row.sub_text.split(' ')" :key="index"
+						:style="'font-size:'+poster2.row.sub_text_size+'px;top:calc(35% + '+index*poster2.row.sub_text_size*1.5+'px);color:'+poster2.row.sub_text_color+';'">{{item}}
+					</span>
+					<span class="qrcode">小程序码</span>
+					<span class="copyname">{:config('setting.web_name')}</span>
+				</div>
+				<div class="right">
+					<el-form label-width="140px" size="small" :model="poster2" ref="poster2" class="demo-ruleForm">
+						<el-form-item label="背景图片:" prop="">
+							<div class="Image">
+								<el-button type="primary" @click="uploadBgImg" size="mini">上传图片</el-button>
+								<img class="layui-upload-img" width="86" height="86"
+									:src="poster2.row.url || '__ADMIN__/images/default.png'">
+							</div>
+						</el-form-item>
+						<el-form-item label="分享文案:">
+							<el-input class="input" placeholder="请输入分享文案" v-model="poster2.row.main_text" maxlength="25" />
+							<div class="layui-word-aux">分享文案字数不超过25个字</div>
+						</el-form-item>
+						<el-form-item label="分享文案字体大小:">
+							<el-input-number v-model="poster2.row.main_text_size" :min="12" :max="30" size="mini"></el-input-number>
+							<span class="layui-word-aux">px,建议设置为20</span>
+						</el-form-item>
+						<el-form-item label="分享文案字体颜色:" prop="">
+							<el-color-picker v-model="poster2.row.main_text_color" color-format="rgb"></el-color-picker>
+							<span class="layui-word-aux">建议设置为白色</span>
+						</el-form-item>
+						<el-form-item label="主标题推广文案:">
+							<el-input class="input" placeholder="请输入分享文案" v-model="poster2.row.sub_text" maxlength="60" />
+							<div class="layui-word-aux">字数不超过24个字，多行以空格隔开</div>
+						</el-form-item>
+						<el-form-item label="主标题字体大小:">
+							<el-input-number v-model="poster2.row.sub_text_size" :min="12" :max="40"  size="mini"></el-input-number>
+							<span class="layui-word-aux">px,建议设置为22</span>
+						</el-form-item>
+						<el-form-item label="主标题字体颜色:" prop="">
+							<el-color-picker v-model="poster2.row.sub_text_color" color-format="rgb"></el-color-picker>
+							<span class="layui-word-aux">建议设置为白色</span>
+						</el-form-item>
+						<el-form-item>
+							<el-button type="primary" @click="submitForm2('poster2')">立即保存</el-button>
+						</el-form-item>
+					</el-form>
+				</div>
+			</div>
+		</el-tab-pane>
+		<!-- 设置分站推广海报 -->
+		<el-tab-pane label="分站推广海报" name="third">
+			<div class="third">
+				<div class="left">
+					<img :src="poster3.row.url" />
+					<span class="qrcode_bar">二维码</span>
+					<span class="bom_text" :style="'font-size:'+poster3.row.bom_text_size+'px;color:'+poster3.row.bom_text_color+';'">{{poster3.row.bom_text}}</span>
+				</div>
+				<div class="right">
+					<el-form label-width="140px" size="small" :model="poster3" ref="poster3" class="demo-ruleForm">
+						<el-form-item label="背景图片:" prop="">
+							<div class="Image">
+								<el-button type="primary" @click="uploadSiteImg" size="mini">上传图片</el-button>
+								<img class="layui-upload-img" width="86" height="86"
+									:src="poster3.row.url || '__ADMIN__/images/default.png'">
+							</div>
+						</el-form-item>
+						<el-form-item label="底部文案:">
+							<el-input class="input" placeholder="请输入分享文案" v-model="poster3.row.bom_text" maxlength="25" />
+							<div class="layui-word-aux">分享文案字数不超过25个字</div>
+						</el-form-item>
+						<el-form-item label="文案字体颜色:" prop="">
+							<el-color-picker v-model="poster3.row.bom_text_color" color-format="rgb"></el-color-picker>
+							<div class="layui-word-aux">建议设置为白色</div>
+						</el-form-item>
+						<el-form-item label="文案字体大小:">
+							<el-input-number v-model="poster3.row.bom_text_size" :min="12" :max="30" size="mini"></el-input-number>
+							<div class="layui-word-aux">px,建议设置为20</div>
+						</el-form-item>
+						<el-form-item>
+							<el-button type="primary" @click="submitForm3('poster3')">立即保存</el-button>
+						</el-form-item>
+					</el-form>
+				</div>
+			</div>
+		</el-tab-pane>
+	</el-tabs>
+</div>
+{include file="common/foot"/}
+<script>
+	new Vue({
+		el: '#app',
+		data: {
+			index: 1,
+			activeName: 'first',
+			poster1: {
+				row: {
+					type: 1,
+					bg_color: "{$row['poster1']['bg_color']}", // 背景颜色
+					main_text: "{$row['poster1']['main_text']}", // 分享文案
+					bg_main_color:"{$row['poster1']['bg_main_color']}", // 主图背景颜色
+					sub_text: "{$row['poster1']['sub_text']}" // 副标题推广文案
+   				}
+			},
+			poster2: {
+				row: {
+					type: 2,
+					url: "{$row['poster2']['url']}", // 背景图片
+					main_text:"{$row['poster2']['main_text']}", // 分享文案
+					main_text_size: "{$row['poster2']['main_text_size']}", // 分享文案字体大小
+					main_text_color: "{$row['poster2']['main_text_color']}", // 分享文案字体颜色
+					sub_text: "{$row['poster2']['sub_text']}", // 主标题推广文案
+					sub_text_size: "{$row['poster2']['sub_text_size']}", // 主标题字体大小
+					sub_text_color: "{$row['poster2']['sub_text_color']}" // 主标题字体颜色
+			 	}
+			},
+			poster3: {
+				row: {
+					type: 3,
+					url: "{$row['poster3']['url']}", // 背景图片
+					bom_text: "{$row['poster3']['bom_text']}", // 底部文案
+					bom_text_color: "{$row['poster3']['bom_text_color']}", // 文案字体颜色
+					bom_text_size: "{$row['poster3']['bom_text_size']}" // 文案字体大小
+    			}
+			}
+		},
+		// 监听上传图片
+		mounted() {
+			var that = this;
+			window.addEventListener("attachmentIn", function (e) {
+				const type = e.detail.type;
+				const org_url = e.detail.org_url;
+				if (type == 'user') {
+					that.poster2.row.url = org_url;
+				} else {
+					that.poster3.row.url = org_url;
+				}
+			});
+		},
+		methods: {
+			uploadBgImg() {
+				layer.open({
+					title:'上传背景图',
+					type:2,
+					maxmin: true,
+					area:['80%','500px'],
+					content:'{:createUrl("attachment/index")}?type=1&name=user',
+				});
+			},
+			uploadSiteImg() {
+				layer.open({
+					title:'上传背景图',
+					type:2,
+					maxmin: true,
+					area:['80%','500px'],
+					content:'{:createUrl("attachment/index")}?type=1&name=site',
+				});
+			},
+			// 设置前端资源海报
+			submitForm1(formName) {
+				this.$refs[formName].validate((valid) => {
+					if (valid) {
+						$.post('{:url("poster")}', this.poster1, function (res) {
+							if(res.status===200){
+								layer.msg('保存成功', { icon: 1, time: 1000 });
+							}else{
+								layer.msg(res.msg, { icon: 2, time: 1000 });
+							}
+						})
+					} else {
+						return false;
+					}
+				});
+			},
+			// 设置用户推广海报
+			submitForm2(formName) {
+				this.$refs[formName].validate((valid) => {
+					if (valid) {
+						$.post('{:url("poster")}', this.poster2, function (res) {
+							if(res.status===200){
+								layer.msg('保存成功', { icon: 1, time: 1000 });
+							}else{
+								layer.msg(res.msg, { icon: 2, time: 1000 });
+							}
+						})
+					} else {
+						return false;
+					}
+				});
+			},
+			// 设置分站推广海报
+			submitForm3(formName) {
+				this.$refs[formName].validate((valid) => {
+					if (valid) {
+						$.post('{:url("poster")}', this.poster3, function (res) {
+							if(res.status===200){
+								layer.msg('保存成功', { icon: 1, time: 1000 });
+							}else{
+								layer.msg(res.msg, { icon: 2, time: 1000 });
+							}
+						})
+					} else {
+						return false;
+					}
+				});
+			},
+		},
+	})
+</script>
+<style>
+	#app {
+		padding: 10px 20px;
+		background-color: #fff;
+	}
+	.layui-layout-body{
+		padding:10px 10px;
+	}
+	.el-tabs {
+		padding-left: 10px;
+	}
+	.el-form-item__content{
+		line-height:normal;
+	}
+	.el-form-item__label{
+		font-size:12px;
+	}
+	.second,
+	.third,
+	.first {
+		display: flex;
+		margin-top: 20px;
+	}
+	.left {
+		width: 360px;
+		position: relative;
+	}
+	.left .user-bar{
+		background-color:#fea700;
+		border-radius: 10px;
+		padding:15px;
+	}
+	.left .user-head{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.left .user-avatar{
+		width:48px;
+		height:48px;
+		border-radius: 50%;
+		background-color:#d4e7f0;
+	}
+	.left .user-info{
+		width: calc(100% - 60px);
+		color:#fff;
+	}
+	.left .user-info .user-maintext{
+		font-size:12px;
+	}
+	.left .user-info .user-nickname{
+		font-size:14px;
+	}
+	.left .user-poster{
+		margin-top:10px;
+		background-color:#fff;
+		border-radius:10px;
+		padding:12px;
+		position: relative;
+	}
+	.left .user-poster .thumb{
+		width:300px;
+		height:280px;
+		background-color:#d4e7f0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color:#c9c9c9;
+		font-size:14px;
+	}
+	.left .user-poster .price{
+		width:65%;
+		margin:5px 0;
+		background-color:#d4e7f0;
+		padding:2px 4px;
+		color: #fe6a00;
+	}
+	.left .user-poster .price .nums{
+		font-size:16px;
+	}
+	.left .user-poster .price .pre{
+		font-size:16px;
+	}
+	.left .user-poster .title{
+		width:65%;
+		font-size:14px;
+		background-color:#d4e7f0;
+		padding:2px 4px;
+		color:#c9c9c9;
+	}
+	.left .user-poster .subtext{
+		padding:20px 0 0 0;
+		font-size:12px;
+	}
+	.left .user-poster .sales{
+		padding-top:5px;
+		color:#fea700;
+		font-size:11px;
+	}
+	.left .user-poster .mini-qrcode{
+		width:96px;
+		height: 96px;
+		background-color:#d4e7f0;
+		border-radius: 50%;
+		position: absolute;
+		right:10px;
+		bottom:10px;
+	}
+	.left img {
+		width: 80%;
+		display: block;
+		border-radius: 10px;
+	}
+	.left .avatar {
+		width: 56px;
+		height: 56px;
+		line-height: 56px;
+		text-align: center;
+		border-radius: 50%;
+		background-color: #fff;
+		position: absolute;
+		z-index: 999;
+		left: 33%;
+		top: 3%;
+	}
+	.left .nickname {
+		position: absolute;
+		z-index: 999;
+		left: 34%;
+		top: 15%;
+		font-size: 14px;
+		color: #fff;
+		text-align: center;
+	}
+	.left .main_text {
+		position: absolute;
+		z-index: 999;
+		left: 40%;
+		margin-left: -100px;
+		top: 23%;
+		font-size: 16px;
+		color: #fff;
+		width: 200px;
+		text-align: center;
+	}
+	.left .sub_text {
+		position: absolute;
+		z-index: 999;
+		left: 40%;
+		margin-left: -120px;
+		top: 28%;
+		font-size: 18px;
+		color: #fff;
+		width: 240px;
+		text-align: center;
+		line-height: 15%;
+	}
+	.left .qrcode {
+		position: absolute;
+		z-index: 999;
+		left: 40%;
+		margin-left: -100px;
+		top: 68%;
+		font-size: 16px;
+		color: #9c9c9c;
+		width: 200px;
+		text-align: center;
+	}
+	.left .copyname {
+		position: absolute;
+		z-index: 999;
+		left: 40%;
+		margin-left: -100px;
+		top: 80%;
+		font-size: 16px;
+		color: #fff;
+		width: 200px;
+		text-align: center;
+	}
+	.left .qrcode_bar {
+		width: 120px;
+		position: absolute;
+		z-index: 999;
+		left: 40%;
+		margin-left: -60px;
+		top: 68%;
+		font-size: 16px;
+		color: #9c9c9c;
+		text-align: center;
+		border: #ddd 1px solid;
+		background-color: #fff;
+		height: 120px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.left .bom_text {
+		position: absolute;
+		z-index: 999;
+		bottom: 2%;
+		width: 100%;
+		text-align: center;
+		left: -10%;
+		right: 0;
+		color: #000;
+	}
+	.right {
+		background-color: #fff;
+		padding: 20px;
+		width: calc(100% - 360px);
+		border-radius: 10px;
+	}
+	.right .Image {
+		display: flex;
+		flex-direction: column;
+	}
+	.right .Image .el-button {
+		width: 80px;
+		margin-bottom: 15px;
+	}
+	.el-form-item{
+		margin-bottom:10px;
+	}
+	.right .input {
+		width: 70%;
+	}
+</style>

@@ -1,0 +1,116 @@
+.login-bady{
+	background-image: url('../images/paper.jpg');
+	position: relative;width: 100%;overflow: hidden;background-size: cover;background-position: center bottom;z-index: 1;
+}
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{color:#ddd;font-size:14px;line-height:normal;}
+.login {
+	position:absolute;
+	top:15%;
+	left:50%;
+	margin-left:-225px;
+	z-index:999;
+	width:450px;
+	padding-bottom:30px;
+	background-color: rgba(255, 255, 255, 1);
+	border-radius: 20px;
+	box-shadow:0 0 6px 0 rgba(9,109,235,0.5);
+}
+.login header {
+	width:85%;
+	margin:0 auto;
+	min-height:80px;
+	padding: 50px 0 15px 10px;
+	display: flex;
+	align-items: center;
+	justify-content:space-between;
+	position: relative;
+}
+.login header::after{
+	position: absolute;
+	content: '';
+	height:1px;
+	left:0;
+	right:0;
+	bottom:0;
+	background-color:#f6f6f6;
+}
+.login header .login-logo{
+	width:65px;
+}
+.login header .login-slogan{
+	width:calc(100% - 80px);
+}
+.login header img{border-radius:50%;}
+.login header h1{font-size: 22px;color:#212121;}
+.login header h3{color:#9c9c9c;}
+.login footer { height: 35px;padding: 10px 10px 0 10px;}
+.login-bar {padding:30px 35px 50px 35px;}
+.login-bar .layui-form-item {position: relative;}
+.login-bar .layui-form-item .login-icon{ position: absolute;color: #9c9c9c;  top: 13px;  left: 10px;  }
+.login-bar .layui-form-item input {padding-left:34px;height:45px;line-height:3045;border-radius:6px;transition: border .2s ease-in-out, background .2s ease-in-out, box-shadow .2s ease-in-out;}
+.login-bar .layui-form-item input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(45,140,240,.2)
+}
+.login-bar .layui-form-item input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(45,140,240,.2)
+}
+.login-bar .layui-form-item .group-btn-view{
+	position: absolute;
+	right: 1px;
+	top: 1px;
+	height:42px;
+	width:40px;
+	border-left: 1px solid #e6e6e6;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+.login-bar .layui-form-item .hide{
+	color:#c9c9c9;
+}
+.login-bar .layui-form-item .show{
+	color:#212121;
+}
+.login-bar .layui-form-item .captcha {position: absolute;right: 1px;top: 1px;border-left: 1px solid #e6e6e6;}
+.login-bar .layui-form-item .captcha img {height: 43px;cursor: pointer;}
+.login-bar .layui-btn{width: 100%;display: block;height:50px;line-height:50px;background:#2C8CF0;border-radius:6px;margin-top:30px;}
+.footer{
+	position: fixed;
+	left:0;
+	right:0;
+	bottom:0;
+	height:40px;
+	width:100%;
+	text-align: center;
+	background-color:rgba(255, 255, 255, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+@media screen and (max-width: 750px){
+	.login{
+		width: 90%;
+		left:50%;
+		margin-left:-45%;
+		height: auto;
+		background-color: rgba(255, 255, 255,1);
+		border-radius: 10px;
+		color: aliceblue;
+	}
+	.login .login-bar{padding:30px 20px 0;}
+}
+
+
+
+
+
+
+
+
+
+
+
+

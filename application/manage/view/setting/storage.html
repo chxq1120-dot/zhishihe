@@ -1,0 +1,385 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <form class="layui-form layui-form-pane">
+            <div class="layui-tab layui-tab-brief" lay-filter="storage">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">上传设置</li>
+                    <li>阿里云存储</li>
+                    <li>腾讯云存储</li>
+                    <li>七牛云存储</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">存储方式</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="radio" name="upload_storage" lay-filter="storage_type" value="local" title="本地存储" {eq name=":config('setting.upload_storage')" value="local"}checked{/eq}/>
+                                <input type="radio" name="upload_storage" lay-filter="storage_type" value="aliyun" title="阿里云存储" {eq name=":config('setting.upload_storage')" value="aliyun"}checked{/eq}/>
+                                <input type="radio" name="upload_storage" lay-filter="storage_type" value="qcloud" title="腾讯云存储" {eq name=":config('setting.upload_storage')" value="qcloud"}checked{/eq}/>
+                                <input type="radio" name="upload_storage" lay-filter="storage_type" value="qiniu" title="七牛云存储" {eq name=":config('setting.upload_storage')" value="qiniu"}checked{/eq}/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">上传设置</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <div class="layui-input-group">
+                                    <div class="layui-input-split layui-input-prefix">文件大小</div>
+                                    <input type="text" name="upload_size" lay-verify="required" lay-reqText="请输入上传大小限制" value="{:config('setting.upload_size')}" style="border-radius:0!important;" placeholder="{:lang('pleaseEnter')}上传大小限制" class="layui-input">
+                                    <div class="layui-input-split layui-input-suffix">MB</div>
+                                </div>
+                                <div class="layui-word-aux" style="padding-top:10px;">上传文件大小限制，单位MB</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">文件类型</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_ext" lay-verify="required" lay-reqText="请输入允许上传文件后缀" value="{:config('setting.upload_ext')}" placeholder="{:lang('pleaseEnter')}允许上传文件后缀" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">允许上传文件的后缀,以逗号隔开，例如: jpg,png,gif,jpeg,ico,zip,rar,doc,docx,xls,xlsx,ppt,pptx,pdf,txt,csv,mp3,mp4,wav,wmv,avi,mov,flv,mkv</div>
+                            </div>
+                        </div>
+                        <div class="layui-line-split"></div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开启缩略图</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="checkbox" name="upload_thumb_open" lay-skin="switch" value="1" lay-filter="thumbOpen" title="开启|关闭" {eq name=":config('setting.upload_thumb_open')" value="1"}checked{/eq}/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">缩略图尺寸</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-group">
+                                        <div class="layui-input-split layui-input-prefix">宽度</div>
+                                        <input type="text" name="upload_thumb_width" lay-verify="required" lay-reqText="请输入宽度" value="{:config('setting.upload_thumb_width')}" style="border-radius:0!important;" placeholder="{:lang('pleaseEnter')}宽度" class="layui-input">
+                                        <div class="layui-input-split layui-input-suffix">px</div>
+                                    </div>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-group">
+                                        <div class="layui-input-split layui-input-prefix">高度</div>
+                                        <input type="text" name="upload_thumb_height" lay-verify="required" lay-reqText="请输入高度" value="{:config('setting.upload_thumb_height')}" style="border-radius:0!important;" placeholder="{:lang('pleaseEnter')}高度" class="layui-input">
+                                        <div class="layui-input-split layui-input-suffix">px</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">缩放类型</label>
+                            <div class="layui-input-inline from-inline-3">
+                                <select class="layui-select" name="upload_thumb_types">
+                                    <option value="1" {eq name=":config('setting.upload_thumb_types')" value="1"}selected{/eq}>等比例缩放</option>
+                                    <option value="2" {eq name=":config('setting.upload_thumb_types')" value="2"}selected{/eq}>缩放后填充</option>
+                                    <option value="3" {eq name=":config('setting.upload_thumb_types')" value="3"}selected{/eq}>居中裁剪</option>
+                                    <option value="4" {eq name=":config('setting.upload_thumb_types')" value="4"}selected{/eq}>左上角裁剪</option>
+                                    <option value="5" {eq name=":config('setting.upload_thumb_types')" value="5"}selected{/eq}>右下角裁剪</option>
+                                    <option value="6" {eq name=":config('setting.upload_thumb_types')" value="6"}selected{/eq}>固定尺寸缩放</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-line-split"></div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">开启水印</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="checkbox" name="upload_water_open" lay-skin="switch" lay-filter="waterOpen" title="开启|关闭" value="1" {eq name=":config('setting.upload_water_open')" value="1"}checked{/eq}>
+                            </div>
+                        </div>
+                        <div id="water_open" style="display: none;">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">水印类型</label>
+                                <div class="layui-input-inline from-inline-5">
+                                    <input type="radio" name="upload_water_types" lay-filter="water_type" value="1" title="图片" {eq name=":config('setting.upload_water_types')" value="1"}checked{/eq}/>
+                                    <input type="radio" name="upload_water_types" lay-filter="water_type" value="2" title="文字" {eq name=":config('setting.upload_water_types')" value="2"}checked{/eq}/>
+                                </div>
+                            </div>
+                            <div id="wather_image">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">水印图片</label>
+                                    <div class="layui-input-inline from-inline-5">
+                                        <input type="hidden" name="upload_water_image" id="thumb" value="{:config('setting.upload_water_image')}">
+                                        <div class="layui-upload">
+                                            <div class="layui-upload-list" id="uploadImg" style="cursor: pointer;width:64px;">
+                                                {if empty(config('setting.upload_water_image'))}
+                                                    <img class="layui-upload-img" width="64" height="64" src="__ADMIN__/images/default.png" id="Image">
+                                                {else/}
+                                                    <img class="layui-upload-img" width="64" height="64" src="{:config('setting.upload_water_image')}" id="Image">
+                                                {/if}
+                                                <p id="preview"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="wather_text" style="display:none;">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">水印文字</label>
+                                    <div class="layui-input-inline from-inline-3">
+                                        <input type="text" name="upload_water_text" lay-verify="required" lay-reqText="请输入水印文字" value="{:config('setting.upload_water_text')}" placeholder="{:lang('pleaseEnter')}水印文字" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">水印文字设置</label>
+                                    <div class="layui-input-inline from-inline-5">
+                                        <div class="layui-input-inline">
+                                            <div class="layui-input-group">
+                                                <div class="layui-input-split layui-input-prefix">大小</div>
+                                                <input type="number" name="upload_water_size" lay-verify="required" lay-reqText="请输入水印文字大小" style="border-radius:0!important;" value="{:config('setting.upload_water_size')}" placeholder="{:lang('pleaseEnter')}文字大小" class="layui-input">
+                                                <div class="layui-input-split layui-input-suffix">px</div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-input-inline">
+                                            <div class="layui-input-group">
+                                                <div class="layui-input-split layui-input-prefix">颜色</div>
+                                                <input type="text" name="upload_water_color" id="upload_water_color" lay-verify="required" lay-reqText="请选择文字颜色" style="border-radius:0!important;" value="{:config('setting.upload_water_color')}" placeholder="请选择文字颜色" class="layui-input">
+                                                <div class="layui-input-split layui-input-suffix">
+                                                    <div id="colorpicker-color" style="margin:0;"></div>
+                                                    <style>
+                                                        .layui-colorpicker-xs{
+                                                            width: 20px!important;
+                                                            height: 20px!important;;
+                                                            line-height: 18px!important;
+                                                            padding:2px !important;
+                                                        }
+                                                    </style>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">水印透明度</label>
+                                <div class="layui-input-inline from-inline-3">
+                                    <input type="number" name="upload_water_alpha" lay-verify="required" lay-reqText="请输入水印透明度" value="{:config('setting.upload_water_alpha')}" placeholder="{:lang('pleaseEnter')}水印透明度" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">水印倾斜度</label>
+                                <div class="layui-input-inline from-inline-3">
+                                    <input type="number" name="upload_water_angle" lay-verify="required" lay-reqText="请输入水印倾斜度" value="{:config('setting.upload_water_angle')}" placeholder="{:lang('pleaseEnter')}水印倾斜度" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">水印位置</label>
+                                <div class="layui-input-inline from-inline-3">
+                                    <select class="layui-select" name="upload_water_locate">
+                                        <option value="1" {eq name=":config('setting.upload_water_locate')" value="1"}selected{/eq}>左上角水印</option>
+                                        <option value="2" {eq name=":config('setting.upload_water_locate')" value="2"}selected{/eq}>上居中水印</option>
+                                        <option value="3" {eq name=":config('setting.upload_water_locate')" value="3"}selected{/eq}>右上角水印</option>
+                                        <option value="4" {eq name=":config('setting.upload_water_locate')" value="4"}selected{/eq}>左居中水印</option>
+                                        <option value="5" {eq name=":config('setting.upload_water_locate')" value="5"}selected{/eq}>居中水印</option>
+                                        <option value="6" {eq name=":config('setting.upload_water_locate')" value="6"}selected{/eq}>右居中水印</option>
+                                        <option value="7" {eq name=":config('setting.upload_water_locate')" value="7"}selected{/eq}>左下角水印</option>
+                                        <option value="8" {eq name=":config('setting.upload_water_locate')" value="8"}selected{/eq}>下居中水印</option>
+                                        <option value="9" {eq name=":config('setting.upload_water_locate')" value="9"}selected{/eq}>右下角水印</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">水印偏移量</label>
+                                <div class="layui-input-inline from-inline-5">
+                                    <div class="layui-input-inline">
+                                        <div class="layui-input-group">
+                                            <div class="layui-input-split layui-input-prefix">横坐标</div>
+                                            <input type="text" name="upload_water_posx" lay-verify="required" lay-reqText="请输入横坐标" value="{:config('setting.upload_water_posx')}" style="border-radius:0!important;" placeholder="{:lang('pleaseEnter')}宽度" class="layui-input">
+                                            <div class="layui-input-split layui-input-suffix">px</div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-input-inline">
+                                        <div class="layui-input-group">
+                                            <div class="layui-input-split layui-input-prefix">纵坐标</div>
+                                            <input type="text" name="upload_water_posy" lay-verify="required" lay-reqText="请输入纵坐标" value="{:config('setting.upload_water_posy')}" style="border-radius:0!important;" placeholder="{:lang('pleaseEnter')}高度" class="layui-input">
+                                            <div class="layui-input-split layui-input-suffix">px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">AccessKeyId</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_keyid" placeholder="{:lang('pleaseEnter')}阿里云AccessKeyId" value="{:config('setting.upload_keyid')}" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">阿里云AccessKeyId，https://usercenter.console.aliyun.com/#/manage/ak</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">AccessSecret</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_secret" placeholder="{:lang('pleaseEnter')}阿里云AccessSecret" value="{:config('setting.upload_secret')}" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">阿里云accessKeySecret</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">绑定域名</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_domain" placeholder="{:lang('pleaseEnter')}阿里云绑定域名" value="{:config('setting.upload_domain')}" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">对象存储绑定的域名，例如：image.zhipall.com</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">存储节点</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_endpoint" placeholder="{:lang('pleaseEnter')}阿里云存储节点" value="{:config('setting.upload_endpoint')}" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">阿里云OSS的endpoint，例如：oss-cn-beijing.aliyuncs.com</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">存储桶名称</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_bucket" placeholder="{:lang('pleaseEnter')}阿里云存储桶名称" value="{:config('setting.upload_bucket')}" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">阿里云OSS存储桶名称：zhipall-zhicms</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">SecretId</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_keyid_qcloud" value="{:config('setting.upload_keyid_qcloud')}" placeholder="{:lang('pleaseEnter')}腾讯云SecretId" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">腾讯云SecretId，https://console.cloud.tencent.com/cam/capi</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">SecretKey</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_secret_qcloud" value="{:config('setting.upload_secret_qcloud')}" placeholder="{:lang('pleaseEnter')}腾讯云SecretKey" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">腾讯云SecretKey</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">绑定域名</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_domain_qcloud" value="{:config('setting.upload_domain_qcloud')}" placeholder="{:lang('pleaseEnter')}腾讯云绑定域名" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">对象存储绑定的域名，例如：image.zhipall.com</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">存储节点</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_endpoint_qcloud" value="{:config('setting.upload_endpoint_qcloud')}" placeholder="{:lang('pleaseEnter')}腾讯云存储节点" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">腾讯云COS的endpoint，例如：ap-beijing</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">存储桶名称</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_bucket_qcloud" value="{:config('setting.upload_bucket_qcloud')}" placeholder="{:lang('pleaseEnter')}腾讯云空间名称" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">腾讯云COS存储桶名称：zhipall-13132201</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">AccessKey</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_keyid_qiniu" value="{:config('setting.upload_keyid_qiniu')}" placeholder="{:lang('pleaseEnter')}七牛云AccessKey" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">七牛云AccessKey，https://portal.qiniu.com/developer/user/key</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">SecretKey</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_secret_qiniu" value="{:config('setting.upload_secret_qiniu')}" placeholder="{:lang('pleaseEnter')}七牛云SecretKey" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">七牛云SecretKey</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">绑定域名</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_domain_qiniu" value="{:config('setting.upload_domain_qiniu')}" placeholder="{:lang('pleaseEnter')}七牛云绑定域名" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">空间名称绑定的域名，例如：image.zhipall.com</div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">空间名称</label>
+                            <div class="layui-input-inline from-inline-5">
+                                <input type="text" name="upload_bucket_qiniu" value="{:config('setting.upload_bucket_qiniu')}" placeholder="{:lang('pleaseEnter')}七牛云空间名称" class="layui-input">
+                                <div class="layui-word-aux" style="padding-top:10px;">七牛云Kodo空间名称：zhipall-zhicms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn" lay-submit="" lay-filter="myform">
+                        保存
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    var upload_water_open="{:config('setting.upload_water_open')}";//是否开启水印
+    var upload_water_types="{:config('setting.upload_water_types')}";//水印类型
+    layui.use(['form', 'layer', 'element','colorpicker'], function () {
+        var form = layui.form, layer = layui.layer, $ = layui.jquery,colorpicker = layui.colorpicker;
+        colorpicker.render({
+            elem: '#colorpicker-color',
+            color: '#4c4c4c',
+            size:'xs',
+            done: function(color){
+                $('#upload_water_color').val(color);
+            }
+        });
+        $("#uploadImg").on('click',function(){
+            layer.open({
+                title:'选择图片',
+                type:2,
+                maxmin: true,
+                area:['80%','500px'],
+                content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image',
+            });
+        });
+        //水印开启
+        if(upload_water_open==='1'){
+            $('#water_open').show();
+        }else{
+            $('#water_open').hide();
+        }
+        //是否开启水印
+        form.on('switch(waterOpen)',function (data){
+            var elem=data.elem;
+            if(elem.checked){
+                $('#water_open').show();
+            }else{
+                $('#water_open').hide();
+            }
+        });
+        //水印类型
+        if(upload_water_types==='1'){
+            $('#wather_image').show();
+            $('#wather_text').hide();
+        }else{
+            $('#wather_image').hide();
+            $('#wather_text').show();
+        }
+        form.on('radio(water_type)', function(data){
+            if(data.value==='1'){
+                $('#wather_image').show();
+                $('#wather_text').hide();
+            }else{
+                $('#wather_image').hide();
+                $('#wather_text').show();
+            }
+        })
+        form.on('submit(myform)', function (data) {
+            loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:createUrl('setting/storage')}", data.field, function (res) {
+                layer.close(loading);
+                if (res.status === 200) {
+                    layer.msg(res.msg, {icon: 1, time: 1000});
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                    return false;
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

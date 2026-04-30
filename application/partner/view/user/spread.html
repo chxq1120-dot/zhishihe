@@ -1,0 +1,41 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">邀请列表</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form,element = layui.element;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("spread")}?ids={:input("param.ids")}',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id',title: 'ID',align:'center',width:80},
+                {field: 'avatar',title: '头像',align:'center',width:80,templet:function(d){
+                    return '<a href="'+d.avatar+'" target="_blank"><img src="'+d.avatar+'" width="32" height="32"/></a>';
+                }},
+                {field: 'nickname',title:'昵称',align:'center'},
+                {field: 'balance', align: 'center',title: '余额',width:100},
+                {field: 'is_vip', align: 'center',title: '是否会员',width:100,templet:function(d){
+                    if(d.is_vip){return '是';}else{return '否'}
+                }},
+                {field: 'exp_time_text', align: 'center',title: '到期时间',width:150},
+                {field: 'ctime_text', align: 'center',title: '注册时间',width:150},
+                {field: 'login_time_text', align: 'center',title: '登陆时间',width:150},
+            ]]
+        });
+    })
+</script>

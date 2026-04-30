@@ -1,0 +1,167 @@
+{include file="common/head"/}
+<link href="__STATIC__/admin/custom/css/style.css?v3.0.6" rel="stylesheet">
+<link href="__STATIC__/admin/custom/element/index.css" rel="stylesheet">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/js/sortable.min.js"></script>
+<script src="__STATIC__/admin/custom/js/vuedraggable.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<style>
+	body{
+		padding:10px;
+	}
+	.layui-table-cell{height: inherit;}
+	.el-button{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+</style>
+<body>
+<div class="layui-fluid" id="app">
+	<div class="layui-header" style="height:40px;display: flex;justify-content: space-between;margin-bottom:10px;">
+		<el-button @click="addSection" size="mini" type="primary"><i class="layui-icon layui-icon-addition"></i> 增加一个章节</el-button>
+		<el-button @click="saveSection" size="mini" type="primary"><i class="layui-icon layui-icon-upload-drag"></i> 保存章节</el-button>
+	</div>
+	<div class="course-list">
+		<div :key="index" class="coure-item" v-for="(item,index) in courseList">
+			<div class="item-head">
+				<div class="name">第{{courseList.length-index}}章节</div>
+				<div @click="delSection(index)" class="delete">
+					<i class="icon icon-delete"></i>
+				</div>
+			</div>
+			<el-form :model="item" label-width="120px" ref="form" size="mini">
+				<el-form-item label="章节标题">
+					<el-input placeholder="请输入章节标题" v-model="item.title"></el-input>
+				</el-form-item>
+				<el-form-item label="播放地址">
+					<div style="display: flex;align-items: center;">
+						<el-input placeholder="请输入播放地址" v-model="item.url"></el-input>
+						<el-button @click="uploadImg(index)" size="small" style="margin-left:5px;" type="primary">选择文件</el-button>
+					</div>
+				</el-form-item>
+				<el-form-item label="播放选项">
+					<el-col :span="2" class="line" style="text-align: center;font-size:12px;">是否试看</el-col>
+					<el-col :span="6">
+						<el-select placeholder="请选择是否试看" v-model="item.is_try">
+							<el-option :value="1" label="是"></el-option>
+							<el-option :value="0" label="否"></el-option>
+						</el-select>
+					</el-col>
+					<el-col :span="2" class="line" style="text-align: center;font-size:12px;">章节时长</el-col>
+					<el-col :span="12">
+						<el-input placeholder="选填，格式为:00:00:00" v-model="item.times"></el-input>
+					</el-col>
+				</el-form-item>
+			</el-form>
+		</div>
+	</div>
+</div>
+{include file="common/foot"/}
+<script>
+	var api_getPages = "{:createUrl('widget/getPages')}";//页面路径
+	Vue.config.productionTip = false;
+	Vue.config.lang = 'zh-CN';
+	new Vue({
+		el: '#app',
+		data: {
+			courseList: [
+				{
+					title:'',
+					url:'',
+					times:'',
+					is_try:0
+				}
+			],
+		},
+		created: function () {
+			let self = this;
+			var section_list=window.localStorage.getItem('courseSection');
+			if(section_list) {
+				section_list = JSON.parse(section_list);
+				if(section_list.length>0){
+					//section_list.reverse();
+					self.courseList=section_list;
+				}
+			}
+		},
+		mounted: function () {
+			var that = this;
+			that.$nextTick(function () {
+				window.addEventListener("attachmentIn", function (e) {
+					const index = parseInt(e.detail.type);
+					that.courseList[index].url = e.detail.org_url;
+				});
+			});
+		},
+		methods: {
+			saveSection(){
+				let self = this;
+				if(!self.courseList){
+					layer.msg('请填写章节信息', { icon: 2, time: 1000 });
+					return false;
+				}
+				window.localStorage.setItem('courseSection',JSON.stringify(self.courseList));
+				layer.msg('章节保存成功', { icon: 1, time: 1000 }, function () {
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+					parent.layer.close(index);//再执行关闭
+				});
+				return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+			},
+			uploadImg(index){
+				layer.open({
+					title:'上传文件',
+					type:2,
+					maxmin: true,
+					area:['80%','500px'],
+					content:'{:createUrl("attachment/index")}?type=1&name='+index,
+				});
+			},
+			delSection(index){
+				let self = this;
+				self.courseList.splice(index,1);
+			},
+			addSection(){
+				let self = this;
+				var item={
+					title:'',
+					url:'',
+					times:'',
+					is_try:0
+				};
+				self.courseList.unshift(item);
+			},
+		}
+	});
+</script>
+<style>
+	.coure-item{
+		padding:10px 20px 10px 10px;
+		border-radius:10px;
+		margin-bottom:10px;
+		border:#eee 1px solid;
+	}
+	.coure-item	.item-head{
+		padding:10px 20px;
+		border-bottom:#f8f8f8 1px solid;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.coure-item	.item-head .name{
+
+	}
+	.coure-item	.item-head .delete{
+		color:#f56c6c;
+		cursor: pointer;
+	}
+	.coure-item	.el-form{
+		padding-top: 10px;
+	}
+	.coure-item	.el-form .el-form-item__label{
+		font-size:12px;
+	}
+	
+	
+</style>
+</body>

@@ -1,0 +1,232 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">分站申请订单</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <input type="text" class="layui-input" placeholder="检索日期" id="ondate" style="width:200px;">
+                    <span class="item-icon"><i class="layui-icon layui-icon-date"></i></span>
+                </div>
+                <div class="layui-inline">
+                    <select id="onstatus" lay-filter="onstatus">
+                        <option value="">全部状态</option>
+                        <option value="1">启用</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+                <div class="layui-inline">
+                    <input type="text" class="layui-input" placeholder="名称" id="search" style="width:200px;" />
+                    <span class="item-icon" id="onsearch"><i class="icon icon-search"></i></span>
+                </div>
+            </form>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">{:lang('del')}</a>
+</script>
+
+<script type="text/html" id="table-toolbar">
+    <div class="layui-btn-container"></div>
+</script>
+<script>
+    var dateVal='',statusVal='',searchVal='',onlineVal='';
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("order")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            cols: [[
+                {field: 'id',title:'ID',align:'center',width:50},
+                {field: 'agent',title: '所属代理',align:'center',width:120,templet:function(d){
+                    if(d.agent){
+                        return d.agent.username+'【'+d.agent.id+'】';
+                    }else{
+                        return '-';
+                    }
+                }},
+                {field: 'ordno',title:'订单号',align:'center',width:160},
+                {field: 'svip',title: 'SVIP套餐名称',align:'center',width:220,templet:function(d){
+                    if(d.svip){
+                        return d.svip.name;
+                    }else{
+                        return '-';
+                    }
+                }},
+                {field: 'money',title:'金额',align:'center',width:100},
+                {field: 'prefix',title:'分站域名',align:'center',width:150,templet:function(d){
+                    return d.prefix+'.'+d.suffix;
+                }},
+                {field: 'username',title:'账号',align:'center',width:100},
+                {field: 'password',title:'密码',align:'center',width:120},
+                {title: '用户',align:'center',width:100,templet:function(d){
+                    return d.user.nickname;
+                }},
+                {field:'status',width:80,title: '状态',align:'center',templet:function(d){
+                    if(d.status==0){
+                        return '<span class="red">未支付</span>';
+                    }else if(d.status==1){
+                        return '<span class="green">已支付</span>';
+                    }else{
+                        return '<span class="blue">已取消</span>';
+                    }
+                }},
+                {field: 'ctime_text', align: 'center',title: '申请时间',width:150},
+            ]]
+        });
+        //选择日期
+        laydate.render({
+            elem: '#ondate',
+            range: '-',
+            done:function(value, date, endDate){
+                dateVal=value, statusVal=$('#onstatus').val(),searchVal=$('#search').val();
+                var params={};
+                if(statusVal){
+                    params['status']=statusVal
+                }
+                table.reload('list',{
+                    where:{
+                        date:dateVal,
+                        search:searchVal,
+                        filter:JSON.stringify(params)
+                    }
+                });
+            }
+        });
+        //下拉选项
+        form.on('select(onstatus)', function(data){
+            dateVal=$('#ondate').val(),statusVal=data.value,searchVal=$('#search').val();
+            var params={};
+            if(statusVal){
+                params['status']=statusVal
+            }
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:JSON.stringify(params)
+                }
+            });
+        });
+
+        //搜索关键字
+        $('#onsearch').on('click',function(e){
+            dateVal=$('#ondate').val(),statusVal=$('#onstatus').val(),searchVal=$('#search').val();
+            var params={};
+            if(statusVal){
+                params['status']=statusVal
+            }
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:JSON.stringify(params)
+                }
+            });
+        });
+        //启用禁用
+        form.on('switch(status)',function(data){
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            var status=data.elem.value===1 ? 0 : 1;
+            $.post('{:createUrl("setUp")}',{'ids':data.elem.id,'params':'{"status":"'+status+'"}'},function(res){
+                layer.close(loading);
+                if(res.status ===200){
+                    data.elem['value']=status;
+                    return false;
+                }else{
+                    layer.msg('操作失败！', {time: 1000, icon: 2});
+                    return false;
+                }
+            });
+        });
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('你确定要删除吗？', {icon: 3}, function (index) {
+                    $.post("{:createUrl('del')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg('删除成功',{time:1000,icon:1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+        //头工具栏事件批量操作---删除
+        table.on('toolbar(list)', function(obj){
+            var checkStatus = table.checkStatus('list');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o){
+                ids.push(o.id);
+            });
+            if(ids.length===0){
+                return false;
+            }
+            switch(obj.event){
+                case 'openAll':
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}",{ids:ids,params:'{"status":1}'},function (res){
+                        layer.close(loading);
+                        if(res.status === 200){
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'closeAll':
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}",{ids:ids,params:'{"status":0}'},function (res){
+                        layer.close(loading);
+                        if (res.status === 200){
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'delAll':
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('del')}",{ids:ids}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200){
+                            layer.msg(res.msg, {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+
+                    break;
+            }
+        });
+    })
+</script>

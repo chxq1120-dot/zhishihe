@@ -1,0 +1,1 @@
+<view class="blank" style="{{'background:'+(wdata.params.backgroundColor)+';'+('height:'+(wdata.params.height*2+'rpx')+';')}}"></view>

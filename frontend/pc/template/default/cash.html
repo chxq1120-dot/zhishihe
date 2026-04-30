@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+  {include file="header"/}
+  <!-- top头部 End -->
+  <!-- 面包削 -->
+  <div class="crumbs clearfix" style="display: none;">
+    <div class="crumbs-min"><a href="/user/spread">推广中心</a> &gt; 我要提现</div>
+  </div>
+  <!-- 面包削 End -->
+  <div class="container">
+
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+      {include file="usermenu"/}
+    </div>
+    <!-- 会员中心左侧 End -->
+
+    <!-- 右侧功能定位 -->
+    <div class="Member-right">
+      <div class="Ml-box uc-main-box">
+        <div class="zp-conter zp-lister">
+          <div class="zp-right-box">
+            <h1 class="title">我的钱包</h1>
+          </div>
+          <div class="zp-open" style="margin-top:15px;">
+            <!-- 可提现金额 -->
+            <div class="tiXian">
+              <div class="zp_tiXian" id="table"></div>
+            </div>
+            <!-- 可提现金额 End -->
+
+            <div class="cash-bar">
+              <div class="cash-form">
+                  <div class="cash-title">我要提现</div>
+                  <div class="cash-input">
+                      <span class="rmb">￥</span>
+                      <input type="text" class="money" maxlength="8" id="JinE" placeholder="请输入提取金额">
+                      <button class="btn-all" onclick="WCCE.withdrawAll()">全部提现</button>
+                  </div>
+                  <div class="tips" id="shouxu"></div>
+                  <div class="cash-box">
+                    <div class="cash-type">
+                      <ul>
+                        <li class="on" data-target="#alipay-tab" data="1">支付宝提现</li>
+                        <li data="3" data-target="#bank-tab">银行卡提现</li>
+                      </ul>
+                    </div>
+                    <div class="tab-content">
+                      <!-- 支付宝 -->
+                      <div id="alipay-tab" class="tab-panel " style="display: block;">
+                        <form>
+                          <div class="form-item">
+                            <i class="icon icon-user"></i>
+                            <input type="text" name="txtTruename" class="passport-txt xl w-full" id="txtTruename" placeholder="请输入支付宝账号姓名">
+                            <p></p>
+                          </div>
+                          <div class="form-item">
+                            <i class="icon icon-alipay"></i>
+                            <input type="text" name="txtAccount" class="passport-txt xl w-full" id="txtAccount" placeholder="请输入支付宝账号" maxlength="16">
+                          </div>
+                          <div class="form-group">
+                            <button type="submit" class="passport-btn button3" style="width:40%">立即提现</button>
+                          </div>
+                        </form>
+                      </div>
+                      <!-- 银行卡 -->
+                      <div id="bank-tab" class="tab-panel " style="display: none;">
+                        <form>
+                          <div class="form-item">
+                            <i class="icon icon-home"></i>
+                            <input type="text" name="bankName" class="passport-txt xl w-full" id="bankName" placeholder="请输入开户行名称">
+                          </div>
+                          <div class="form-item">
+                            <i class="icon icon-user"></i>
+                            <input type="text" name="bankTrueName" class="passport-txt xl w-full" id="bankTrueName" placeholder="请输入银行开户名">
+                          </div>
+                          <div class="form-item">
+                            <i class="icon icon-qiamizhifu"></i>
+                            <input type="text" name="bankCardNo" class="passport-txt xl w-full" id="bankCardNo" placeholder="请输入银行卡号" maxlength="20">
+                          </div>
+                          <input type="hidden" name="gourl" id="gourl" value="">
+                          <div class="form-group">
+                            <button type="submit" class="passport-btn button3" style="width:40%">立即提现</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+              </div> <!-- 注意事项 -->
+              <div class="cash-desc">
+                <h2 style="font-weight:700;display:block;padding-bottom:10px;">提现说明：</h2>
+                <p class="tip">1、每日提现时间：{$zhicms.cash_time}，只能提现{$zhicms.cash_num}次,并且金额要满{$zhicms.cash_min}元才能提现。</p>
+                <p class="tip">2、请仔细核对收款人信息,如因账号填错造成的资金损失,将由个人承担。</p>
+                <p class="tip">* 提现需人工审核,1~3个工作日内到账,如有超时,请及时联系客服处理！</p>
+              </div>
+              <!-- 注意事项 End -->
+            </div>
+
+          </div>
+          <!-- 提现 End -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 右侧功能定位 End -->
+ {include file="footer"/}
+  <!-- 网站导航 End -->
+  <script>
+      $('.cash-type li').on('click', function () {
+          $(this).addClass('on').siblings().removeClass('on');
+          $('.tab-content>div:eq(' + $(this).index() + ')').show().siblings().hide();
+      });
+    WCCE.handleCash();
+    WCCE.incomeStat();
+  </script>
+</body>
+</html>

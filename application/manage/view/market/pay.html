@@ -1,0 +1,144 @@
+{include file="common/head"/}
+<body>
+	<style>
+		html,body{
+			background-color:#fff;
+		}
+		.layui-fluid{
+			padding:10px;
+		}
+		.pay-img{
+			height: 40px;
+		}
+		.paybar{
+			padding:20px 10px;
+		}
+		.pay-line{
+			display: flex;
+			align-items: center;
+			border-bottom:#eee 1px solid;
+			cursor: pointer;
+			position: relative;
+			padding:10px 0;
+		}
+		.pay-line:active{
+			background-color:#eee;
+		}
+		.pay-line.on::after{
+			font-family: "icon" !important;
+			position: absolute;
+			content:'\e6a7';
+			right:10px;
+			font-size: 20px;
+			font-style: normal;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			color:#36B34B;
+		}
+		.totols{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height:80px;
+		}
+		.totols .nums{
+			font-size:38px;
+		}
+		.totols .name{
+			font-size:14px;
+		}
+		.layui-form{
+			padding:0 30px;
+		}
+	</style>
+	<div class="layui-fluid">
+		<div class="totols">
+			<div class="nums">
+				<span>￥{$totals}</span>
+			</div>
+			<div class="name">订单总计</div>
+		</div>
+		<form class="layui-form layui-form-pane">
+			<div class="paybar">
+				<div class="pay-line on" data-id="1">
+					<img src="__STATIC__/common/images/alipay.png" class="pay-img" alt="">
+				</div>
+				<div class="pay-line" data-id="2">
+					<img src="__STATIC__/common/images/wechat.png" class="pay-img" alt="">
+				</div>
+				<div class="pay-line" data-id="3">
+					<img src="__STATIC__/common/images/balance.png" class="pay-img" alt="">
+					<span style="color:#ff6800;">({$balance})</span>
+				</div>
+				<input type="hidden" name="pay" id="pay" value="1"/>
+			</div>
+			<div class="layui-form-item">
+				  <button class="layui-btn layui-btn-normal layui-btn-lg layui-btn-fluid layui-btn-radius" lay-submit lay-filter="sub">立即购买</button>
+			</div>
+		</form>
+	</div>
+{include file="common/foot"/}
+<div id="layer-photos" style="display:none;">
+	<img id="qrcode" src="">
+</div>
+<script>
+var myTimer;
+layui.use(['form'], function(){
+	var $ = layui.jquery,form = layui.form; //Tab的切换功能，切换事件监听等，需要依赖element模块
+	$('.paybar .pay-line').on('click',function (e) {
+		$('#pay').val($(this).data('id'));
+        $('.paybar .pay-line').removeClass('on');
+        $(this).addClass('on');
+    });
+	form.on('submit(sub)', function(data){
+		loading = layer.load(1, { shade: [0.1, '#fff'] });
+		$.post('',data.field,function(res) {
+			layer.close(loading);
+		    if (res.status === 200){
+                function getQuery() {
+                    $.post(res.data.api_url,{ordno:res.data.ordno,token:res.data.token},function (result) {
+                        if(result.status===1){
+                            clearInterval(myTimer);
+                            layer.msg('购买成功', { icon: 1, time: 2000 },function () {
+                                parent.window.location.reload();
+                            });
+                        }else{
+                            console.log('订单未支付');
+                        }
+                    },'json');
+                }
+                if(res.msg=='购买成功'){
+                    layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                        parent.window.location.reload()
+                    });
+                }else { //在线支付
+                    layer.photos({
+                        photos: {
+                            "title": "扫码支付", //相册标题
+                            "data": [
+                                {
+                                    "alt": "",
+                                    "pid": 0, //图片id
+                                    "src": res.data.imgbase64,
+                                    "thumb": "" //缩略图地址
+                                }
+                            ]
+                        },
+                        anim: 5,
+                        success: function(layero, index){
+                            myTimer=setInterval(function () {
+                                getQuery();
+                            },1000);
+                        }
+                    });
+                }
+		    } else {
+		        layer.msg(res.msg, { icon: 2, time: 1000 });
+		    }
+		});
+		return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+});
+</script>
+</body>

@@ -1,0 +1,220 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">卡密管理</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-inline">
+                   <input type="text" class="layui-input" placeholder="检索日期" id="ondate" style="width:200px;">
+                    <span class="item-icon"><i class="layui-icon layui-icon-date"></i></span>
+                </div>
+                <div class="layui-inline">
+                    <select id="onstatus" lay-filter="onstatus">
+                        <option value="">全部状态</option>
+                        <option value="1">已使用</option>
+                        <option value="0">未使用</option>
+                    </select>
+                </div>
+                <div class="layui-inline">
+                    <input type="text" class="layui-input" placeholder="卡密" id="search" style="width:200px;" />
+                    <span class="item-icon" id="onsearch"><i class="icon icon-search"></i></span>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn">
+                {if $partner['kammi_type']==1}
+                    <a href="javascript:;" class="add layui-btn layui-bg-blue layui-btn-small">
+                        <i class="layui-icon layui-icon-addition"></i>
+                        新增卡密
+                    </a>
+                {/if}
+            </div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i>
+        {:lang('del')}
+    </a>
+</script>
+<script type="text/html" id="table-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-danger" lay-event="delAll"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+    </div>
+</script>
+<script>
+    var dateVal='',statusVal='',searchVal='';
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            cols: [[
+                {type: 'checkbox',title:'ID',align:'center',width:50},
+                {field: 'id',title: 'ID',align:'center',width:60},
+                {field: 'cdkey',title: '卡密',width:220},
+                {field: 'money',align:'center',title: '金额',width:100,},
+                {field: 'svip',align:'center',title: '是否会员',width:180,templet:function(d){
+                    if(d.svip){
+                        return '<span class="blue_block">'+d.svip.name+'</span>';
+                    }else {
+                        return '<span class="gray_block">未指定</span>';
+                    }
+                }},
+                {title: '状态',width:120,align:'center',templet:function(d){
+                    if(d.status==0){
+                        return '<span class="red_block">未使用</span>';
+                    }else if(d.status==1){
+                        return '<span class="green_block">已使用</span>';
+                    }
+                }},
+                {field: 'user',align:'center',title: '使用用户',width:160,templet:function(d){
+                    if(d.user){
+                        return d.user.nickname;
+                    }else{
+                        return '-';
+                    }
+                }},
+                {field: 'utime', align: 'center',title: '使用时间',width:150},
+                {field: 'ctime', align: 'center',title: '添加时间',width:150},
+                {align: 'center',toolbar:'#action',width:150}
+            ]]
+        });
+        //选择日期
+        laydate.render({
+            elem: '#ondate',
+            range: '-',
+            done:function(value, date, endDate){
+                dateVal=value, statusVal=$('#onstatus').val(),searchVal=$('#search').val();
+                var params='';
+                if(statusVal) params='{"status":"'+statusVal+'"}';
+                table.reload('list',{
+                    where:{
+                        date:dateVal,
+                        search:searchVal,
+                        filter:params
+                    }
+                });
+            }
+        });
+        //下拉选项
+        form.on('select(onstatus)', function(data){
+            dateVal=$('#ondate').val(),statusVal=data.value,searchVal=$('#search').val();
+            var params='';
+            if(statusVal) params='{"status":"'+statusVal+'"}';
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:params
+                }
+            });
+        });
+        //搜索关键字
+        $('#onsearch').on('click',function(e){
+            console.log(e);
+            dateVal=$('#ondate').val(),statusVal=$('#onstatus').val(),searchVal=$('#search').val();
+            var params='';
+            if(statusVal) params='{"status":"'+statusVal+'"}';
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal,
+                    filter:params
+                }
+            });
+        });
+        //监听添加
+        $('#func-btn .add').on('click',function () {
+            layer.open({
+                title:'新增卡密',
+                type:2,
+                maxmin: true,
+                content:'{:createUrl("add")}',
+                area:['500px','300px'],
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+        //启用禁用
+        form.on('switch(status)',function(data){
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            var status=data.elem.value===1 ? 0 : 1;
+            $.post('{:createUrl("setUp")}',{'ids':data.elem.id,'params':'{"status":"'+status+'"}'},function(res){
+                layer.close(loading);
+                if(res.status ===200){
+                    data.elem['value']=status;
+                    return false;
+                }else{
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                    return false;
+                }
+            });
+        });
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('确定删除吗',{icon: 3},function(index){
+                    $.post("{:createUrl('del')}",{ids:data.id},function(info){
+                        if(info.status==200){
+                            layer.msg('删除成功',{time: 1000, icon: 1},function(){
+                                tableIn.reload();
+                            });
+                        }else{
+                            layer.msg(info.msg,{time: 1000, icon: 2});
+                        }                        
+                    });
+                });
+            }
+        });
+        //头工具栏事件批量操作---删除
+        table.on('toolbar(list)', function(obj){
+            var checkStatus = table.checkStatus('list');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o){
+                ids.push(o.id);
+            });
+            if(ids.length===0){
+               return false;
+            }
+            switch(obj.event){
+                case 'delAll':
+                    layer.confirm('确定删除吗',{icon: 3},function(index){
+                        $.post("{:createUrl('del')}",{ids:ids},function(info){
+                            if(info.status==200){
+                                layer.msg('删除成功',{time: 1000, icon: 1},function(){
+                                    tableIn.reload();
+                                });
+                            }else{
+                                layer.msg(info.msg,{time: 1000, icon: 2});
+                            }
+                        });
+                    });
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+
+                    break;
+            }
+        });
+    })
+</script>

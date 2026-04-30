@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "音频课程详情",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "wcce-audio": "/components/wcce-audio/wcce-audio",
+    "uv-tabs": "/uni_modules/uv-tabs/components/uv-tabs/uv-tabs",
+    "mp-html": "/uni_modules/mp-html/components/mp-html/mp-html",
+    "uni-popup": "/uni_modules/uni-popup/components/uni-popup/uni-popup",
+    "navbar-side": "/components/wcce/navbar-side"
+  }
+}

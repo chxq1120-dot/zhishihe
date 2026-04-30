@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "verify-slide": "/pages/login/components/verify/verifySlider/verifySlider",
+    "verify-slider-pc": "/pages/login/components/verify/verifySlider/verifySliderPc"
+  }
+}

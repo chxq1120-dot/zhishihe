@@ -1,0 +1,461 @@
+{include file="common/head"/}
+<style>
+    .layui-fluid{
+        background-color:#f6f6f6;
+        padding:0;
+    }
+    .layui-table td, .layui-table th {
+        padding: 8px 15px !important;
+    }
+    .layui-myMenu{
+        margin-bottom:15px;
+    }
+    .layui-myWrap{
+        display: flex;
+        flex-flow: wrap;
+        gap: 10px 10px;
+    }
+    .layui-myWrap li{
+        background-color:#fff;
+        width:calc(12.5% - 10px);
+        height:135px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+    }
+    .layui-myWrap li a{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .layui-myWrap li i{
+        display: flex;
+        background-color:#f6f6f6;
+        width:48px;
+        height:48px;
+        align-items: center;
+        justify-content: center;
+        border-radius:50%;
+        font-size:24px;
+    }
+    .layui-myWrap li cite{
+        margin-top:10px;
+        font-size:14px;
+        color:#6c6c6c;
+    }
+    .layui-myWrap .icon-yingxiao{
+        color:#7DA2FF;
+    }
+    .layui-myWrap .icon-sort{
+        color:#efb44e;
+    }
+    .layui-myWrap .icon-user{
+        color:#638eec;
+    }
+    .layui-myWrap .icon-kucun{
+        color:#8f44e6;
+    }
+    .layui-myWrap .icon-caiwu{
+        color:#FF7B8C;
+    }
+    .layui-myWrap .icon-book{
+        color:#0FC6C2;
+    }
+    .layui-myWrap .icon-agent{
+        color:#e49331;
+    }
+    .layui-myWrap .icon-setting{
+        color:#3ed246;
+    }
+    .layui-mystats{
+        display: flex;
+        gap: 10px 10px;
+        margin-bottom: 10px;
+    }
+    .layui-mystats .layui-block-stat{
+        width:calc(25% - 20px);
+        background-color:#fff;
+        border-radius:5px;
+        padding:10px 15px;
+    }
+    .layui-block-stat .stat-title{
+        padding:5px 0 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .layui-block-stat .stat-title .name{
+        font-size:14px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+    }
+    .layui-block-stat .stat-title .name i{
+        color:#1E9FFF;
+        padding-right:5px;
+    }
+    .layui-block-stat .stat-title .today{
+        font-size:12px;
+        color: #83D587;
+        background-color:#E8FFDB;
+        border: #d9f7c8 1px solid;
+        border-radius:3px;
+        padding:2px 6px;
+    }
+    .layui-block-stat .stat-value{
+        padding:20px 5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .layui-block-stat .stat-value .total-num{
+        font-size: 22px;
+        padding:0 3px;
+        color:#4c4c4c;
+    }
+    .layui-block-stat .stat-value .today-num{
+        font-size: 28px;
+        padding:0 3px;
+    }
+    .layui-block-stat .stat-days{
+        padding:0 5px 10px 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .layui-block-stat .stat-yesday{
+        font-size: 13px;
+    }
+    .layui-block-stat .stat-month{
+        font-size: 13px;
+    }
+    .layui-block-stat .stat-days .name{
+        color:#9c9c9c;
+    }
+    .layui-block-stat .stat-total{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding:10px 5px;
+        border-top:#eee 1px solid;
+        font-size:14px;
+        color:#6c6c6c;
+    }
+    .layui-block-stat .stat-total .name{
+        color:#9c9c9c;
+    }
+    @media screen and (max-width: 768px){
+        .layui-mystats{
+            display: flex;
+            flex-flow: wrap;
+        }
+        .layui-mystats .layui-block-stat{
+            width: calc(50% - 35px);
+        }
+        .layui-myWrap li{
+            background-color:#fff;
+            width:calc(50% - 15px);
+            height:135px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+    }
+</style>
+<div class="layui-fluid">
+    <div class="layui-mystats">
+        <div class="layui-block-stat">
+            <div class="stat-title">
+                <span class="name"><i class="icon icon-liulan"></i>累计访问</span>
+                <span class="today">今日</span>
+            </div>
+            <div class="stat-value">
+                <span class="total-num" id="total_visitor">0</span>
+                <span class="today-num" id="today_visitor">0</span>
+            </div>
+            <div class="stat-days">
+                <div class="stat-week">
+                    <span class="name">本周</span>
+                    <span class="num" id="week_visitor">0次</span>
+                </div>
+                <div class="stat-yesday">
+                    <span class="name">昨日</span>
+                    <span class="num" id="yes_visitor">0次</span>
+                </div>
+            </div>
+            <div class="stat-total">
+                <div class="yes-month">
+                    <span class="name">上月</span>
+                    <span class="num" id="last_month_visitor">0次</span>
+                </div>
+                <div class="today-month">
+                    <span class="name">本月</span>
+                    <span class="num" id="today_month_visitor">0次</span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-block-stat">
+            <div class="stat-title">
+                <span class="name"><i class="icon icon-user"></i>累计用户</span>
+                <span class="today">今日</span>
+            </div>
+            <div class="stat-value">
+                <span class="total-num" id="total_user">0</span>
+                <span class="today-num" id="today_user">0</span>
+            </div>
+            <div class="stat-days">
+                <div class="stat-week">
+                    <span class="name">本周</span>
+                    <span class="num" id="week_user">0人</span>
+                </div>
+                <div class="stat-yesday">
+                    <span class="name">昨日</span>
+                    <span class="num" id="yes_user">0人</span>
+                </div>
+            </div>
+            <div class="stat-total">
+                <div class="yes-month">
+                    <span class="name">上月</span>
+                    <span class="num" id="last_month_user">0人</span>
+                </div>
+                <div class="today-month">
+                    <span class="name">本月</span>
+                    <span class="num" id="this_month_user">0人</span>
+                </div>
+            </div>
+        </div>
+        <div class="layui-block-stat">
+            <div class="stat-title">
+                <span class="name"><i class="icon icon-kucun"></i>累计订单</span>
+                <span class="today">今日</span>
+            </div>
+            <div class="stat-value">
+                <span class="total-num" id="total_order">0</span>
+                <span class="today-num" id="today_order">0</span>
+            </div>
+            <div class="stat-days">
+                <div class="stat-week">
+                    <span class="name">本周</span>
+                    <span class="num" id="week_order">0笔</span>
+                </div>
+                <div class="stat-yesday">
+                    <span class="name">昨日</span>
+                    <span class="num" id="yes_order">0笔</span>
+                </div>
+            </div>
+            <div class="stat-total">
+                <div class="yes-month">
+                    <span class="name">上月</span>
+                    <span class="num" id="last_month_order">0笔</span>
+                </div>
+                <div class="today-month">
+                    <span class="name">本月</span>
+                    <span class="num" id="this_month_order">0笔</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-block-stat">
+            <div class="stat-title">
+                <span class="name"><i class="icon icon-jine"></i>累计成交</span>
+                <span class="today">今日</span>
+            </div>
+            <div class="stat-value">
+                <span class="total-num" id="total_money">0</span>
+                <span class="today-num" id="today_money">0</span>
+            </div>
+            <div class="stat-days">
+                <div class="stat-week">
+                    <span class="name">本周</span>
+                    <span class="num" id="week_money">0元</span>
+                </div>
+                <div class="stat-yesday">
+                    <span class="name">昨日</span>
+                    <span class="num" id="yes_money">0元</span>
+                </div>
+            </div>
+            <div class="stat-total">
+                <div class="yes-month">
+                    <span class="name">上月</span>
+                    <span class="num" id="last_month_money">0元</span>
+                </div>
+                <div class="today-month">
+                    <span class="name">本月</span>
+                    <span class="num" id="this_month_money">0元</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <i class="icon icon-WhiteBoard"></i>
+            订单趋势
+        </div>
+        <div class="layui-card-body" data-anim="fade" lay-filter="LAY-order-dataview">
+            <div id="LAY-order-dataview" style="width:100%;height:400px;"></div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <i class="icon icon-WhiteBoard"></i>
+                    最近访问统计
+                </div>
+                <div class="layui-card-body" data-anim="fade" lay-filter="LAY-order-dataview">
+                    <div id="LAY-view-dataview" style="width:100%;height:300px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <i class="icon icon-WhiteBoard"></i>
+                    最近新增用户
+                </div>
+                <div class="layui-card-body" data-anim="fade" lay-filter="LAY-view-dataview">
+                    <div id="LAY-user-dataview" style="width:100%;height:300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.config({
+        base: '__STATIC__/layuiadmin/'//静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'jquery', 'echarts'], function () {
+        var $ = layui.jquery, echarts = layui.echarts;
+        $.post("{:createUrl('statinfo')}",{}, function (res) {
+            if (res.status===200){
+                $('#total_visitor').text(res.data.total_visitor);
+                $('#today_visitor').text(res.data.today_visitor);
+                $('#week_visitor').text(res.data.week_visitor+'次');
+                $('#yes_visitor').text(res.data.yes_visitor+'次');
+                $('#last_month_visitor').text(res.data.last_month_visitor+'次');
+                $('#today_month_visitor').text(res.data.month_visitor+'次');
+
+                $('#total_user').text(res.data.total_user);
+                $('#today_user').text(res.data.today_user);
+                $('#week_user').text(res.data.week_user+'人');
+                $('#yes_user').text(res.data.yes_user+'人');
+                $('#last_month_user').text(res.data.last_month_user+'人');
+                $('#this_month_user').text(res.data.month_user+'人');
+
+                $('#total_order').text(res.data.total_order);
+                $('#today_order').text(res.data.today_order);
+                $('#week_order').text(res.data.week_order+'笔');
+                $('#yes_order').text(res.data.yes_order+'笔');
+                $('#last_month_order').text(res.data.last_month_order+'笔');
+                $('#this_month_order').text(res.data.month_order+'笔');
+
+                $('#total_money').text(res.data.total_money);
+                $('#today_money').text(res.data.today_money);
+                $('#week_money').text(res.data.week_money+'元');
+                $('#yes_money').text(res.data.yes_money+'元');
+                $('#last_month_money').text(res.data.last_month_money+'元');
+                $('#this_month_money').text(res.data.month_money+'元');
+            }
+        });
+        $.post("{:createUrl('dataView')}",{}, function (res) {
+            if (res.status===200){
+                var option = [
+                    {
+                        tooltip: {trigger: "axis"},
+                        color: ["#1495EB", "#00CC66", "#F9D249", "#ff9900", "#9860DF"],
+                        grid: {
+                            left: 16,
+                            right: 25,
+                            bottom: 10,
+                            top: 40,
+                            containLabel: false
+                        },
+                        legend: {data: ["订单金额", "订单数量"]},
+                        xAxis: [{
+                            type: "category",
+                            boundaryGap: false,
+                            data: res.data.date_list
+                        }],
+                        yAxis: [{type: "value"}],
+                        series: [ {
+                            name: "订单金额",
+                            type: "line",
+                            smooth: !0,
+                            itemStyle: {normal: {areaStyle: {type: "default"}}},
+                            data: res.data.order_money
+                        },{
+                            name: "订单数量",
+                            type: "line",
+                            smooth: !0,
+                            itemStyle: {normal: {areaStyle: {type: "default"}}},
+                            data: res.data.order_list
+                        }]
+                    }, {
+                        title: {text: "最近访问趋势",x: "center",textStyle: {fontSize: 14}},
+                        color: ["#1495EB", "#00CC66", "#F9D249", "#ff9900", "#9860DF"],
+                        grid: {
+                            left: 16,
+                            right: 25,
+                            bottom: 10,
+                            top: 40,
+                            containLabel: false
+                        },
+                        tooltip: {
+                            trigger: "axis",
+                            formatter: "{b}<br>访问人数：{c}"
+                        },
+                        xAxis: [{
+                            type: "category",
+                            data: res.data.date_list
+                        }],
+                        yAxis: [{
+                            type: "value"
+                        }],
+                        series: [{
+                            type: "line",
+                            data: res.data.view_list
+                        }]
+                    }, {
+                        title: {text: "新增用户趋势",x: "center",textStyle: {fontSize: 14}},
+                        color: ["#1495EB", "#00CC66", "#F9D249", "#ff9900", "#9860DF"],
+                        grid: {
+                            left: 16,
+                            right: 25,
+                            bottom: 10,
+                            top: 40,
+                            containLabel: false
+                        },
+                        tooltip: {
+                            trigger: "axis",
+                            formatter: "{b}<br>用户人数：{c}"
+                        },
+                        xAxis: [{
+                            type: "category",
+                            data: res.data.date_list
+                        }],
+                        yAxis: [{
+                            type: "value"
+                        }],
+                        series: [{
+                            type: "line",
+                            data: res.data.user_list
+                        }]
+                    }
+                ];
+                var order_chart=echarts.init(document.getElementById('LAY-order-dataview'),layui.echartsTheme);
+                order_chart.setOption(option[0],true);
+                var view_chart=echarts.init(document.getElementById('LAY-view-dataview'),layui.echartsTheme);
+                view_chart.setOption(option[1],true);
+                var user_chart=echarts.init(document.getElementById('LAY-user-dataview'),layui.echartsTheme);
+                user_chart.setOption(option[2],true);
+            }
+        });
+    });
+</script>
+</body>
+</html>

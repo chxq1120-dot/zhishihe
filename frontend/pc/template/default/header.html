@@ -1,0 +1,62 @@
+<!-- top头部 -->
+<script>
+    var mobile_url='{$zhicms.account_domain}';
+    WCCE.mobileRedirect(mobile_url);
+</script>
+<div class="zp-box"></div>
+<div class="head">
+    <div class="bag">
+        <!-- logo -->
+        <a class="logo" href="/" rel="nofollow">
+            <img src="{$zhicms.coms_logo}" alt="{$zhicms.coms_title}" width="100%"/>
+        </a>
+        <!-- logo End -->
+        <!-- 网站导航 -->
+        <div id="navbar">
+            <ul class="navbar1 mask">
+                <li><a href="/">首页</a></li>
+                <li class="sub-cource"><a href="/course" title="全部课程">全部课程</a>
+                    <ol class="sub-cource-list">
+                        {zhi:list table="resource_sort" order="indexid asc,id asc" limit="20" where="pid=0 and status=1"
+                        id="item" key="k"}
+                            <li><a href="/course/list{$item['id']}" target="_blank" title="{$item['name']}">{$item['name']}</a></li>
+                        {/zhi:list}
+                    </ol>
+                </li>
+                <li><a href="/svip" title="会员特权">会员特权</a></li>
+                <li><a href="/article" title="精选文章">精选文章</a></li>
+                <li><a href="/help" title="帮助中心">帮助中心</a></li>
+            </ul>
+        </div>
+        <!-- 课程搜索 -->
+        <div class="search-bar">
+            <input type="text" class="keyword" id="keys" placeholder="搜索你感兴趣的资源" autocomplete="off">
+            <button class="btn-search" id="btn-search">
+                <i class="icon icon-search"></i>
+            </button>
+        </div>
+        <script type="text/javascript">
+            $('#btn-search').on('click',function () {
+                var keyword=$('#keys').val();
+                if(!keyword){
+                    alert('请输入关键字');
+                    return false;
+                }
+                window.location.href='/course?keys='+keyword;
+            });
+        </script>
+        <!-- 课程搜索 End -->
+        <!-- 登录/注册 -->
+        <div class="dright">
+            <div class="sbox" id="ulogin"></div>
+        </div>
+        <!-- 登录/注册 End -->
+        <input type="hidden" id="mytoken" value="{$user['token']}">
+    </div>
+</div>
+<script>
+    WCCE.NavBar();//导航菜单
+    WCCE.validLogin();
+</script>
+<!-- top头部 End -->
+<div class="head-gl"></div>

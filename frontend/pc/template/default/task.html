@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$zhicms.coms_title}</title>
+    <link href="__STATIC__/default/css/index_v3.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/c/font_2476635_8occw87hvv3.css">
+    <link rel="stylesheet" href="__STATIC__/layuiadmin/layui/css/layui.css">
+    <script type="text/javascript" src="__STATIC__/default/js/jquery.js"></script>
+    <script ype="text/javascript" src="__STATIC__/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/main.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/clipboard.min.js"></script>
+</head>
+<body style="background-color:#fff;">
+<div class="taskbar">
+    <div class="process">
+        <div class="ico">
+            <i class="icon icon-bxs-group"></i>
+        </div>
+        <div class="info">
+            <div class="name">邀请{$spread['invite_num']}位朋友助力</div>
+            <div class="desc">已完成进度{$task['percent']}%</div>
+        </div>
+        <div class="ctl-btn">
+            <button class="btn-link" data-clipboard-target=".invite_url" aria-label="邀请链接复制成功,快去邀请好友助力吧！">去邀请</button>
+        </div>
+    </div>
+    <div class="slide-process">
+        <div class="layui-progress">
+            <div class="layui-progress-bar" lay-percent="{$task['percent']}%"></div>
+        </div>
+    </div>
+    <div class="tips">完成邀请任务后，免费获得该资源，快去邀请好友吧</div>
+    <div class="invites">
+        <div class="invite_url">{$invite_url}</div>
+        <div class="invite_btn" data-clipboard-target=".invite_url" aria-label="邀请链接复制成功,快去邀请好友助力吧！">
+            复制链接
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('element', function () {
+        var element = layui.element;
+    });
+    var clipboard = new Clipboard('.invite_btn,.btn-link');
+    clipboard.on('success', function (e) {
+        var msg = e.trigger.getAttribute('aria-label');
+        alert(msg);
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        e.clearSelection();
+    });
+</script>
+</body>
+</html>

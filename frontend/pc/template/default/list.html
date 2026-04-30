@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+{include file="header"/}
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+    <div class="crumbs-min"><a href="/" title="首页">首页</a> &gt; <a href="/course" title="全部课程">全部课程</a> {$navPath|raw}</div>
+</div>
+<!-- 面包削End -->
+<!-- 课程分类 -->
+<div class="option-bar clearfix">
+    <div class="option-item">
+        <span class="labels">分类:</span>
+        <div class="sort-item">
+            <a href="/course?ty={$type}&pe={$price}&le={$level}"  {if $sid==0}class="on"{/if} title="全部">全部</a>
+            {zhi:list table="resource_sort" order="indexid asc,id asc" limit="20" where="pid=0 and status=1" id="item" key="k"}
+                {if $sid==$item['id']}
+                    <a href="/course/list{$item['id']}?ty={$type}&pe={$price}&le={$level}" class="on" title="{$item['name']}">{$item['name']}</a>
+                {else/}
+                    <a href="/course/list{$item['id']}?ty={$type}&pe={$price}&le={$level}" title="{$item['name']}">{$item['name']}</a>
+                {/if}
+            {/zhi:list}
+        </div>
+    </div>
+    <div class="option-item">
+        <span class="labels">类型:</span>
+        <div class="sort-item">
+            <a {if $type==0} class="on"{/if} href="/course/list{$sid}?le={$level}&pe={$price}" rel="nofollow">全部</a>
+            <a {if $type==3} class="on"{/if} href="/course/list{$sid}?ty=3&le={$level}&pe={$price}" rel="nofollow">文章资源</a>
+            <a {if $type==2} class="on"{/if} href="/course/list{$sid}?ty=2&le={$level}&pe={$price}" rel="nofollow">视频资源</a>
+            <a {if $type==1} class="on"{/if} href="/course/list{$sid}?ty=1&le={$level}&pe={$price}" rel="nofollow">网盘资源</a>
+            <a {if $type==4} class="on"{/if} href="/course/list{$sid}?ty=4&le={$level}&pe={$price}" rel="nofollow">视频课程</a>
+            <a {if $type==5} class="on"{/if} href="/course/list{$sid}?ty=5&le={$level}&pe={$price}" rel="nofollow">音频课程</a>
+            <a {if $type==6} class="on"{/if} href="/course/list{$sid}?ty=6&le={$level}&pe={$price}" rel="nofollow">卡密资源</a>
+        </div>
+    </div>
+    <div class="option-item">
+        <span class="labels">等级:</span>
+        <div class="sort-item">
+            <a {if $level=="0"} class="on"{/if} href="/course/list{$sid}?ty={$type}&pe={$price}" rel="nofollow">全部</a>
+            {volist name="level_list" id="item"}
+                <a {if $level==$item.id} class="on"{/if} href="/course/list{$sid}?le={$item.id}&ty={$type}&pe={$price}" title="{$item.name}" rel="nofollow">{$item.name}</a>
+            {/volist}
+        </div>
+    </div>
+    <div class="option-item">
+        <span class="labels">性质:</span>
+        <div class="sort-item">
+            <a {if $price=="0"} class="on"{/if} href="/course/list{$sid}?ty={$type}&le={$level}" rel="nofollow">全部</a>
+            <a {if $price==1} class="on"{/if} href="/course/list{$sid}?pe=1&ty={$type}&le={$level}" rel="nofollow">免费</a>
+            <a {if $price==2} class="on"{/if} href="/course/list{$sid}?pe=2&ty={$type}&le={$level}" rel="nofollow">付费</a>
+        </div>
+    </div>
+</div>
+<!-- 课程分类 End -->
+<div class="container">
+    <!-- 课程列表 -->
+    {empty name="list"}
+        <div class="nodata">
+            <i class="icon icon-nodata"></i>
+            <span class="msg">暂时没有内容</span>
+        </div>
+    {else/}
+        <div class="list-course">
+            <ul class="list-wrap clearfix">
+                {volist name="list" id="item"}
+                <li>
+                    <a href="/course/show/{$item['id']}.html" class="link" title="{$item['title']}" target="_blank">
+                        <img class="course-thumb lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}" style="display: block;">
+                        <div class="course-card">
+                            <h3 class="course-title">{$item['title']}</h3>
+                            <div class="course-labels">
+                                <label class="labels">{:getLevelLabel($item['level'])}</label>
+                                {volist name=":getSortAttr($item['id'])" id="v"}
+                                <label class="label">{$v.name}</label>
+                                {/volist}
+                            </div>
+                            <div class="course-desc">
+                                    <span class="course-price">
+                                        {if $item['price']>0}
+                                            <em class="price">￥{$item['price']}</em>
+                                        {else/}
+                                            <em class="price">免费</em>
+                                        {/if}
+                                        <em class="cost-price">￥{$item['dis_price']}</em>
+                                    </span>
+                                <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                {/volist}
+            </ul>
+        </div>
+        <div class="pages">
+            {$page|raw}
+        </div>
+    {/empty}
+    <!-- 课程列表 End -->
+</div>
+{include file="footer"/}
+<!-- 网站导航 End -->
+</body>
+</html>

@@ -1,0 +1,74 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="table-body">
+        <div class="layui-card" style="padding-top:20px;">
+            <form class="layui-form layui-form-pane" lay-filter="configs">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">版本号</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="text" name="row[version]" value="{$vnums}" lay-verify="required" placeholder="{:lang('pleaseEnter')}版本号" class="layui-input">
+                        <span class="layui-word-aux">例如：1.0.1</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">版本描述</label>
+                    <div class="layui-input-inline from-inline-4">
+                        <textarea type="text" name="row[remark]" style="width:100%;padding-top:10px;height:80px;" lay-verify="required" placeholder="{:lang('pleaseEnter')}版本描述" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">插件信息</label>
+                    <div class="layui-input-inline from-inline-5" style="padding-top:10px;">
+                        <input type="checkbox" name="row[plugins]" title="百度网盘插件" value="netdiskShare" lay-skin="primary" checked>
+                        <span class="layui-word-aux">如小程序没有申请百度网盘插件，请勿勾选</span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"></label>
+                    <div class="layui-input-inline from-inline-5">
+                        <div class="layui-word-aux">小程序代码上传比较耗时，请勿关闭页面，等待上传成功</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" lay-submit="" lay-filter="upload">上传小程序</button>
+                        <button type="button" class="layui-btn" lay-submit="" lay-filter="preview">预览二维码</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+layui.use(['form'], function(){
+    var form = layui.form,$= layui.jquery;
+    form.on('submit(upload)', function (data) {
+        loading =layer.load(1, {shade: [0.1,'#fff']});
+        $.post("{:url('issue')}?type=upload", data.field, function (res) {
+            layer.close(loading);
+            if (res.code===200){
+                layer.msg('上传成功，请前往微信小程序-版本管理查看',{time: 2000, icon: 1});
+            } else {
+                layer.msg(res.msg, {time: 2000, icon: 2});
+            }
+        });
+    });
+    form.on('submit(preview)', function (data) {
+        loading =layer.load(1, {shade: [0.1,'#fff']});
+        $.post("{:url('issue')}?type=preview", data.field, function (res) {
+            layer.close(loading);
+            if (res.code===200){
+                layer.open({
+                    title:'预览二维码',
+                    type:1,
+                    content:"<img src='"+res.data.preview+"' style='margin:0 auto;display:block;' width='300px' height='auto'/>",
+                    area:['350px','350px'],
+                });
+            } else {
+                layer.msg(res.msg, {time: 2000, icon: 2});
+            }
+        });
+    })
+});
+</script>

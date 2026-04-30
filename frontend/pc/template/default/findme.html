@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+    <link href="__STATIC__/default/css/login.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/default/css/verify.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <div class="logo">
+            <a href="/" rel="nofollow">
+                <img src="{$zhicms.coms_logo}" alt="{$zhicms.coms_title}" width="100%"/>
+            </a>
+        </div>
+        <div class="menu-right">
+            <a href="/help" title="帮助中心">
+                <i class="icon icon-help"></i>
+                帮助中心
+            </a>
+        </div>
+    </div>
+    <div class="passport">
+        <!-- 右边 -->
+        <div class="findme">
+            <!-- tab切换 -->
+            <div class="sign-up-tab">
+                <ul>
+                    <li class="current"><a href="javascript:;"><span>找回密码</span></a></li>
+                </ul>
+            </div>
+            <div class="sign-up-bar">
+                <input type="hidden" id="fromUrl" value="{:input('fromurl')}">
+                <div class="sign-up-item">
+                    <div class="form-item">
+                        <i class="icon icon-phone"></i>
+                        <input type="text" class="sign-inp" id="reUsername" placeholder="请输入手机号码" maxlength="11">
+                    </div>
+                    <div class="form-item">
+                        <i class="icon icon-lock"></i>
+                        <input type="password" class="sign-inp" id="rePassword" placeholder="请设置新密码，建议数字+字母组合" maxlength="20">
+                    </div>
+                    <div class="form-item">
+                        <i class="icon icon-lock"></i>
+                        <input type="password" class="sign-inp" id="rerPassword" placeholder="请再次输入新密码" maxlength="20">
+                    </div>
+                    <div class="form-item">
+                        <i class="icon icon-yzm"></i>
+                        <input type="text" class="sign-inp" maxlength="6" id="reCode" placeholder="请输入验证码" autocomplete="off">
+                        <button class="btn-code" id="btn-code">获取验证码</button>
+                    </div>
+                    <div id="panelCaptcha"></div>
+                    <!-- 用户协议 End -->
+                    <div class="form-group">
+                        <button type="button" onclick="WCCE.findMe()" class="btn-regiter">确定</button>
+                    </div>
+                </div>
+                <!-- 注册账号 End -->
+            </div>
+            <!-- Tab End -->
+        </div>
+        <!-- 右边 End -->
+    </div>
+</div>
+{include file="footer"/}
+<script src="__STATIC__/default/js/crypto-js.js"></script>
+<script src="__STATIC__/default/js/ase.js"></script>
+<script src="__STATIC__/default/js/verify.js" ></script>
+<script>
+    // 初始化验证码弹出式
+    var baseUrl=window.location.protocol+'//'+window.location.host;
+    $('#panelCaptcha').slideVerify({
+        baseUrl:baseUrl,  //服务器请求地址, 默认地址为安吉服务器;
+        mode:'pop',     //展示模式
+        containerId:'btn-code',//pop模式 必填 被点击之后出现行为验证码的元素id
+        imgSize : {       //图片的大小对象,有默认值{ width: '310px',height: '155px'},可省略
+            width: '400px',
+            height: '200px',
+        },
+        barSize:{
+            width: '400px',
+            height: '40px',
+        },
+        beforeCheck:function(){  //检验参数合法性的函数  mode ="pop"有效
+            var mobile = $('#reUsername').val();
+            var password = $('#rePassword').val();
+            var rpassword = $('#rerPassword').val();
+            var filter = /^1(3|4|5|6|7|8|9)\d{9}$/;
+            if (!mobile || !filter.test(mobile)) {
+                layer.msg('请输入手机号码', {time: 1500});
+                return false;
+            }
+            if (!password || password.length < 6 || password.length > 20) {
+                layer.msg('请设置登录密码，长度为6~20个字符', {time: 1500});
+                return false;
+            }
+            if (password !== rpassword) {
+                layer.msg('二次密码输入不一致', {time: 1500});
+                return false;
+            }
+            return true;
+        },
+        ready : function() {},  //加载完毕的回调
+        success : function(params) { //成功的回调
+            WCCE.sendSms(params.captchaVerification);
+        },
+        error : function() {}        //失败的回调
+    });
+</script>
+</body>
+</html>

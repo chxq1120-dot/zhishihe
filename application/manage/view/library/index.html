@@ -1,0 +1,256 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">主资源库</li>
+        </ul>
+    </div>
+    <style>
+        .tool-option{}
+        .option-item{
+            display: flex;
+            border-bottom:#eee 1px solid;
+            padding:15px 0;
+            font-size:14px;
+        }
+        .option-item .option-label{
+            width:100px;
+            text-align:center;
+            color:#c9c9c9;
+        }
+        .option-item .option-list{
+            width:calc(100% - 100px);
+        }
+        .option-item .option-big{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .option-item .option-list a{
+            padding:2px 10px;
+            margin-right:10px;
+            color:#3c3c3c;
+        }
+        .option-item .option-list a.on{
+            color:#1E9FFF;
+        }
+        .option-item .option-list a:hover{
+            color:#1E9FFF;
+        }
+        .option-item .option-small{
+            padding:10px 10px;
+            background-color:#f8f8f8;
+            border-radius:5px;
+            margin-top:10px;
+        }
+        .option-item .option-small a{
+            display: inline-block;
+            font-size:12px;
+            padding:2px 10px;
+            margin-right:10px;
+        }
+    </style>
+    <div class="table-body">
+        <div class="tool-option">
+            {notempty name="sortList"}
+            <div class="option-item">
+                <div class="option-label">资源类别</div>
+                <div class="option-list">
+                    <div class="option-big">
+                        <a {eq name=":input('sid/d',0)" value="0"}class="on"{/eq} href="{:createUrl('index',['sid'=>0,'cid'=>0,'type'=>input('type/d',0),'price'=>input('price/d',0)])}" title="全部">全部</a>
+                        {volist name="sortList" id="v"}
+                        <a {eq name=":input('sid/d',0)" value="$v.id"}class="on"{/eq} href="{:createUrl('index',['sid'=>$v.id,'cid'=>0,'type'=>input('type/d',0),'price'=>input('price/d',0)])}" title="{$v.name}">{$v.name}</a>
+                        {/volist}
+                    </div>
+                    {notempty name="smallList"}
+                    <div class="option-small">
+                        {volist name="smallList" id="v"}
+                        <a {eq name=":input('cid/d',0)" value="$v.id"}class="on"{/eq} href="{:createUrl('index',['sid'=>input('sid/d',0),'cid'=>$v.id,'type'=>input('type/d',0),'price'=>input('price/d',0)])}" title="{$v.name}">{$v.name}</a>
+                        {/volist}
+                    </div>
+                    {/notempty}
+                </div>
+            </div>
+            {/notempty}
+            <div class="option-item">
+                <div class="option-label">资源类型</div>
+                <div class="option-list">
+                    <a {eq name=":input('type/d',0)" value="0"}class="on"{/eq} href="{:createUrl('index',['type'=>0,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="全部类型">全部</a>
+                    <a {eq name=":input('type/d',0)" value="1"}class="on"{/eq} href="{:createUrl('index',['type'=>1,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="网盘资源">网盘资源</a>
+                    <a {eq name=":input('type/d',0)" value="2"}class="on"{/eq} href="{:createUrl('index',['type'=>2,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="视频资源">视频资源</a>
+                    <a {eq name=":input('type/d',0)" value="3"}class="on"{/eq} href="{:createUrl('index',['type'=>3,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="文章文库">文章文库</a>
+                    <a {eq name=":input('type/d',0)" value="4"}class="on"{/eq} href="{:createUrl('index',['type'=>4,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="视频课程">视频课程</a>
+                    <a {eq name=":input('type/d',0)" value="5"}class="on"{/eq} href="{:createUrl('index',['type'=>5,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="音频课程">音频课程</a>
+                </div>
+            </div>
+            <div class="option-item">
+                <div class="option-label">资源价格</div>
+                <div class="option-list">
+                    <a {eq name=":input('price/d',0)" value="0"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>0])}" title="全部类型">全部</a>
+                    <a {eq name=":input('price/d',0)" value="1"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>1])}" title="免费">免费</a>
+                    <a {eq name=":input('price/d',0)" value="2"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>2])}" title="0-10元">0-10元</a>
+                    <a {eq name=":input('price/d',0)" value="3"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>3])}" title="10-20元">10-20元</a>
+                    <a {eq name=":input('price/d',0)" value="4"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>4])}" title="20-30元">20-30元</a>
+                    <a {eq name=":input('price/d',0)" value="5"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>5])}" title="30-50元">30-50元</a>
+                    <a {eq name=":input('price/d',0)" value="6"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>6])}" title="50-100元">50-100元</a>
+                    <a {eq name=":input('price/d',0)" value="7"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>7])}" title="100-200元">100-200元</a>
+                    <a {eq name=":input('price/d',0)" value="8"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>8])}" title="200元以上">200元以上</a>
+                </div>
+            </div>
+        </div>
+        <div class="search-tool" style="padding-top:10px;">
+            <form class="layui-form">
+                <div class="layui-form-item" style="padding-left:20px;margin-bottom:0;">
+                    <div class="layui-inline" style="color:#9c9c9c;">查找资源</div>
+                    <div class="layui-inline">
+                        <input type="text" name="search" style="border-radius:10px;width:300px;" class="layui-input" placeholder="请输入关键字">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-bg-blue" lay-submit="" lay-filter="search">
+                            <i class="layui-icon">&#xe615;</i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn"></div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="table-toolbar">
+    <div class="layui-btn-container">
+        {if $admin.group_id==1}
+            <button class="layui-btn layui-bg-blue" lay-event="synsAll"><i class="layui-icon layui-icon-release"></i> 批量同步</button>
+        {/if}
+    </div>
+</script>
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm" lay-event="detail">详情</a>
+</script>
+<script>
+    var sid="{:input('sid/d',0)}";
+    var cid="{:input('cid/d',0)}";
+    var type="{:input('type/d',0)}";
+    var price="{:input('price/d',0)}";
+    layui.use(['table','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form;
+        var api_token="{$admin['api_token']}";
+
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            toolbar:'#table-toolbar',
+            method:'post',
+            where:{
+                sid:sid,
+                cid:cid,
+                type:type,
+                price:price
+            },
+            page:true,
+            cols: [[
+                {type: 'checkbox',title:'ID',align:'center',width:50},
+                {field: 'id',title: 'ID',align:'center',width:80},
+                {field: 'title',title: '标题',align:'center',width:300},
+                {field: 'thumb',title: '封面',align:'center',width:80,templet:function(d){
+                    return '<a href="'+d.thumb+'" target="_blank"><img  src="'+d.thumb+'" width="32" height="32"/></a>';
+                }},
+                {field: 'sorts',title:'所属分类',align:'center',width:280,templet:function(d){
+                   return '<span class="gray">'+d.sorts+'</span>';
+                }},
+                {field: 'type', align: 'center',title: '资源类型',width:120,templet:function(d){
+                    if(d.type==1){
+                        return '网盘资源';
+                    }else if(d.type==2){
+                        return '视频资源';
+                    }else if(d.type==3){
+                        return '文章资源';
+                    }else if(d.type==4){
+                        return '视频课程';
+                    }else if(d.type==5){
+                        return '音频课程'
+                    }else if(d.type==6){
+                        return '卡密资源'
+                    }
+                }},
+                {field: 'is_sync',title:'同步状态',align:'center',width:120,templet:function(d){
+                    if(d.is_sync==1){
+                        return '<span class="gray_block">已同步</span>';
+                    }else{
+                        return '<span class="green_block">未同步</span>';
+                    }
+                }},
+                {field: 'ctime', align: 'center',title: '发布时间',width:130},
+                {align: 'center',toolbar:'#action',width:140},
+            ]]
+        });
+        //加载分类
+        form.on('submit(search)', function(data){
+            table.reload('list', {
+                url: "{:createUrl('index')}",
+                method:'post',
+                where:data.field,
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+        //选择日期
+        laydate.render({
+            elem: '#startDate',
+            type:'datetime'
+        });
+        laydate.render({
+            elem: '#endDate',
+            type:'datetime'
+        });
+
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event==='detail'){
+                var detail=layer.open({
+                    title:'资源详情',
+                    type:2,
+                    maxmin: true,
+                    content:'{:createUrl("info")}?id='+data.id,
+                    area:['80%','550px'],
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }
+        });
+        table.on('toolbar(list)', function(obj) {
+            var checkStatus = table.checkStatus('list');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {
+                ids.push(o.id);
+            });
+            if(ids.length===0){
+                layer.msg('请选择要同步的资源', {time: 1000, icon: 2});
+                return false;
+            }
+            switch (obj.event) {
+                case 'synsAll'://同步操作
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:createUrl('synsAll')}", {ids: ids}, function (res) {
+                        layer.close(loading);
+                        if (res.status === 200) {
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+            }
+        });
+    });
+
+</script>

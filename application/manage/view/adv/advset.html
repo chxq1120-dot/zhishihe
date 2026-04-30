@@ -1,0 +1,443 @@
+{include file="common/head"/}
+<body>
+<style>
+    .adv-title {
+        justify-content: center;
+        display: flex;
+        font-size: 15px;
+    }
+</style>
+<div class="layui-fluid">
+    <form class="layui-form layui-form-pane">
+        <div class="layui-card">
+            <div class="layui-card-header">Banner广告设置</div>
+            <div class="layui-card-body">
+                <div style="display:flex;">
+                    <div style="flex-direction: column;">
+                        <div class="adv-title">首页</div>
+                        {php}$aid=getAdvId(1,1);{/php}
+                        <div>
+                            <select name="ban[1]">
+                                <option value="0">未选择</option>
+                                {foreach $ban as $k=>$v}
+                                    <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">资源页</div>
+                        {php}$aid=getAdvId(1,2);{/php}
+                        <div>
+                            <select name="ban[2]">
+                                <option value="0">未选择</option>
+                                {foreach $ban as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">收藏页</div>
+                        {php}$aid=getAdvId(1,3);{/php}
+                        <div>
+                            <select name="ban[3]">
+                                <option value="0">未选择</option>
+                                {foreach $ban as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">个人中心</div>
+                        {php}$aid=getAdvId(1,4);{/php}
+                        <div>
+                            <select name="ban[4]">
+                                <option value="0">未选择</option>
+                                {foreach $ban as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的资源</div>
+                        {php}$aid=getAdvId(1,5);{/php}
+                        <div>
+                            <select name="ban[5]">
+                                <option value="0">未选择</option>
+                                {foreach $ban as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的好友</div>
+                        {php}$aid=getAdvId(1,6);{/php}
+                        <div>
+                            <select name="ban[6]">
+                                <option value="0">未选择</option>
+                                {foreach $ban as $k=>$v}
+                                    <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="layui-card">
+            <div class="layui-card-header">插屏广告设置</div>
+            <div class="layui-card-body">
+                <div style="display:flex;">
+                    <div style="flex-direction: column;">
+                        <div class="adv-title">首页</div>
+                        {php}$aid=getAdvId(3,1);{/php}
+                        <div>
+                            <select name="plug[1]">
+                                <option value="0">未选择</option>
+                                {foreach $plug as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">资源页</div>
+                        {php}$aid=getAdvId(3,2);{/php}
+                        <div>
+                            <select name="plug[2]">
+                                <option value="0">未选择</option>
+                                {foreach $plug as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">收藏页</div>
+                        {php}$aid=getAdvId(3,3);{/php}
+                        <div>
+                            <select name="plug[3]">
+                                <option value="0">未选择</option>
+                                {foreach $plug as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">个人中心</div>
+                        {php}$aid=getAdvId(3,4);{/php}
+                        <div>
+                            <select name="plug[4]">
+                                <option value="0">未选择</option>
+                                {foreach $plug as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的资源</div>
+                        {php}$aid=getAdvId(3,5);{/php}
+                        <div>
+                            <select name="plug[5]">
+                                <option value="0">未选择</option>
+                                {foreach $plug as $k=>$v}
+                                    <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的好友</div>
+                        {php}$aid=getAdvId(3,6);{/php}
+                        <div>
+                            <select name="plug[6]">
+                                <option value="0">未选择</option>
+                                {foreach $plug as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="layui-card">
+            <div class="layui-card-header">视频广告设置</div>
+            <div class="layui-card-body">
+                <div style="display:flex;">
+                    <div style="flex-direction: column;">
+                        <div class="adv-title">首页</div>
+                        {php}$aid=getAdvId(4,1);{/php}
+                        <div>
+                            <select name="video[1]">
+                                <option value="0">未选择</option>
+                                {foreach $video as $k=>$v}
+                                    <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">资源页</div>
+                        {php}$aid=getAdvId(4,2);{/php}
+                        <div>
+                            <select name="video[2]">
+                                <option value="0">未选择</option>
+                                {foreach $video as $k=>$v}
+                                    <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">收藏页</div>
+                        {php}$aid=getAdvId(4,3);{/php}
+                        <div>
+                            <select name="video[3]">
+                                <option value="0">未选择</option>
+                                {foreach $video as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">个人中心</div>
+                        {php}$aid=getAdvId(4,4);{/php}
+                        <div>
+                            <select name="video[4]">
+                                <option value="0">未选择</option>
+                                {foreach $video as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的资源</div>
+                        {php}$aid=getAdvId(4,5);{/php}
+                        <div>
+                            <select name="video[5]">
+                                <option value="0">未选择</option>
+                                {foreach $video as $k=>$v}
+                                    <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的好友</div>
+                        {php}$aid=getAdvId(4,6);{/php}
+                        <div>
+                            <select name="video[6]">
+                                <option value="0">未选择</option>
+                                {foreach $video as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card">
+            <div class="layui-card-header">格子广告设置</div>
+            <div class="layui-card-body">
+                <div style="display:flex;">
+                    <div style="flex-direction: column;">
+                        <div class="adv-title">首页</div>
+                        {php}$aid=getAdvId(5,1);{/php}
+                        <div>
+                            <select name="cell[1]">
+                                <option value="0">未选择</option>
+                                {foreach $cell as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">资源页</div>
+                        {php}$aid=getAdvId(5,2);{/php}
+                        <div>
+                            <select name="cell[2]">
+                                <option value="0">未选择</option>
+                                {foreach $cell as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">收藏页</div>
+                        {php}$aid=getAdvId(5,3);{/php}
+                        <div>
+                            <select name="cell[3]">
+                                <option value="0">未选择</option>
+                                {foreach $cell as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">个人中心</div>
+                        {php}$aid=getAdvId(5,4);{/php}
+                        <div>
+                            <select name="cell[4]">
+                                <option value="0">未选择</option>
+                                {foreach $cell as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的资源</div>
+                        {php}$aid=getAdvId(5,5);{/php}
+                        <div>
+                            <select name="cell[5]">
+                                <option value="0">未选择</option>
+                                {foreach $cell as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的好友</div>
+                        {php}$aid=getAdvId(5,6);{/php}
+                        <div>
+                            <select name="cell[6]">
+                                <option value="0">未选择</option>
+                                {foreach $cell as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card">
+            <div class="layui-card-header">原生广告设置</div>
+            <div class="layui-card-body">
+                <div style="display:flex;">
+                    <div style="flex-direction: column;">
+                        <div class="adv-title">首页</div>
+                        {php}$aid=getAdvId(7,1);{/php}
+                        <div>
+                            <select name="nat[1]">
+                                <option value="0">未选择</option>
+                                {foreach $nat as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">资源页</div>
+                        {php}$aid=getAdvId(7,2);{/php}
+                        <div>
+                            <select name="nat[2]">
+                                <option value="0">未选择</option>
+                                {foreach $nat as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">收藏页</div>
+                        {php}$aid=getAdvId(7,3);{/php}
+                        <div>
+                            <select name="nat[3]">
+                                <option value="0">未选择</option>
+                                {foreach $nat as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">个人中心</div>
+                        {php}$aid=getAdvId(7,4);{/php}
+                        <div>
+                            <select name="nat[4]">
+                                <option value="0">未选择</option>
+                                {foreach $nat as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的资源</div>
+                        {php}$aid=getAdvId(7,5);{/php}
+                        <div>
+                            <select name="nat[5]">
+                                <option value="0">未选择</option>
+                                {foreach $nat as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column;margin-left: 15px;">
+                        <div class="adv-title">我的好友</div>
+                        {php}$aid=getAdvId(7,6);{/php}
+                        <div>
+                            <select name="nat[6]">
+                                <option value="0">未选择</option>
+                                {foreach $nat as $k=>$v}
+                                <option value="{$v.id}" {if $v.id==$aid}selected{/if}>{$v.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">提交</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.on('submit(sub)', function (data) {
+            loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post('', data.field, function (res) {
+                layer.close(loading);
+                if (res.status === 200) {
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    });
+</script>
+</body>

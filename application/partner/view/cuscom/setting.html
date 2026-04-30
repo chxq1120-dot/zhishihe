@@ -1,0 +1,405 @@
+{include file="common/head"/}
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<link rel="stylesheet" href="__STATIC__/admin/fonts/icon/iconfont.css">
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<div id="app">
+    <el-container>
+        <el-header>
+            <span class="title">主题风格</span>
+        </el-header>
+        <el-main>
+            <el-main>
+                <div class="item">
+                    <div class="item-title">请选择主题风格</div>
+                    <div class="item-content">
+                        <button v-for="(item,index) in theme" :key="index" @click="tab(index,item)" :class="item.name === activeName ? 'activeButton Button' : 'Button' ">
+                            <div class="Color_blue" :style="{'background-color':item.maincolor}">
+                                <i class="el-icon-circle-check" v-if="item.name === activeName"></i></div>
+                            <span>{{item.title}}</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="item-title">风格示例或设置</div>
+                    <div class="item-content">
+                        <div class="setting" v-if="activeName === 'diy'">
+                            <el-form label-width="110px" size="mini">
+                                <el-form-item label="全局主题色：" size="mini">
+                                    <div style="display: flex;align-items: center;">
+                                        <el-form-item label="主题颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.maincolor"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="辅助颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.subcolor"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="文字颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.textcolor"></el-color-picker>
+                                        </el-form-item>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item label="全局导航栏：" size="mini">
+                                    <div style="display: flex;align-items: center;">
+                                        <el-form-item label="背景颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.nav_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="文字颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.nav_text_color"></el-color-picker>
+                                        </el-form-item>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item label="主要页面背景：" size="mini">
+                                    <div style="display: flex;align-items: center;">
+                                        <el-form-item label="首页背景:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.home_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="VIP背景:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.svip_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="好友背景:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.team_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item label="详情页设置：" size="mini">
+                                    <div style="display: flex;align-items: center;">
+                                        <el-form-item label="导航背景:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.show_nav_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="导航文字:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.show_nav_text_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="头部背景:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.show_top_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="头部文字:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.show_top_text_color"></el-color-picker>
+                                        </el-form-item>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item label="底部导航菜单：" size="mini">
+                                    <div style="display: flex;align-items: center;">
+                                        <el-form-item label="背景颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.tab_bg_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="文字颜色:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.tab_text_color"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="文字选中:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="activeTheme.themeColor.tab_text_color_on"></el-color-picker>
+                                        </el-form-item>
+                                        <el-form-item label="边框样式:" size="mini" label-width="80px" style="margin-right:20px;">
+                                            <el-select v-model="activeTheme.themeColor.tab_border_color" style="width:120px;" placeholder="请选择">
+                                                <el-option name="black">黑色</el-option>
+                                                <el-option name="white">白色</el-option>
+                                            </el-select>
+                                        </el-form-item>
+                                    </div>
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                        <img :src="activeTheme.thumb" :alt="activeTheme.title" v-else>
+                    </div>
+                </div>
+                <div class="bottom">
+                    <el-button type="primary" size="medium" @click="saveSubject">保存设置</el-button>
+                </div>
+            </el-main>
+        </el-main>
+    </el-container>
+</div>
+{include file="common/foot"/}
+<script>
+    var currentTheme={$row|raw};
+    new Vue({
+        el: '#app',
+        data: {
+            activeName:currentTheme.name,
+            activeTheme:currentTheme,
+            theme:[
+                {
+                    title:'默认主题',
+                    name:'default',
+                    themeColor:{
+                        'nav_bg_color':'#ffc037',
+                        'nav_text_color':'#000000',
+                        'home_bg_color':'#ffc037',
+                        'svip_bg_color':'#ffc037',
+                        'team_bg_color':'#ffc037',
+                        'tab_bg_color':'#ffffff',
+                        'tab_text_color':'#999999',
+                        'tab_text_color_on':'#ffc037',
+                        'tab_border_color':'black',
+                        'show_nav_bg_color':'#000000',
+                        'show_nav_text_color':'#ffffff',
+                        'show_top_bg_color':'#ffffff',
+                        'show_top_text_color':'#000000',
+                    },
+                    tabbar:{
+                        "limit":"5",
+                        "list":[
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/home.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/yellow/home.png","text":"首页","linkType":"6","linkValue":"/pages/tabbar/home/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/sort.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/yellow/sort.png","text":"课程","linkType":"6","linkValue":"/pages/tabbar/sort/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/vip.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/yellow/vip.png","text":"会员","linkType":"6","linkValue":"/pages/tabbar/vip/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/my.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/yellow/my.png","text":"我的","linkType":"6","linkValue":"/pages/tabbar/my/index"}
+                        ]
+                    },
+                    maincolor:'#ffc037',
+                    subcolor:'#fcc44b',
+                    textcolor:'#2c2c2c',
+                    thumb:'https://zpcms.oss-cn-beijing.aliyuncs.com/icon/theme/default.jpg',
+                },
+                {
+                    title:'天空蓝',
+                    name:'blue',
+                    themeColor:{
+                        'nav_bg_color':'#1DAFFC',
+                        'nav_text_color':'#ffffff',
+                        'home_bg_color':'#1DAFFC',
+                        'svip_bg_color':'#1DAFFC',
+                        'team_bg_color':'#1DAFFC',
+                        'tab_bg_color':'#ffffff',
+                        'tab_text_color':'#999999',
+                        'tab_text_color_on':'#1DAFFC',
+                        'tab_border_color':'black',
+                        'show_nav_bg_color':'#000000',
+                        'show_nav_text_color':'#ffffff',
+                        'show_top_bg_color':'#ffffff',
+                        'show_top_text_color':'#000000',
+                    },
+                    tabbar: {
+                        "limit":"5",
+                        "list":[
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/home.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/blue/home.png","text":"首页","linkType":"6","linkValue":"/pages/tabbar/home/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/sort.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/blue/sort.png","text":"课程","linkType":"6","linkValue":"/pages/tabbar/sort/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/vip.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/blue/vip.png","text":"会员","linkType":"6","linkValue":"/pages/tabbar/vip/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/my.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/blue/my.png","text":"我的","linkType":"6","linkValue":"/pages/tabbar/my/index"}
+                        ]
+                    },
+                    maincolor:'#1DAFFC',
+                    subcolor:'#56c0fa',
+                    textcolor:'#ffffff',
+                    thumb:'https://zpcms.oss-cn-beijing.aliyuncs.com/icon/theme/blue.jpg',
+                },
+                {
+                    title:'青春蓝',
+                    name:'green',
+                    themeColor:{
+                        'nav_bg_color':'#22b28e',
+                        'nav_text_color':'#ffffff',
+                        'home_bg_color':'#22b28e',
+                        'svip_bg_color':'#22b28e',
+                        'team_bg_color':'#22b28e',
+                        'tab_bg_color':'#ffffff',
+                        'tab_text_color':'#999999',
+                        'tab_text_color_on':'#22b28e',
+                        'tab_border_color':'black',
+                        'show_nav_bg_color':'#000000',
+                        'show_nav_text_color':'#ffffff',
+                        'show_top_bg_color':'#ffffff',
+                        'show_top_text_color':'#000000',
+                    },
+                    tabbar:{
+                        "limit":"5",
+                        "list":[
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/home.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/green/home.png","text":"首页","linkType":"6","linkValue":"/pages/tabbar/home/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/sort.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/green/sort.png","text":"课程","linkType":"6","linkValue":"/pages/tabbar/sort/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/vip.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/green/vip.png","text":"会员","linkType":"6","linkValue":"/pages/tabbar/vip/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/my.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/green/my.png","text":"我的","linkType":"6","linkValue":"/pages/tabbar/my/index"}
+                        ]
+                    },
+                    maincolor:'#22b28e',
+                    subcolor:'#44c4a3',
+                    textcolor:'#ffffff',
+                    thumb:'https://zpcms.oss-cn-beijing.aliyuncs.com/icon/theme/green.jpg',
+                },
+                {
+                    title:'热情红',
+                    name:'red',
+                    themeColor:{
+                        'nav_bg_color':'#FF3333',
+                        'nav_text_color':'#ffffff',
+                        'home_bg_color':'#FF3333',
+                        'svip_bg_color':'#FF3333',
+                        'team_bg_color':'#FF3333',
+                        'tab_bg_color':'#ffffff',
+                        'tab_text_color':'#999999',
+                        'tab_text_color_on':'#FF3333',
+                        'tab_border_color':'black',
+                        'show_nav_bg_color':'#000000',
+                        'show_nav_text_color':'#ffffff',
+                        'show_top_bg_color':'#ffffff',
+                        'show_top_text_color':'#000000',
+                    },
+                    tabbar:{
+                        "limit":"5",
+                        "list":[
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/home.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/red/home.png","text":"首页","linkType":"6","linkValue":"/pages/tabbar/home/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/sort.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/red/sort.png","text":"课程","linkType":"6","linkValue":"/pages/tabbar/sort/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/vip.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/red/vip.png","text":"会员","linkType":"6","linkValue":"/pages/tabbar/vip/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/my.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/red/my.png","text":"我的","linkType":"6","linkValue":"/pages/tabbar/my/index"}
+                        ]
+                    },
+                    maincolor:'#FF3333',
+                    subcolor:'#e55757',
+                    textcolor:'#ffffff',
+                    thumb:'https://zpcms.oss-cn-beijing.aliyuncs.com/icon/theme/red.jpg',
+                },
+                {
+                    title:'魅力粉',
+                    name:'pink',
+                    themeColor:{
+                        'nav_bg_color':'#FE448F',
+                        'nav_text_color':'#ffffff',
+                        'home_bg_color':'#FE448F',
+                        'svip_bg_color':'#FE448F',
+                        'team_bg_color':'#FE448F',
+                        'tab_bg_color':'#ffffff',
+                        'tab_text_color':'#999999',
+                        'tab_text_color_on':'#FE448F',
+                        'tab_border_color':'black',
+                        'show_nav_bg_color':'#000000',
+                        'show_nav_text_color':'#ffffff',
+                        'show_top_bg_color':'#ffffff',
+                        'show_top_text_color':'#000000',
+                    },
+                    tabbar:{
+                        "limit":"5",
+                        "list":[
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/home.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/pink/home.png","text":"首页","linkType":"6","linkValue":"/pages/tabbar/home/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/sort.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/pink/sort.png","text":"课程","linkType":"6","linkValue":"/pages/tabbar/sort/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/vip.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/pink/vip.png","text":"会员","linkType":"6","linkValue":"/pages/tabbar/vip/index"},
+                            {"image":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/default/my.png","image_on":"https://zpcms.oss-cn-beijing.aliyuncs.com/icon/tabbar/pink/my.png","text":"我的","linkType":"6","linkValue":"/pages/tabbar/my/index"}
+                        ]
+                    },
+                    maincolor:'#FE448F',
+                    subcolor:'#ff69a5',
+                    textcolor:'#ffffff',
+                    thumb:'https://zpcms.oss-cn-beijing.aliyuncs.com/icon/theme/pink.jpg',
+                },
+                {
+                    title:'自定义主题',
+                    name:'diy',
+                    themeColor:currentTheme.themeColor,
+                    tabbar:currentTheme.tabbar,
+                    maincolor: currentTheme.maincolor,
+                    subcolor:currentTheme.subcolor,
+                    textcolor:currentTheme.textcolor,
+                    thumb:'__STATIC__/admin/images/diy.png',
+                }
+            ],
+        },
+        methods: {
+            saveSubject(){
+                var self = this;
+                var loading = layer.load(1, {shade: [0.1, '#fff']});
+                $.post("{:createUrl('cuscom/setting')}",{data:self.activeTheme}, function (res) {
+                    layer.close(loading);
+                    if (res.status == 200){
+                        self.$message.success('保存成功');
+                    } else {
+                        self.$message.error(res.msg);
+                    }
+                }, 'json');
+            },
+            tab(index,item) {
+                this.activeName = item.name;
+                this.activeTheme=item;
+            }
+        },
+    })
+</script>
+<style>
+    #app {
+      margin: 20px;
+    }
+    .el-header {
+      display: flex;
+      background-color: #fff;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px;
+      margin-bottom: 15px;
+    }
+    .el-header .title {
+      display: inline-block;
+      color: #17233d;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 32px;
+    }
+    .el-main {
+      background-color: #fff;
+    }
+    .el-main .item{
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 10px;
+    }
+    .el-main .item .item-title{
+      width: 180px;
+      text-align: right;
+      padding-top:10px;
+    }
+    .el-main .item .item-content{
+      width: calc(100% - 200px);
+      display: flex;
+    }
+  
+    .el-main .bottom{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .el-main .Button {
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border: 1px solid #e5e5e5;
+      padding: 10px 20px;
+      margin-right: 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .el-main .Button span {
+      margin-left: 10px;
+      font-size: 16px;
+    }
+    .el-main .Button .Color_blue {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+    }
+    .el-main .Button .el-icon-circle-check {
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      color: #fff;
+      font-size: 16px;
+    }
+    .el-main .activeButton {
+      border: 1px solid #3B91FF;
+    }
+    .el-main img{
+      display: block;
+      height: 500px;
+      border-radius: 10px;
+    }
+    .el-main .preview{
+      background-color: #eee;
+      width:300px;
+      height: 450px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .el-main .preview  .label{
+      color:#c9c9c9;
+      font-size: 28px;
+      writing-mode: vertical-rl;
+    }
+</style>

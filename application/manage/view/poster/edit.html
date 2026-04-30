@@ -1,0 +1,173 @@
+{include file="common/head"/}
+<style>
+    .boardbar{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    .boardbar .items{
+        width:20%;
+        height:300px;
+        text-align: center;
+        overflow: hidden;
+    }
+    .boardbar .items img{
+        border:#eee 2px solid;
+        border-radius:10px;
+        height:260px;
+    }
+    .boardbar .items .name{
+        padding:10px 0;
+    }
+    .boardbar .on img{
+        border:#1E9FFF 2px solid;
+    }
+    #myform .form-item{
+        padding-bottom:10px;
+    }
+    #myform .form-img{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    #myform .form-img .form-label{
+        width:100px;
+    }
+    #myform .form-text{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    #myform .form-text .form-label{
+        width:100px;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="table-body">
+        <div class="layui-card" style="padding-top:15px;">
+            <form class="layui-form layui-form-pane" lay-filter="agent">
+                <input type="hidden" name="row[ids]" value="{$row['id']}"/>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">海报名称</label>
+                    <div class="layui-input-inline from-inline-4">
+                        <input type="text" name="row[name]" lay-verify="required" lay-reqText="请输入海报名称" value="{$row['name']}" placeholder="{:lang('pleaseEnter')}海报名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">海报模板</label>
+                    <div class="layui-input-inline from-inline-8" style="background-color:#f8f8f8;padding:10px;border-radius:10px;">
+                        <div class="boardbar">
+                            <input type="hidden" name="row[board_id]" id="board_id" value="{$row['board_id']}"/>
+                                {foreach $board as $k=>$v}
+                                    {if $row['board_id']==$v.id}
+                                        <div class="items on" id="{$v.id}">
+                                    {else/}
+                                        <div class="items" id="{$v.id}">
+                                    {/if}
+                                        <img src="{$v.url}" height="100%">
+                                        <div class="name">{$v.name}</div>
+                                    </div>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">海报文案</label>
+                        <div class="layui-input-inline from-inline-5" id="myform"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">推广内容</label>
+                        <div class="layui-input-inline from-inline-5">
+                            <textarea class="layui-textarea" lay-verify="content" name="row[content]">{$row['content']}</textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn" lay-submit="" lay-filter="submit">{:lang('submit')}</button>
+                        </div>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form','upload','layedit'], function(){
+        var form = layui.form,$= layui.jquery,upload=layui.upload;
+        var board_id="{$row['board_id']}";
+        load_params(board_id);
+        //海报选择事件
+        $('.boardbar .items').on('click',function () {
+            $('.boardbar .items').removeClass('on');
+            $(this).addClass('on');
+            var id=$(this).attr('id');
+            load_params(id);
+        });
+        function load_params(id){
+            $('#board_id').val(id);
+            $.post('{:url("getParams")}',{ids:id},function (res) {
+                if(res.status===200){
+                    var html='',params;
+                    params=JSON.parse(res.data.params);
+                    for( let i in params){
+                        if(params[i].show===1){
+                            if(params[i].type==='text'){
+                                if(params[i].name=='sub2'){
+                                    html+='<div class="form-item form-text">';
+                                    html+='<label class="form-label">'+params[i].label+'：</label>';
+                                    html+='<textarea class="layui-textarea" maxlength="'+params[i].length+'" lay-verify="required" lay-reqText="请输入'+params[i].placeholder+'" name="row['+params[i].name+']" placeholder="{:lang(\'pleaseEnter\')}'+params[i].placeholder+'">'+params[i].txt+'</textarea>';
+                                    html+='</div>';
+                                }else{
+                                    html+='<div class="form-item form-text">';
+                                    html+='<label class="form-label">'+params[i].label+'：</label>';
+                                    html+='<input type="text" maxlength="'+params[i].length+'" name="row['+params[i].name+']" value="'+params[i].txt+'" lay-verify="required" lay-reqText="请输入'+params[i].placeholder+'" placeholder="{:lang(\'pleaseEnter\')}'+params[i].placeholder+'" class="layui-input">';
+                                    html+='</div>';
+                                }
+                            }else if(params[i].type==='image'){
+                                html+='<div class="form-item">';
+                                html+='<div class="form-img">';
+                                html+='<label class="form-label">'+params[i].label+'：</label>';
+                                html+='<input type="text" name="row['+params[i].name+']" id="'+params[i].name+'" lay-verify="required" lay-reqText="请输入'+params[i].placeholder+'" placeholder="{:lang(\'pleaseEnter\')}'+params[i].placeholder+'" class="layui-input">';
+                                html+='<button type="button" class="layui-btn" id="onUpload">上传图片</button>';
+                                html+='</div>';
+                                html+='<div class="layui-upload-list">';
+                                html+='<img class="layui-upload-img" width="76" height="76" src="__ADMIN__/images/default.png" id="Image">';
+                                html+='<p id="preview"></p>';
+                                html+='</div>';
+                                html+='</div>';
+                                html+='<script>'+
+                                    'layui.use("upload", function () {'+
+                                    'var upload = layui.upload;'+
+                                    'upload.render({'+
+                                    'elem: "#onUpload",'+
+                                    'url: "{:createUrl(\'UpFiles/upload\')}",'+
+                                    'done: function(res){'+
+                                    'if(res.status===200){$("#qrcode").val(res.url);$("#Image").attr("src",res.url);}else{return layer.msg("上传失败");}'+
+                                    '}'+
+                                    '});})'+
+                                    "<\/script>";
+                            }
+                        }
+                    }
+                    $('#myform').html(html);
+                }else{
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        }
+        form.on('submit(submit)', function (data) {
+            loading =layer.load(1, {shade: [0.1,'#fff']});
+            $.post("", data.field, function (res) {
+                layer.close(loading);
+                if (res.status===200){
+                    layer.msg('保存成功',{time: 1000, icon: 1},function(){
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        })
+    });
+</script>

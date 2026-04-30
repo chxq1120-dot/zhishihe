@@ -1,0 +1,72 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm" lay-event="edit">{:lang('edit')}</a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">{:lang('del')}</a>
+</script>
+
+<script type="text/html" id="statusTpl">
+    {{# if(d.status==1){ }}
+        <span class="green">启用</span>
+    {{# }else{ }}
+        <span class="gray">禁用</span>
+    {{# } }}
+</script>
+<script>
+    layui.use(['table','element'],function(){
+        var table = layui.table, $ = layui.jquery,element = layui.element;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("tsort")}?ids={:input("ids/d")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,
+            cols: [[
+                {field: 'name',title: '分类名称',align:'center'},
+                {field: 'thumb',title: '图标',align:'center',templet:function(d){
+                    return '<img  src="'+d.thumb+'" width="32" height="32"/>';
+                }},
+                {field: 'indexid',title: '排序',align:'center'},
+                {field:'status',title: '状态',align:'center',templet:'#statusTpl'},
+                {field: 'ctime', align: 'center',title: '添加时间'},
+                {align: 'center',toolbar:'#action',width:320}
+            ]]
+        });
+
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('你确定要删除吗？', {icon: 3}, function (index) {
+                    $.post("{:createUrl('delsort')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg('删除成功',{time:1000,icon:1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if(obj.event === 'edit'){
+                layer.open({
+                    title:'编辑资源',
+                    type:2,
+                    maxmin: true,
+                    content:'{:createUrl("editsort")}?ids='+data.id,
+                    area:['70%','500px'],
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }
+        });
+    })
+</script>

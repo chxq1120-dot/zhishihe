@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>{:config('setting.web_name')}代理分站管理后台</title>
+    <link rel="stylesheet" href="__STATIC__/layuiadmin/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__ADMIN__/css/login.css" />
+    <link rel="stylesheet" href="__STATIC__/admin/fonts/iconfont.css" />
+</head>
+<body class="login-bady">
+    <div class="wraper" id="wraper">
+        <canvas id="canvas"></canvas>
+        <div class="login">
+            <header>
+                <div class="login-logo">
+                    <img src="{:config('setting.web_logo')}" width="60px" height="auto" alt=""/>
+                </div>
+                <div class="login-slogan">
+                    <h1>欢迎登录</h1>
+                    <h3>{:config('setting.web_name')}代理分站管理后台</h3>
+                </div>
+            </header>
+            <div class="login-bar">
+                <form class="layui-form layui-form-pane" method="post">
+                    {:token('__token__', 'sha1')}
+                    <div class="layui-form-item">
+                        <label class="login-icon fs1">
+                            <span class="icon icon-user"></span>
+                        </label>
+                        <input type="text" name="username" lay-verify="required" lay-reqText="请输入登录账号" placeholder="请输入登录账号" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="login-icon fs1">
+                            <i class="icon icon-lock"></i>
+                        </label>
+                        <input type="password" name="password" id="password" lay-verify="required" lay-reqText="请输入登录密码" autocomplete="off" placeholder="请输入登录密码" class="layui-input">
+                        <span class="group-btn-view hide" id="hanleView">
+                            <i class="icon icon-view"></i>
+                        </span>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="login-icon fs1">
+                            <i class="icon icon-quality"></i>
+                        </label>
+                        <input type="text" name="captcha" id="captcha" lay-verify="required" lay-reqText="请输入验证码" placeholder="请输入验证码" autocomplete="off" class="layui-input">
+                        <div class="captcha">
+                            <img src="{:createUrl('login/verify')}" alt="captcha" lay-filter="captcha" id="yzimg"/>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <button type="submit" class="layui-btn btn-submit" lay-submit lay-filter="login">登录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<script src="__ADMIN__/js/rAF.js"></script>
+<script src="__ADMIN__/js/login.js"></script>
+<script type="text/javascript" src="__STATIC__/layuiadmin/layui/layui.js"></script>
+<script>
+    layui.use('form',function(){
+        var form = layui.form,$ = layui.jquery;
+        $('#yzimg').on('click',function () {
+            $('.captcha img').attr('src','{:createUrl("login/verify")}?t='+Math.random());
+        });
+        $('#hanleView').on('click',function () {
+            if($('#password').attr('type') == 'password'){
+                $(this).removeClass('hide').addClass('show');
+                $('#password').attr('type','text');
+            }else{
+                $(this).removeClass('show').addClass('hide');
+                $('#password').attr('type','password');
+            }
+        });
+        //监听提交
+        form.on('submit(login)', function(data){
+            loading =layer.load(1, {shade: [0.1,'#fff'] });//0.1透明度的白色背景
+            $.post('{:createUrl("login/index")}',data.field,function(res){
+                layer.close(loading);
+                if(res.status === 200){
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function(){
+                        top.location.href = res.url;
+                    });
+                }else{
+                    layer.msg(res.msg, {icon: 2, time: 1000},function (){
+                        window.location.reload();
+                    });
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

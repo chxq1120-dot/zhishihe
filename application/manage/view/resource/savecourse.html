@@ -1,0 +1,86 @@
+{include file="common/head"/}
+<script>
+    var manage_Image="{:createUrl('Ueditor/index')}";
+</script>
+<body>
+<div class="layui-fluid">
+	<div class="table-body">
+		<form class="layui-form layui-form-pane">
+		<div class="layui-form-item">
+			<label class="layui-form-label">章节标题</label>
+			<div class="layui-input-block from-inline-5">
+				<input type="text" name="title" lay-verify="required" placeholder="请输入章节标题" class="layui-input" value="{present name='info'}{$info.title}{/present}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">播放地址</label>
+			<div class="layui-input-block from-inline-5" style="display: flex;align-items: center;">
+				<input type="text" name="url" id="url" lay-verify="required|url" placeholder="请输入播放地址" class="layui-input" value="{present name='info'}{$info.url}{/present}">
+				<button type="button" class="layui-btn" id="uploadImg" style="margin-left:5px;">上传章节</button>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">时长</label>
+			<div class="layui-input-block from-inline-2">
+				<input type="text" name="times" id="times" placeholder="选填，格式为:00:00:00"  class="layui-input" value="{present name='info'}{$info.times}{/present}">
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">排序</label>
+			<div class="layui-input-block from-inline-2">
+				<input type="number" name="indexid" class="layui-input" placeholder="选填，格式为数字" value="{present name='info'}{$info.indexid}{/present}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">是否试看</label>
+			<div class="layui-input-block">
+				<input type="radio" name="is_try" value="0" title="否" {present name='info'}{if ($info.is_try==0)}checked{/if}{else /}checked{/present}>
+				<input type="radio" name="is_try" value="1" title="是" {present name='info'}{if ($info.is_try==1)}checked{/if}{/present}>
+			</div>
+		</div>
+		<input type="hidden" name="rid" value="{$res.id}">
+		<input type="hidden" name="type" value="{$res.type}">
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit lay-filter="sub">提交</button>
+			</div>
+		</div>
+	</form>
+	</div>
+</div>
+{include file="common/foot"/}
+<script>
+layui.use(['form','laydate'], function(){
+    var $ = layui.jquery,form = layui.form,laydate=layui.laydate;
+    form.on('submit(sub)', function(data){
+		loading = layer.load(1, { shade: [0.1, '#fff'] });
+	  	$.post('',data.field,function(res) {
+	  		layer.close(loading);
+	        if (res.status === 200){
+	            layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+	                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+	                parent.layer.close(index);//再执行关闭
+	            });
+	        } else {
+	            layer.msg(res.msg, { icon: 2, time: 1000 });
+	        }
+	  	});
+		return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+	$("#uploadImg").on('click',function(){
+		layer.open({
+			title:'上传文件',
+			type:2,
+			maxmin: true,
+			area:['80%','500px'],
+			content:'{:createUrl("attachment/index")}?type=0&name=url',
+		});
+	});
+    laydate.render({
+    	elem:'#times',
+    	type:'time'
+    });
+});
+</script>
+</body>

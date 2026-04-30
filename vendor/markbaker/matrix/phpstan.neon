@@ -1,0 +1,6 @@
+parameters:
+    ignoreErrors:
+        - '#Property [A-Za-z\\]+::\$[A-Za-z]+ has no typeZpMember specified#'
+        - '#Method [A-Za-z\\]+::[A-Za-z]+\(\) has no return typeZpMember specified#'
+        - '#Method [A-Za-z\\]+::[A-Za-z]+\(\) has parameter \$[A-Za-z0-9]+ with no typeZpMember specified#'
+    checkMissingIterableValueType: false

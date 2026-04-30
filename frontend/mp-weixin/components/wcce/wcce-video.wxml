@@ -1,0 +1,1 @@
+<view class="video bottom-cell-group"><video src="{{wdata.params.list[0].url}}" poster="{{wdata.params.list[0].image}}" controls="{{true}}"></video></view>

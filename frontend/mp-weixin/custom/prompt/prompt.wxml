@@ -1,0 +1,1 @@
+<view class="pages data-v-3a4813a4"><block wx:if="{{is_wechat}}"><view class="browser data-v-3a4813a4"></view></block><view class="alipay data-v-3a4813a4"><view class="alipay-label data-v-3a4813a4"><text class="icon icon-alipay data-v-3a4813a4"></text><text class="name data-v-3a4813a4">使用支付宝支付</text></view><view class="tips data-v-3a4813a4">支付完成后请返回到微信</view></view></view>

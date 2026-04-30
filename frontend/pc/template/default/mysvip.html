@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+    <script type="text/javascript" src="__STATIC__/default/js/jquery.superslide.2.1.1.js"></script>
+</head>
+<body>
+  {include file="header"/}
+  <div class="container">
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+        {include file="usermenu"/}
+    </div>
+    <!-- 会员中心左侧 End -->
+    <!-- 右侧功能定位 -->
+    <div class="Member-right" style="position: relative;">
+      <div class="Ml-box uc-main-box">
+        <div class="zp-conter zp-lister">
+          <div class="zp-right-box">
+            <h1 class="title">SVIP会员</h1>
+          </div>
+          <!-- 用户信息 -->
+          <div class="zp-Uinfo">
+            <img class="zp-Uinfo-logo" id="avatar" src="__STATIC__/default/img/avatar.png">
+            <div class="zp-Uinfo-wrap">
+              <div class="user-info"></div>
+              <div class="zp-tips" id="svip_info"></div>
+            </div>
+          </div>
+          <!-- 用户信息 End -->
+          <div class="zp-Kai">一次开通，全站资源享有SVIP特权</div>
+          <!-- SVIP会员开通 -->
+          <div class="zpForm">
+            <div name="f1" id="f1">
+                <input type="hidden" id="type" value="2">
+                <input type="hidden" id="rid" value="{$rid}">
+                <input type="hidden" id="paytype" value="1">
+                <input type="hidden" id="money" value="{$total}">
+              <div class="zp-vvip slideTxtBox">
+                <div class="prev"><i class="icon icon-left"></i></div>
+                <div class="next"><i class="icon icon-right"></i></div>
+                <div class="bd">
+                  <ul class="clearfix Huiyuan">
+                    {volist name="svip_list" id="item"}
+                      <li {if $key==0}class="fl on"{else/}class="fl"{/if} data-type="2" data-price="{$item['price']}" data-id="{$item['id']}">
+                        <div class="zp-vlister">
+                          <div class="left-top">{$item['days']}</div>
+                          <div class="zp_hui_name zp-name">{$item['name']}</div>
+                          <div class="zp_hui_price">¥<strong>{$item['price']}</strong></div>
+                          <div class="zp_hui_desc">{$item['content']}</div>
+                        </div>
+                      </li>
+                    {/volist}
+                  </ul>
+                </div>
+              </div>
+               <!-- 支付方式 -->
+              <div class="payTitle">支付方式</div>
+              <div class="paytype">
+                  <ul>
+                      <!-- 支付宝 -->
+                      <li class="on" data-type="1">
+                          <!-- 支付宝图标 -->
+                          <i class="icon icon-alipay"></i>
+                          <span>支付宝支付</span>
+                      </li>
+                      <!-- 微信支付 -->
+                      <li data-type="2">
+                          <!-- 微信图标 -->
+                          <i class="icon icon-wechat"></i>
+                          <span>微信支付</span>
+                      </li>
+                      <!-- 卡密 -->
+                      <li class="mi" data-type="3">
+                          <!-- 卡密图标 -->
+                          <i class="icon icon-qiamizhifu"></i>
+                          <span>卡密兑换</span>
+                          <input type="text" id="cardno" class="cardno" placeholder="请输入您的卡密">
+                      </li>
+                  </ul>
+              </div>
+              <!-- 合计 -->
+              <div class="paytotal">
+                <span>合计：</span>
+                <span class="y1 y2 money" style="font-size: 16px;" id="total">￥{$total}</span>
+                <button class="target-element button3" onclick="WCCE.handlePay()">立即支付</button>
+              </div>
+            </div>
+          </div>
+          <!-- SVIP会员开通 End -->
+          <!-- SVIP开通注意事项 -->
+          <div class="zp_hui_zhu">
+            <h3>温馨说明：</h3>
+            <p><strong data-price="">1.</strong>会员服务为虚拟产品，购买后不支持退款，请您理解。</p>
+            <p><strong data-price="">2.</strong>重复购买会员服务，会员有效期将在原有基础上顺延。</p>
+            <p><strong data-price="">3.</strong>禁止用户使用任何方式，利用本站资源，为他人提供有偿服务，一经发现，本站有权查封该账号，并追究法律责任。</p>
+          </div>
+          <!-- SVIP开通注意事项 End -->
+        </div>
+      </div>
+    </div>
+    <!-- 右侧功能定位 End -->
+  </div>
+  {include file="footer"/}
+  <script>
+      WCCE.taoCan();//开通会员套餐切换
+      WCCE.getUserInfo(function (data) {
+          $('#avatar').attr('src',data.avatar);
+          if(data.svip.id>0){
+              $('.user-info').html('<span class="nkname">'+data.nickname+'</span><span class="ico on"><i class="icon icon-icon"></i></span>');
+              var svip_info='<span class="vip-name">'+data.svip.name+'</span><span class="date">'+data.svip.exp_name+'</span>';
+              $('#svip_info').html(svip_info);
+          }else{
+              $('.user-info').html('<span class="nkname">'+data.nickname+'</span><span class="ico"><i class="icon icon-icon"></i></span>');
+              var svip_info='<span class="name">'+data.svip.name+'</span><span class="date">'+data.svip.exp_name+'</span>';
+              $('#svip_info').html(svip_info);
+          }
+      });
+  </script>
+</body>
+</html>

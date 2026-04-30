@@ -1,0 +1,1174 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/css/style.css?v3.0.6">
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/js/sortable.min.js"></script>
+<script src="__STATIC__/admin/custom/js/vuedraggable.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<style>
+    .layui-table-cell{height: inherit;}
+    body{
+        padding:5px;
+    }
+    .layui-table, .layui-table-view{
+        margin:5px 0 10px 0;
+    }
+    .custom-bar{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .custom-bar .preview{
+        width:320px;
+        height:560px;
+        position: relative;
+        background-color:#f8f8f8;
+        border: 1px solid #eee;
+        border-radius: 10px;
+    }
+
+    .preview .custom_page{
+        width: 100%;
+        height: 100%;
+    }
+    .custom-bar .custom-list{
+        width:calc(100% - 340px);
+    }
+    .custom-list .custom-header{
+        display: flex;
+        justify-content: flex-end;
+    }
+    .custom-user{
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    .custom-user .user-page{
+        width:310px;
+        height:550px;
+        position: relative;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background-color:#f8f8f8;
+        overflow-y: auto;
+    }
+    .user-page .u-header{
+        background-color:#FFC037;
+        position: relative;
+        overflow: hidden;
+    }
+    .user-page .u-header::before{
+        position: absolute;
+        content:'';
+        width:280px;
+        height:280px;
+        right:-60px;
+        bottom:-50px;
+        background-color:rgba(255,245,199,0.2);
+        border-radius:50%;
+        z-index:99;
+    }
+    .user-page .u-header::after{
+        position: absolute;
+        content:'';
+        width:160px;
+        height:160px;
+        left:-30px;
+        top:-60px;
+        background-color:rgba(255,245,199,0.1);
+        border-radius:50%;
+        z-index:9;
+    }
+    .user-page .u-header .u-title{
+        height:44px;
+        line-height:44px;
+        text-align: center;
+        font-size:16px;
+    }
+    .user-page .u-header .u-user{
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        position: relative;
+        padding:10px 15px 20px 15px;
+        z-index:999;
+    }
+    .u-user .u-user-avatar{
+        width:60px;
+    }
+    .u-user .u-user-avatar img{
+        border-radius: 50%;
+        border:#FFFFFF 3px solid;
+    }
+    .u-user .u-user-info{
+        margin-left:10px;
+    }
+    .u-user .u-user-info .u-nickname{
+        font-size:16px;
+        font-weight:bold;
+    }
+    .u-user .u-user-info .u-option{
+        font-size:12px;
+        padding-top:5px;
+    }
+    .u-user .u-setting{
+        position:absolute;
+        top:19%;
+        right:15px;
+    }
+    .u-user .u-setting .icon{
+        font-size:20px;
+    }
+    .u-header .u-svip{
+        height:40px;
+        width:94%;
+        margin:0 auto;
+        border-radius:10px 10px 0 0;
+        position: relative;
+        padding:0 10px;
+        z-index:9999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .u-header .u-svip.style1{
+        background-color:#403F45;
+        color:#efefef;
+    }
+    .u-header .u-svip.style2{
+        background-color: #fde5ae;
+        color:#ae5a2a;
+    }
+    .u-header .u-svip .u-svip-do{
+        width:74%;
+        font-size:12px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    .u-header .u-svip .u-svip-do .icon-VIP{
+        color:#FCE0C7;
+    }
+    .u-header .u-svip.style2 .icon-VIP{
+        color:#ae5a2a;
+    }
+    .u-header .u-svip .u-svip-do .name{
+        padding-left:5px;
+    }
+    .u-header .u-svip .u-right{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width:25%;
+        font-size:12px;
+    }
+    .u-header .u-svip .icon-right{
+        font-size:12px;
+    }
+    .user-page .u-menu{
+        margin:10px;
+        border-radius:10px;
+    }
+    .user-page .u-menu .u-item{
+        display: flex;
+        align-items: center;
+        position:relative;
+        padding:15px 15px;
+        background-color:#fff;
+    }
+    .user-page .u-menu .u-item .icon{
+        margin-right:10px;
+    }
+    .user-page .u-item .icon-zixun{
+
+    }
+    .user-page .u-menu .u-item .name{
+        font-size:14px;
+    }
+    .user-page .u-menu .u-item .icon-right{
+        position:absolute;
+        right:5px;
+        font-size:14px;
+        font-weight:bold;
+        color:#c9c9c9;
+    }
+    .user-page .u-menu .u-item::after{
+        position: absolute;
+        content:'';
+        height:1px;
+        left:50px;
+        right:15px;
+        bottom:0;
+        background-color:#eee;
+    }
+    .user-page .u-menu .u-item:last-child::after{
+        height:0;
+    }
+    .custom-user .user-config{
+        margin-left:20px;
+        width:calc(100% - 570px);
+    }
+    .user-config .user-setting{
+        padding:0 20px;
+    }
+    .user-config .user-setting .tips{
+        font-size:12px;
+        color:#9c9c9c;
+    }
+    .reset-color{
+        font-size:12px;
+        border-radius:3px;
+        border:#eee 1px solid;
+    }
+    .user-setting .user-title{
+        position:relative;
+        font-size:14px;
+        font-weight: bold;
+        margin:0 0 20px 10px;
+
+    }
+    .user-setting .user-title::before{
+        content: "";
+        position: absolute;
+        width: 2px;
+        height: 14px;
+        background: #1890ff;
+        top: 50%;
+        margin-top: -7px;
+        left: -8px;
+    }
+    .user-setting ul{}
+    .user-setting li.item{
+        display: flex;
+        align-items:center;
+        justify-content: space-between;
+        border:#ddd 1px dashed;
+        padding:5px 20px;
+        margin:10px 0;
+        border-radius:10px;
+        position: relative;
+    }
+    .user-setting li.item .icon-drag{
+        position: absolute;
+        content:'';
+        left:15px;
+        font-size:20px;
+        color:#9c9c9c;
+    }
+    .user-setting li.item .item-icon{
+        margin-left:30px;
+        width:64px;
+        height:64px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+    }
+    .item-icon .ico-uploader{
+        background-color:#efefef;
+        width:60px;
+        height:60px;
+        padding:2px;
+        overflow: hidden;
+        border-radius:10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .item-icon .el-icon-camera{
+        font-size:22px;
+        color:#9c9c9c;
+    }
+    .user-setting li.item .item-set{
+        width:calc(100% - 124px);
+    }
+    .user-setting .el-form-item{
+        margin-bottom:5px;
+    }
+    .user-setting li.item .icon-close{
+        position: absolute;
+        content:'';
+        right:-15px;
+        top:-5px;
+        color: #ea7974;
+        width:24px;
+        height:24px;
+        cursor: pointer;
+    }
+    .custom-bar .custom-config{
+        width:calc(100% - 330px);
+    }
+    .custom-btn{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .el-tabs__nav-wrap{
+        padding-left:10px;
+    }
+    .el-tabs__item{
+        height:46px;
+        line-height:46px;
+        color:#6c6c6c;
+    }
+    .sort-page{
+        width:330px;
+        height:550px;
+        position: relative;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background-color:#fff;
+        overflow-y: auto;
+    }
+    .sort-page .search{
+        padding:10px 10px;
+        border-bottom:#f8f8f8 1px solid;
+    }
+    .sort-page .search .search-bar{
+        height:32px;
+        background-color:#efefef;
+        border:#eee 1px solid;
+        border-radius:30px;
+        color:#c9c9c9;
+        display: flex;
+        align-items: center;
+        padding:0 10px;
+    }
+    .sort-page .search .search-bar.style1{
+        justify-content: center;
+    }
+    .sort-page .search .search-bar.style2{
+        justify-content: flex-start;
+    }
+
+    .sort-page .search .search-bar .name{
+        padding-left:5px;
+    }
+    .sort-page .sort-list{
+        display: flex;
+        justify-content: space-between;
+        background-color:#fff;
+    }
+    .sort-page .sort-list .sort-menu{
+        width:70px;
+        background-color:#f8f8f8;
+        border-right:#eee 1px solid;
+        position: relative;
+    }
+    .sort-list .el-form-item{
+        margin-bottom:12px;
+    }
+    .sort-list .sort-menu .sort-menu-nav{
+        height:40px;
+        line-height:40px;
+        border-bottom:#efefef 1px solid;
+        text-align: center;
+        color:#4c4c4c;
+    }
+    .sort-list .sort-menu .sort-menu-nav.active{
+        background-color:#fff;
+        position: relative;
+        z-index:1;
+        border-right:#fff 1px solid;
+        margin-right:-1px;
+        color:#000;
+        font-weight:bold;
+    }
+    .sort-list .sort-menu .sort-menu-nav.active::before{
+        position: absolute;
+        content:'';
+        left:2px;
+        top:25%;
+        width:4px;
+        background-color:#FF6E3E;
+        border-radius:6px;
+        bottom:25%;
+    }
+    .sort-page .sort-list .sort-main{
+        width:calc(100% - 70px);
+    }
+    .sort-style1{
+        padding:0 0 10px 10px;
+    }
+    .sort-style1 .sort-two{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding:12px 0;
+    }
+    .sort-style1 .sort-two .name{
+        font-size:12px;
+        font-weight:bold;
+    }
+    .sort-style1 .sort-two .icon{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        font-size:12px;
+        color:#9c9c9c;
+    }
+    .sort-style1 .sort-two .icon-right{
+        color:#c9c9c9;
+    }
+    .sort-style1 .sort-three{
+        margin:0;
+        padding:0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+    .sort-style1 .sort-three li{
+        width:25%;
+        text-align: center;
+    }
+    .sort-style1 .sort-three li img{}
+    .sort-style1 .sort-three li .name{
+        margin:8px 0 5px 0;
+        font-size:11px;
+        color:#6c6c6c;
+    }
+    .sort-style2{
+        padding:10px 8px 10px 10px;
+    }
+    .sort-style2 .sort-nav{
+        display: flex;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .sort-style2 .sort-nav .navli{
+        display: inline-block;
+        font-size:12px;
+        color:#6c6c6c;
+        padding:5px 15px;
+    }
+    .sort-style2 .sort-nav .navli.active{
+        border-radius:30px;
+    }
+    .sort-style2 .course-list{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .sort-style2 .course-list .course-item{
+        width:48%;
+        margin:5px 0;
+    }
+    .sort-style2 .course-list .course-item img{
+        width:100%;
+        height:80px;
+        border-radius:3px;
+    }
+    .sort-style2 .course-item .course-title{
+        margin-top:5px;
+        font-size:12px;
+        height:36px;
+        line-height:18px;
+        overflow: hidden;
+    }
+    .sort-style2 .course-price{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding:5px 0;
+    }
+    .course-price .price{
+        color:#FF6E3E;
+        font-size: 14px;
+        font-weight:bold;
+    }
+    .course-price .dis-price{
+        color:#c9c9c9;
+        text-decoration: line-through;
+    }
+    .course-info{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding:5px 0;
+    }
+    .course-info .level{
+        background-color:#ffece2;
+        color:#FF6E3E;
+        border-radius:3px;
+        padding:2px 6px;
+    }
+    .course-info .sales{
+        background-color:#f8f8f8;
+        color:#9c9c9c;
+        font-size:11px;
+        padding:2px 6px;
+        border-radius:20px;
+    }
+    .sort-style3{
+        padding:10px 8px 10px 10px;
+    }
+    .sort-style3 .sort-nav{
+        display: flex;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .sort-style3 .sort-nav .navli{
+        display: inline-block;
+        font-size:12px;
+        color:#6c6c6c;
+        padding:5px 15px;
+    }
+    .sort-style3 .sort-nav .navli.active{
+        border-radius:30px;
+    }
+    .sort-style3 .course-list{
+        display: flex;
+        flex-direction: column;
+    }
+    .sort-style3 .course-list .course-item{
+        margin:5px 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+    .sort-style3 .course-list .course-item img{
+        width:90px;
+        height:70px;
+        border-radius:3px;
+    }
+    .sort-style3 .course-list .course-item .course-option{
+        width:calc(100% - 100px);
+    }
+    .sort-style3 .course-item .course-title{
+        font-size:12px;
+        height:34px;
+        line-height:16px;
+        overflow: hidden;
+    }
+    .sort-style3 .course-price{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .sort-style3 .course-info{
+        padding:0;
+    }
+    .sort-style3 .course-info .level{
+        background-color:#ffece2;
+        color:#FF6E3E;
+        border-radius:3px;
+        font-size:10px;
+        padding:1px 6px;
+    }
+    .sort-title{
+        position:relative;
+        font-size:14px;
+        font-weight: bold;
+        margin:0 0 20px 10px;
+    }
+    .sort-title::before{
+        content: "";
+        position: absolute;
+        width: 2px;
+        height: 14px;
+        background: #1890ff;
+        top: 50%;
+        margin-top: -7px;
+        left: -8px;
+    }
+    .sort-style{
+        margin-left:20px;
+        width:60%;
+    }
+    .msg-data{
+        margin:50px auto;
+    }
+    .msg-data .msg-icon{
+        margin:0 auto;
+        border:#ddd 1px solid;
+        width:200px;
+        height:200px;
+        border-radius:10px;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .msg-data .msg-icon .icon{
+        font-size:32px;
+        color:#0BB20C;
+    }
+    .msg-data .msg-name{
+        text-align: center;
+        font-size:18px;
+        color:#9c9c9c;
+        padding:15px 0;
+    }
+    .msg-data .msg-name .line{
+        padding-bottom:10px;
+    }
+    .pagelist{
+        padding:20px;
+        display: flex;
+        justify-content: center;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">移动端装修</li>
+        </ul>
+    </div>
+    <div class="table-body" id="app">
+        <el-tabs v-model="pageName" @tab-click="handleClick">
+            <el-tab-pane label="首页装修" name="home">
+                <div class="custom-bar">
+                    <div class="preview">
+                        <template v-if="home_url">
+                            <iframe class="custom_page" frameborder="0" src="{$home_url}" id="custom_page"></iframe>
+                            <div class="mask"></div>
+                        </template>
+                        <template v-else>
+                            <div class="msg-data">
+                                <div class="msg-icon">
+                                    <i class="icon icon-mini"></i>
+                                </div>
+                                <div class="msg-name">
+                                    <div class="line">暂不支持预览</div>
+                                    <div class="line">请在微信上查看</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="custom-list">
+                        <div class="custom-header">
+                            <a href="javascript:;" @click="addHome" class="addpage layui-btn layui-bg-blue layui-btn-small">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                {:lang('add')}首页
+                            </a>
+                        </div>
+                        <el-table :data="homeList" style="width:100%" size="small">
+                            <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                            <el-table-column prop="name" label="名称" width="240"></el-table-column>
+                            <el-table-column prop="ctime_text" label="添加时间" width="180"></el-table-column>
+                            <el-table-column prop="utime_text" label="更新时间" width="180"></el-table-column>
+                            <el-table-column label="操作" >
+                                <template slot-scope="scope">
+                                    <el-button v-if="scope.row.id!==view_id" @click="handleSet(scope.row.id)" type="text" size="small">设置为首页</el-button>
+                                    <el-button @click="handleEdit(scope.row.code)" type="text" size="small">编辑</el-button>
+                                    <el-button v-if="scope.row.id!==1" @click="handletDel(scope.row.id)" type="text" size="small">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="pagelist"><el-pagination v-if="total>0" :current-page.sync="page" :page-size="limit" :hide-on-single-page="true" layout="prev, pager, next" :total="total" @current-change="getThemeList"></el-pagination></div>
+                    </div>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="专题页" name="subject">
+                <div class="custom-bar">
+                    <div class="preview">
+                        <template v-if="special_url">
+                            <iframe class="custom_page" frameborder="0" src="{$special_url}" id="special_page"></iframe>
+                        </template>
+                        <template v-else>
+                            <div class="msg-data">
+                                <div class="msg-icon">
+                                    <i class="icon icon-mini"></i>
+                                </div>
+                                <div class="msg-name">
+                                    <div class="line">暂不支持预览</div>
+                                    <div class="line">请在微信上查看</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="custom-list">
+                        <div class="custom-header">
+                            <a href="javascript:;" @click="addSpecial" class="addsubpage layui-btn layui-bg-blue layui-btn-small">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                {:lang('add')}专题页
+                            </a>
+                        </div>
+                        <el-table :data="homeList" style="width:100%" size="small">
+                            <el-table-column prop="id" label="ID" width="60"></el-table-column>
+                            <el-table-column prop="name" label="名称" width="180"></el-table-column>
+                            <el-table-column prop="ctime_text" label="添加时间" width="150"></el-table-column>
+                            <el-table-column prop="utime_text" label="更新时间" width="150"></el-table-column>
+                            <el-table-column label="页面链接" width="260">
+                                <template slot-scope="scope">
+                                    <div style="display:flex;align-items: center; justify-content: space-around;">
+                                        <el-link>/custom/subject/index?id={{scope.row.id}}</el-link>
+                                        <el-button class="copylink" type="primary" :data-clipboard-text="'/custom/subject/index?id='+scope.row.id" size="mini" @click="copylinks" plain>复制</el-button>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" >
+                                <template slot-scope="scope">
+                                    <el-button @click="handleEdit(scope.row.code)" type="text" size="small">编辑</el-button>
+                                    <el-button @click="handletDel(scope.row.id)" type="text" size="small">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="pagelist"><el-pagination v-if="total>0" :current-page.sync="page" :page-size.sync="limit" :hide-on-single-page="true" layout="prev, pager, next" :total="total" @current-change="getThemeList"></el-pagination></div>
+                    </div>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="资源分类" name="sort">
+                <div class="custom-bar">
+                    <div class="sort-page preview">
+                        <div class="search">
+                            <div :class="'search-bar '+sortWidget.search.style">
+                                <i class="icon icon-search"></i>
+                                <span class="name">{{sortWidget.search.placeholder}}</span>
+                            </div>
+                        </div>
+                        <div class="sort-list">
+                            <div class="sort-menu">
+                                <div :class="index==0?'sort-menu-nav active':'sort-menu-nav'" v-for="(item,index) in sortList" :key="index">
+                                    {{item.name}}
+                                </div>
+                            </div>
+                            <div class="sort-main">
+                                <div class="sort-style1" v-if="sortWidget.style=='style1'">
+                                    <template v-for="(item,index) in twolist">
+                                        <div class="sort-two" :key="index">
+                                            <span class="name">{{item.name}}</span>
+                                            <span class="icon">
+                                                更多
+                                                <i class="icon icon-right"></i>
+                                            </span>
+                                        </div>
+                                        <ul class="sort-three" v-if="item.children">
+                                            <li v-for="(item1,index1) in item.children">
+                                                <img :src="item1.thumb" width="44px" height="44px">
+                                                <div class="name">{{item1.name}}</div>
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </div>
+                                <div class="sort-style2" v-else-if="sortWidget.style=='style2'">
+                                    <div class="sort-nav">
+                                        <div class="navli active" :style="'background-color:'+sortWidget.color.bg+';color:'+sortWidget.color.text+';'">全部</div>
+                                        <div class="navli" v-for="(item,index) in twolist" :key="index">{{item.name}}</div>
+                                    </div>
+                                    <div class="course-list">
+                                        <div class="course-item" v-for="(item,index) in spreadList" :key="index">
+                                            <img class="thumb" :src="item.thumb"/>
+                                            <div class="course-title">{{item.title}}</div>
+                                            <div class="course-price">
+                                                <span class="price">&yen;{{item.price}}</span>
+                                                <span class="dis-price">&yen;{{item.dis_price}}</span>
+                                            </div>
+                                            <div class="course-info">
+                                                <span class="level">{{item.level_name}}</span>
+                                                <span class="sales">{{item.sales}}人学习</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="sort-style3" v-else>
+                                    <div class="sort-nav">
+                                        <div class="navli active" :style="'background-color:'+sortWidget.color.bg+';color:'+sortWidget.color.text+';'">全部</div>
+                                        <div class="navli" v-for="(item,index) in twolist" :key="index">{{item.name}}</div>
+                                    </div>
+                                    <div class="course-list">
+                                        <div class="course-item" v-for="(item,index) in spreadList" :key="index">
+                                            <img class="thumb" :src="item.thumb"/>
+                                            <div class="course-option">
+                                                <div class="course-title">{{item.title}}</div>
+                                                <div class="course-price">
+                                                    <span class="price">&yen;{{item.price}}</span>
+                                                    <span class="dis-price">&yen;{{item.dis_price}}</span>
+                                                </div>
+                                                <div class="course-info">
+                                                    <span class="level">{{item.level_name}}</span>
+                                                    <span class="sales">{{item.sales}}人学习</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-list">
+                        <div class="sort-style">
+                            <el-form ref="sortform" label-width="90px" label-position="left">
+                                <div class="sort-title">分类页面</div>
+                                <el-form-item label="搜索框样式:" size="normal" class="column">
+                                    <el-radio-group v-model="sortWidget.search.style">
+                                        <el-radio label="style1">居中显示</el-radio>
+                                        <el-radio label="style2">居左显示</el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <el-form-item label="搜索框示:" size="normal" class="column">
+                                    <el-input v-model="sortWidget.search.placeholder" placeholder="请输入搜索框提示"></el-input>
+                                </el-form-item>
+                                <el-form-item label="页面样式:" size="normal" class="column">
+                                    <el-radio-group v-model="sortWidget.style">
+                                        <el-radio label="style1">三级分类</el-radio>
+                                        <el-radio label="style2">资源两列</el-radio>
+                                        <el-radio label="style3">资源单列</el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <template v-if="sortWidget.style!=='style1'">
+                                    <el-form-item label="选中颜色:" size="normal" class="column">
+                                        <div style="display: flex;align-items: center;">
+                                            <el-form-item label="背景颜色:" label-width="80px" style="margin-right:20px;">
+                                                <el-color-picker v-model="sortWidget.color.bg" size="mini"></el-color-picker>
+                                                <a class="reset-color" href="javascript:;" @click="sortWidget.color.bg = '#FFF3E9'">重置</a>
+                                            </el-form-item>
+                                            <el-form-item label="文字颜色:" label-width="80px">
+                                                <el-color-picker v-model="sortWidget.color.text" size="mini"></el-color-picker>
+                                                <a class="reset-color" href="javascript:;" @click="sortWidget.color.text = '#FF6E3E'">重置</a>
+                                            </el-form-item>
+                                        </div>
+                                    </el-form-item>
+                                    <el-form-item label="是否推荐:" size="normal" class="column">
+                                        <el-radio-group v-model="sortWidget.isTop">
+                                            <el-radio :label="1">推荐</el-radio>
+                                            <el-radio :label="0">不限制</el-radio>
+                                        </el-radio-group>
+                                    </el-form-item>
+                                    <el-form-item label="每页数量:" size="normal" class="column">
+                                        <el-input v-model="sortWidget.limit" placeholder="请输入资源每页显示数量"></el-input>
+                                    </el-form-item>
+                                </template>
+                                <el-form-item label="" size="normal" class="column">
+                                    <el-button class="save_btn" type="primary" @click="saveSort">保存设置</el-button>
+                                </el-form-item>
+                            </el-form>
+
+                        </div>
+                    </div>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane label="个人中心" name="user">
+                <div class="custom-user">
+                    <div class="user-page">
+                        <div class="u-header" :style="'background-image: linear-gradient(to right,'+userWidget.topBgcolor.start+','+userWidget.topBgcolor.end+')'">
+                            <div class="u-title" :style="'color:'+userWidget.topTextColor">我的</div>
+                            <div class="u-user">
+                                <div class="u-user-avatar">
+                                    <img src="{:config('setting.web_logo')}" width="52px" height="52px">
+                                </div>
+                                <div class="u-user-info">
+                                    <div class="u-nickname">修行之旅</div>
+                                    <div class="u-option">普通会员</div>
+                                </div>
+                                <div class="u-setting">
+                                    <i class="icon icon-setting2"></i>
+                                </div>
+                            </div>
+                            <div :class="'u-svip '+userWidget.cardStyle">
+                                <div class="u-svip-do">
+                                    <i class="icon icon-VIP"></i>
+                                    <span class="name">激活会员 解锁更多特权</span>
+                                </div>
+                                <div class="u-right">
+                                    <span class="name">去开通</span>
+                                    <i class="icon icon-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="u-menu">
+                            <div class="u-item" v-for="(item,index) in userWidget.list" key="index">
+                                <div class="icon">
+                                    <img v-if="item.image" :src="item.image" :alt="item.name" width="20px" height="20px">
+                                    <i v-else class="icon icon-zixun"></i>
+                                </div>
+                                <div class="name">{{item.name}}</div>
+                                <i class="icon icon-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-config">
+                        <div class="user-setting">
+                            <el-form ref="form" label-width="90px" label-position="left">
+                                <div class="user-title">个人中心页面</div>
+                                <el-form-item label="头部背景:" size="normal" class="column">
+                                    <div style="display: flex;align-items: center;">
+                                        <el-form-item label="起始背景:" label-width="80px" style="margin-right:20px;">
+                                            <el-color-picker v-model="userWidget.topBgcolor.start" size="mini"></el-color-picker>
+                                            <a class="reset-color" href="javascript:;" @click="userWidget.topBgcolor.start = '#fff'">重置</a>
+                                        </el-form-item>
+                                        <el-form-item label="结束背景:" label-width="80px">
+                                            <el-color-picker v-model="userWidget.topBgcolor.end" size="mini"></el-color-picker>
+                                            <a class="reset-color" href="javascript:;" @click="userWidget.topBgcolor.end = '#fff'">重置</a>
+                                        </el-form-item>
+                                    </div>
+                                </el-form-item>
+                                <el-form-item label="头部字体:" size="normal" class="column">
+                                    <el-color-picker v-model="userWidget.topTextColor" size="mini"></el-color-picker>
+                                    <a class="reset-color" href="javascript:;" @click="userWidget.topTextColor = '#000000'">重置</a>
+                                </el-form-item>
+                                <el-form-item label="会员样式:" size="normal" class="column">
+                                    <el-radio-group v-model="userWidget.cardStyle">
+                                        <el-radio label="style1">样式1</el-radio>
+                                        <el-radio label="style2">样式2</el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <el-form-item label="服务菜单:" size="normal" class="column">
+                                    <div class="tips">建议尺寸：72px * 72px，拖拽图片可调整图片显示顺序哦</div>
+                                </el-form-item>
+                                <draggable class="dragArea" v-model="userWidget.list" tag="ul">
+                                    <li  v-for="(item, index) in userWidget.list" :key="index" class="item">
+                                        <span class="icon icon-drag"></span>
+                                        <div class="item-icon" @click="uploadImg(index)">
+                                            <div class="ico-uploader">
+                                                <img v-if="item.image" :src="item.image" width="58" height="58" class="avatar">
+                                                <i v-else class="el-icon-camera"></i>
+                                            </div>
+                                        </div>
+                                        <div class="item-set">
+                                            <div class="name">
+                                                <el-form-item label="菜单名称" size="normal" class="column">
+                                                    <el-input v-model="item.name" placeholder="请输入菜单名称"></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="链接地址" size="normal" class="column">
+                                                    <el-input v-model="item.link" placeholder="请选择链接地址">
+                                                        <template slot="append">
+                                                            <el-button size="mini" @click="hadnlePage(index)" class="select-page">选择</el-button>
+                                                        </template>
+                                                    </el-input>
+                                                </el-form-item>
+                                            </div>
+                                            <div class="link"></div>
+                                        </div>
+                                        <i class="icon icon-close" @click="handleDel(index)"></i>
+                                    </li>
+                                </draggable>
+                                <el-button class="add_btn" type="primary" size="small" @click="addMenus">添加菜单</el-button>
+                            </el-form>
+                        </div>
+                    </div>
+                </div>
+                <div class="custom-btn">
+                    <el-button class="save_btn" type="primary" @click="saveUser">保存页面</el-button>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    var api_getPages = "{:createUrl('widget/getPages')}";//页面路径
+    var home_url='{$home_url}';
+    var special_url='{$special_url}';
+    var userConfig={$userConfig|raw};
+    var sortConfig={$sortConfig|raw};
+    var sortList={$sortList|raw};
+    var resource={$resource|raw};
+    var view_id= {$view_id};
+    Vue.config.productionTip = false;
+    Vue.config.lang = 'zh-CN';
+    new Vue({
+        el: '#app',
+        data: {
+            pageName:'home',
+            userWidget:userConfig,
+            sortList:sortList,
+            oneItem:[],
+            twolist:[],
+            spreadList:resource,
+            sortWidget:sortConfig,
+            homeList:[],
+            sortSList:[],
+            page:1,
+            limit:10,
+            total:0,
+            type:1,
+            view_id:view_id
+        },
+        created:function(){
+            let self = this;
+            self.oneItem=self.sortList.slice(0,1)[0];
+            if(self.oneItem.children.length>0){
+                self.twolist=self.oneItem.children;
+            }
+            self.getThemeList();
+        },
+        mounted: function () {
+            var that = this;
+            that.$nextTick(function () {
+                layui.use(['table'], function () {
+                    var table = layui.table;
+                    //监听前端页面列表页工具条
+                    table.on('tool(pagesTable)', function (obj) {
+                        var data = obj.data; //获得当前行数据
+                        that.userWidget.list[currentIndex].link=data.path;
+                        layer.close(window.box);
+                    });
+                });
+                window.addEventListener("attachmentIn", function (e) {
+                    const index = parseInt(e.detail.type);
+                    that.userWidget.list[index].image=e.detail.org_url;
+                });
+            });
+        },
+        methods: {
+            uploadImg(index){
+                layer.open({
+                    title:'上传图标',
+                    type:2,
+                    maxmin: true,
+                    area:['80%','500px'],
+                    content:'{:createUrl("attachment/index")}?type=1&name='+index,
+                });
+            },
+            addSpecial(){
+                window.location.href='{:createUrl("saveTheme")}?layout=2';
+            },
+            addHome(){
+                window.location.href='{:createUrl("saveTheme")}?layout=1';
+            },
+            //复制链接
+            copylinks(){
+                let self=this;
+                var clipboard = new Clipboard('.copylink');
+                clipboard.on('success', function(e) {
+                    self.$message.success('复制成功');
+                });
+                clipboard.on('error', function(e) {
+                    self.$message.error('复制失败');
+                });
+            },
+            //编辑布局
+            handleEdit(code){
+                window.location.href='{:createUrl("saveTheme")}?layout='+this.type+'&code='+code;
+            },
+            //删除布局
+            handletDel(id){
+                let self=this;
+                self.$confirm('此操作将删除该布局不可恢复, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    $.post("{:createUrl('del')}",{ids:id},function(res){
+                        if(res.status==200){
+                            self.$message.success(res.msg);
+                            self.getThemeList();
+                        }else{
+                            self.$message.error(res.msg);
+                        }
+                    });
+                }).catch(() => {
+                    self.$message({type: 'info',message: '已取消删除'});
+                });
+            },
+            //设置首页
+            handleSet(id){
+                let self=this;
+                JsPost("{:createUrl('cuscom/changeTemp')}", {id:id}, function (res) {
+                    if (res.status) {
+                        self.$message.success(res.msg);
+                        self.view_id=id;
+                    } else {
+                        self.$message.error(res.msg);
+                    }
+                });
+            },
+            //获取列表
+            getThemeList(){
+                let self=this;
+                $.get("{:createUrl('cuscom/index')}",{filter: '{"layout":'+self.type+'}',page:self.page,limit:self.limit},function(res){
+                    if (res.status==200) {
+                        self.homeList=res.data;
+                        self.total=res.total;
+                    }else{
+                        self.$message.error(res.msg);
+                    }
+                },'json');
+            },
+            saveSort(){
+                let self=this;
+                var params={
+                    data: JSON.stringify(this.sortWidget)
+                };
+                JsPost("{:createUrl('cuscom/saveSortConfig')}", params, function (res) {
+                    if (res.status) {
+                        self.$message.success(res.msg);
+                    } else {
+                        self.$message.error(res.msg);
+                    }
+                });
+            },
+            handleClick(){
+                let self=this;
+                if(self.pageName=='home'){
+                    self.page=1;
+                    self.type=1;
+                    self.homeList=[];
+                    self.getThemeList();
+                }else if(self.pageName=='subject'){
+                    self.page=1;
+                    self.type=2;
+                    self.homeList=[];
+                    self.getThemeList();
+                }
+            },
+            saveUser(){
+                let self=this;
+                var params={
+                    data: JSON.stringify(this.userWidget)
+                };
+                JsPost("{:createUrl('cuscom/saveUserConfig')}", params, function (res) {
+                    if (res.status) {
+                        self.$message.success(res.msg);
+                    } else {
+                        self.$message.error(res.msg);
+                    }
+                });
+            },
+            hadnlePage(currentIndex){
+                let self=this;
+                layui.layer.open({
+                    type: 2,
+                    content: api_getPages,
+                    area: ["800px", "550px"],
+                    title: "选择链接",
+                    btn: ["完成", "取消"],
+                    yes: function (index, layero) {
+                        var pageLinks = layer.getChildFrame('#pageLinkVal', index).val();
+                        self.$set(self.userWidget.list[currentIndex], 'link', pageLinks);
+                        layer.close(index);
+                    }
+                });
+            },
+            addMenus(){
+                let self=this;
+                self.userWidget.list.push({image:'',name:'',link:''});
+            },
+            handleDel(index){
+                let self=this;
+                self.userWidget.list.splice(index,1);
+            },
+            handleUpload(param){
+                let self = this;
+                const formData = new FormData();
+                var index= param.data.index;
+                formData.append('file', param.file);
+                $.ajax({
+                    url: "{:createUrl('upFiles/upload')}",
+                    dataType: 'json',
+                    async: false,
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    method: 'POST',
+                    success(res) {
+                        console.log(res);
+                        if (res.status == 200) {
+                            self.$message.success(res.msg);
+                            self.userWidget.list[index].image=res.url;
+                        } else {
+                            self.$message.error(res.msg);
+                        }
+                    },
+                    error(err) {
+                        console.log(err);
+                    },
+                });
+            },
+            beforeUpload(file){
+                console.log(file);
+            },
+        }
+    })
+</script>

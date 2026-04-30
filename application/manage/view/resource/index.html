@@ -1,0 +1,528 @@
+{include file="common/head"/}
+<style>
+    .layui-btn-container .layui-btn{
+        height:30px;
+        line-height:30px;
+    }
+    .layui-btn-container .layui-btn i{
+        font-size:12px;
+    }
+    .layui-btn-sm i{
+        font-size:12px;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">资源列表</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <div class="layui-input-inline" style="width: 130px;">
+                        <input type="text" name='start' autocomplete="off" id="startDate" class="layui-input" placeholder="开始日期">
+                    </div>
+                    <div class="layui-input-inline">-</div>
+                    <div class="layui-input-inline" style="width: 130px;">
+                        <input type="text" name='end' autocomplete="off" id="endDate" class="layui-input" placeholder="结束日期">
+                    </div>
+                </div>
+                <div class="layui-inline" style="width: 100px;">
+                    <select name="status">
+                        <option value="">状态</option>
+                        <option value="0">禁用</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>
+                <div class="layui-inline" style="width: 140px;">
+                    <select name="sort" class="layui-select">
+                        <option value="">选择分类</option>
+                        {$sortSelect|raw}
+                    </select>
+                </div>
+                <div class="layui-inline">
+                    <input type="text" name="search" class="layui-input" placeholder="标题">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit="" lay-filter="search">
+                        <i class="layui-icon">&#xe615;</i>
+                    </button>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn">
+                <a href="javascript:;" class="onekeyspread layui-btn layui-bg-blue layui-btn-small">
+                    <i class="layui-icon layui-icon-release"></i>
+                    一键推广
+                </a>
+                <a href="javascript:;" class="batch layui-btn layui-bg-blue layui-btn-small">
+                    <i class="layui-icon layui-icon-upload-drag"></i>
+                    批量导入
+                </a>
+                <a href="javascript:;" class="add layui-btn layui-bg-blue layui-btn-small">
+                    <i class="layui-icon layui-icon-addition"></i>
+                    {:lang('add')}资源
+                </a>
+            </div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+<div style="display: none;" id='cs'>
+    <div style="display: flex;width: 100%;margin-top: 30px;justify-content: center;align-items: center;">
+        <span>销售价格</span>
+        <input type="number" name="money" style="width:240px;margin-left: 10px;" id="money" placeholder="请输入出售价格" autocomplete="off" class="layui-input">
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm layui-btn-normal" lay-event="spread">
+        <i class="layui-icon layui-icon-release"></i>
+        推广
+    </a>
+    <a class="layui-btn layui-btn-sm" lay-event="edit">
+        <i class="layui-icon layui-icon-edit"></i>
+        {:lang('edit')}
+    </a>
+    <a class="layui-btn layui-btn-sm" lay-event="copy">
+        <i class="layui-icon layui-icon-senior"></i>
+        复制
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">
+        <i class="layui-icon layui-icon-delete"></i>
+        {:lang('del')}
+    </a>
+</script>
+<script type="text/html" id="pushTpl">
+    {{# if(d.spread==1){ }}
+    <span class="green_block">推广中</span>
+    {{# }else{ }}
+    <span class="orange_block">未推广</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="statusTpl">
+    {{# if(d.status==1){ }}
+        <span class="green">启用</span>
+    {{# }else{ }}
+        <span class="gray">禁用</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="table-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="spreadAll"><i class="layui-icon layui-icon-release"></i> 批量推广</button>
+        <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="sellAll"><i class="layui-icon layui-icon-rmb"></i> 提交出售</button>
+        <button class="layui-btn layui-btn-sm" lay-event="openAll"><i class="icon icon-qiyong"></i> 批量启用</button>
+        <button class="layui-btn layui-btn-sm" lay-event="closeAll"><i class="icon icon-jinyong"></i> 批量禁用</button>
+        <button class="layui-btn layui-btn-sm" lay-event="sortAll"><i class="layui-icon layui-icon-component"></i> 批量分类</button>
+        <button class="layui-btn layui-btn-sm" lay-event="copyAll"><i class="layui-icon layui-icon-senior"></i> 批量复制</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delAll"><i class="layui-icon layui-icon-delete"></i> 批量删除</button>
+    </div>
+</script>
+<script>
+    var admin_token='{$admin.api_token}';
+    var admin_group='{$admin.group_id}';
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,
+            cols: [[
+                {type: 'checkbox',title:'ID',align:'center',width:50},
+                {field: 'is_push',title: '推广状态',align:'center',width:90,templet:'#pushTpl'},
+                {field: 'agent',title:'所属代理',align:'center',width:120,templet:function(d){
+                    if(d.agent){
+                        return d.agent.username+'【'+d.agent.id+'】';
+                    }else{
+                        return '平台';
+                    }
+                }},
+                {field: 'thumb',title: '封面',align:'center',width:80,event:'viewPhoto',templet:function(d){
+                    return '<img  src="'+d.thumb+'" width="32" height="auto"/>';
+                 }},
+                {field: 'title',title: '标题',width:300,edit:true},
+                {field: 'type', align: 'center',title: '资源类型',width:80,templet:function(d){
+                    if(d.type==1){
+                        return '网盘资源';
+                    }else if(d.type==2){
+                        return '视频资源';
+                    }else if(d.type==3){
+                        return '文章资源';
+                    }else if(d.type==4){
+                        return '视频课程';
+                    }else if(d.type==5){
+                        return '音频课程';
+                    }else if(d.type==6){
+                        return '卡密资源';
+                    }
+                 }},
+                {field: 'sort_name', align: 'center',title: '资源分类',width:150,templet:function(d){
+                    if(d.sort_name){
+                        return d.sort_name;
+                    }else{
+                        return ' - ';
+                    }
+                }},
+                {field:'status',width:80,title: '状态',align:'center',templet:'#statusTpl'},
+                {field: 'type', align: 'center',title: '是否列表',event:"section",width:130,templet:function(d){
+                    if(d.type==4 || d.type==5){
+                        return '<span class="blue_block" style="cursor: pointer;"><i class="layui-icon layui-icon-list"></i> 课程章节</span>';
+                    }else if(d.type==6){
+                         return '<span class="blue_block" style="cursor: pointer;"><i class="layui-icon layui-icon-list"></i> 卡密列表</span>';
+                    }else{
+                        return '<span class="gray_block">无列表</span>';
+                    }
+                }},
+                {field: 'price',title:'价格',align:'center',width:70,edit:true},
+                {field: 'dis_price',title:'原价',align:'center',width:70,edit:true},
+                {field: 'is_sell', align: 'center',title: '出售状态',width:100,templet:function(d){
+                    if(d.is_buy==0){
+                        if(d.is_sell==1){
+                            return '<span class="green_block">出售中</span>';
+                        }else if(d.is_sell==-1){
+                            return '<span class="red_block">未通过</span>';
+                        }else{
+                            return '<span class="blue_block">可出售</span>';
+                        }
+                    }else{
+                        return '<span class="gray_block">不可出售</span>';
+                    }
+                }},
+                {field: 'user',title:'发布人',align:'center',width:120,templet:function(d){
+                    if(d.user){
+                        return d.user.nickname+'【'+d.user.id+'】';
+                    }else{
+                        if(d.agent && d.agent.group_id==2){
+                            return '代理';
+                        }else{
+                            return '平台';
+                        }
+                    }
+                }},
+                {field: 'ctime', align: 'center',title: '发布时间',width:150},
+                {align: 'center',toolbar:'#action',width:350}
+            ]]
+        });
+        form.on('submit(search)', function(data){
+            table.reload('list', {
+                url: "{:createUrl('index')}",
+                method:'get',
+                where:data.field,
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+        //选择日期
+        laydate.render({
+            elem: '#startDate',
+            type:'datetime'
+        });
+        laydate.render({
+            elem: '#endDate',
+            type:'datetime'
+        });
+        //监听添加
+        $('#func-btn .add').on('click',function () {
+            layer.open({
+                title:'添加资源',
+                type:2,
+                maxmin: true,
+                area:['100%','100%'],
+                content:'{:createUrl("add")}',
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+        //一键推广
+        $('#func-btn .onekeyspread').on('click',function () {
+            layer.confirm('一键推广比较耗时，确定吗',{icon: 3},function(index){
+                var loading = layer.load(1,{shade: [0.1, '#fff']});
+                layer.close(index);
+                $.post("{:createUrl('spread')}",{type:1},function(res){
+                    layer.close(loading);
+                    if(res.status===200){
+                        layer.msg(res.msg,{time: 1000, icon: 1});
+                        tableIn.reload();
+                    }else{
+                        layer.msg(res.msg,{time: 1000, icon: 2});
+                    }                        
+                });
+            });
+        });
+        //批量导入
+        $('#func-btn .batch').on('click',function () {
+            layer.open({
+                title:'批量导入',
+                type:2,
+                maxmin: true,
+                content:'{:createUrl("batch")}',
+                area:['500px','350px'],
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+        table.on('edit(list)', function(obj){ //注：edit是固定事件名，test是table原始容器的属性 lay-filter="对应的值"
+            var loading = layer.load(1,{shade: [0.1, '#fff']});
+            $.post("{:createUrl('setUp')}",{ids:obj.data.id,params:'{"'+obj.field+'":"'+obj.value+'"}'},function (res){
+                layer.close(loading);
+                if (res.status === 200){
+                    layer.msg('操作成功', {time: 1000, icon: 1});
+                } else {
+                    layer.msg(res.msg, {time: 1000, icon: 2});
+                }
+            });
+        });
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                layer.open({
+                    title:'编辑资源',
+                    type:2,
+                    maxmin: true,
+                    content:'{:createUrl("edit")}?ids='+data.id,
+                    area:['100%','100%'],
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }else if(obj.event === 'del'){
+                layer.confirm('确定删除吗',{icon: 3},function(index){
+                    $.post("{:createUrl('del')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg(res.msg,{time: 1000, icon: 1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time: 1000, icon: 2});
+                        }                        
+                    });
+                });
+            }else if(obj.event === 'spread'){
+                layer.confirm('确定推广吗',{icon: 3},function(index){
+                    $.post("{:createUrl('spread')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg(res.msg,{time: 1000, icon: 1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time: 1000, icon: 2});
+                        }                        
+                    });
+                });
+            }else if(obj.event === 'copy'){
+                layer.confirm('确定复制吗',{icon: 3},function(index){
+                    $.post("{:createUrl('copys')}",{ids:data.id},function(res){
+                        if(res.status===200){
+                            layer.msg(res.msg,{time: 1000, icon: 1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time: 1000, icon: 2});
+                        }                        
+                    });
+                });
+            }else if(obj.event === 'viewPhoto'){
+                layer.open({
+                    type:1,
+                    title:'封面图片',
+                    area:['50%','450px'],
+                    content:'<img src="'+data.thumb+'" width="100%" height="100%"/>'
+                });
+            }else if(obj.event==='sell'){
+                if(admin_token){
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    var setSell=layer.open({
+                        title:'设置售价',
+                        type:1,
+                        content:$("#cs"),
+                        area:['380px','200px'],
+                        btn:['确定', '取消'],
+                        yes:function(index, layero){
+                            layer.close(setSell);
+                            var money=$("#money").val();
+                            $.post("{:createUrl('Market/sell')}",{ids:data.id,money:money},function(res){
+                                layer.close(loading);
+                                if(res.status===200){
+                                    layer.msg(res.msg,{time: 1000, icon: 1});
+                                    tableIn.reload();
+                                    layer.closeAll();
+                                }else{
+                                    layer.msg(res.msg,{time: 1000, icon: 2});
+                                }
+                            });
+                        },
+                        end:function(){
+                            layer.close(loading);
+                        }
+                    });
+                }else{
+                    layer.msg('请入驻资源市场后再操作',{time: 1000, icon: 2});
+                }
+            }else if(obj.event==='section'){
+                if(data.type==4 || data.type==5){
+                    var course=layer.open({
+                        type:2,
+                        title:'课程章节',
+                        area:['100%','100%'],
+                        content:"{:createUrl('course')}?ids="+data.id
+                    });
+                }else if(data.type==6){
+                    var kammi=layer.open({
+                        type:2,
+                        title:'卡密列表',
+                        area:['90%','540px'],
+                        content:"{:createUrl('kammi')}?ids="+data.id
+                    });
+                }
+            }
+        });
+        //头工具栏事件批量操作
+        table.on('toolbar(list)', function(obj){
+            var checkStatus = table.checkStatus('list');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o){
+                ids.push(o.id);
+            });
+            switch(obj.event){
+                case 'spreadAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('spread')}",{ids:ids},function (res){
+                        layer.close(loading);
+                        if (res.status === 200){
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'copyAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('copys')}",{ids:ids},function (res){
+                        layer.close(loading);
+                        if (res.status === 200){
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'openAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}",{ids:ids,params:'{"status":1}'},function (res){
+                        layer.close(loading);
+                        if (res.status === 200){
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                case 'closeAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    var loading = layer.load(1,{shade: [0.1, '#fff']});
+                    $.post("{:createUrl('setUp')}",{ids:ids,params:'{"status":0}'},function (res){
+                        layer.close(loading);
+                        if (res.status === 200){
+                            layer.msg('操作成功', {time: 1000, icon: 1});
+                            tableIn.reload();
+                        } else {
+                            layer.msg(res.msg, {time: 1000, icon: 2});
+                        }
+                    });
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'delAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    layer.confirm('确定删除吗',{icon: 3},function(index){
+                        $.post("{:createUrl('del')}",{ids:ids},function(res){
+                            if(res.status===200){
+                                layer.msg('删除成功', {time: 1000, icon: 1});
+                                tableIn.reload();
+                            }else{
+                                layer.msg(res.msg, {time: 1000, icon: 2});
+                            }
+                        });
+                    });
+                    break;
+                case 'sortAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    layer.open({
+                        title:'批量设置分类',
+                        type:2,
+                        maxmin: true,
+                        content:'{:createUrl("setSort")}?ids='+ids.join(','),
+                        area:['60%','300px'],
+                        end:function(){
+                            tableIn.reload();
+                        }
+                    });
+                    break;
+                case 'sellAll':
+                    if(ids.length===0){
+                        layer.msg('请选择要操作的资源',{time: 1000, icon: 2});
+                        return false;
+                    }
+                    if(admin_token){
+                        var loading = layer.load(1,{shade: [0.1, '#fff']});
+                        var setSell=layer.open({
+                            title:'设置售价',
+                            type:1,
+                            content:$("#cs"),
+                            area:['380px','200px'],
+                            btn:['确定', '取消'],
+                            yes:function(index, layero){
+                                layer.close(setSell);
+                                var money=$("#money").val();
+                                $.post("{:createUrl('Market/sell')}",{ids:ids,money:money},function(res){
+                                    layer.close(loading);
+                                    if(res.status===200){
+                                        layer.msg(res.msg,{time: 1000, icon: 1});
+                                        tableIn.reload();
+                                    }else{
+                                        layer.msg(res.msg,{time: 1000, icon: 2});
+                                    }
+                                });
+                            },end:function(){
+                                layer.close(loading);
+                            }
+                        });
+                    }else{
+                        layer.msg('请入驻资源市场后再操作',{time: 1000, icon: 2});
+                    }
+                break    
+            }
+        });
+    })
+</script>

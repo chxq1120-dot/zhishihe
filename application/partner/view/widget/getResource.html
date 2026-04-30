@@ -1,0 +1,55 @@
+<form class="layui-form seller-form"  action="" >
+    <div class="layui-form-item" style="display:flex;align-items: center;padding:10px 0 0 15px;margin-bottom:0;">
+        <div class="layui-inline">资源名称</div>
+        <div class="layui-inline">
+            <input type="text" name="name" lay-verify="title" style="width:300px;" placeholder="请输入资源名称" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-mid" lay-submit lay-filter="goods-search">查询</button>
+        </div>
+    </div>
+</form>
+<table id="goodsTable" lay-filter="goodsTable"></table>
+<script>
+    layui.use(['form', 'laydate','table'], function(){
+        var layer = layui.layer, table = layui.table,form = layui.form,date = layui.laydate;
+        table.render({
+            elem: '#goodsTable',
+            height: '330',
+            cellMinWidth: '80',
+            page: 'true',
+            limit:'20',
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            url: "{:createUrl('Spread/index')}",
+            id:'goodsTable',
+            cols: [[
+                {type: 'numbers'},
+                {field:'thumb', width:100,title:'缩略图', align: 'center',templet: function(data){
+                    return '<a href="javascript:void(0);" onclick=viewImage("'+data.thumb+'")><image style="max-width:30px;max-height:30px;" src="'+data.thumb+'"/></a>';
+                }},
+                {field:'title', width:300,title:'资源名称', align: 'center'},
+                {field:'price', width:120,title:'价格', align: 'center'},
+                {title:'操作',align:'center', toolbar:'#goodsBar'}
+            ]]
+        });
+        form.on('submit(goods-search)', function(data){
+            layui.table.reload('goodsTable', {
+                where: {
+                    search:data.field.name
+                },page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    });
+</script>
+<script type="text/html" id="goodsBar">
+    <a class="layui-btn layui-btn-xs" lay-event="selectGoods">选择</a>
+</script>

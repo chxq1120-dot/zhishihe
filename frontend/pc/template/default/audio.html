@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$title}</title>
+    <meta name="keywords" content="{$keyword}">
+    <meta name="description" content="{$desc}">
+    <link href="__STATIC__/default/css/index_v3.css?v=3.2.1" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="__STATIC__/default/fonts/iconfont.css?v=3.2.1" media="all">
+    <link rel="shortcut icon" href="{$zhicms.coms_favicon}">
+    <script type="text/javascript" src="__STATIC__/default/js/jquery.js"></script>
+    <script type="text/javascript" src="__STATIC__/common/layer/layer.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/main.js?v1.0.2"></script>
+    <link href="__STATIC__/default/css/xgplayer.min.css" rel="stylesheet" type="text/css">
+    <link href="__STATIC__/default/css/xgplayer.music.min.css" rel="stylesheet" type="text/css">
+    <style>
+        #mse {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+        .plays{
+            overflow: hidden;
+        }
+        #canvas {
+              width: 100%;
+              position: absolute;
+              bottom: 45px;
+              left: 0;
+              z-index: 0;
+              -webkit-mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0, rgba(255, 255, 255, .8) 70%, rgba(255, 255, 255, 0.9) 100%);
+        }
+        canvas {
+            width: 100%;
+        }
+        .xgplayer-next{
+            display: none!important;
+        }
+        .audio-wrap{
+            display:none;
+        }
+        .audio-bar{
+            width:50%;
+            margin:16% auto 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color:rgba(255,255,255,0.2);
+            padding:15px 15px;
+            border-radius:20px;
+        }
+        .audio-bar .thumb{
+            width:128px;
+        }
+        .audio-bar .thumb img{
+            border-radius:10px;
+        }
+        .audio-bar .info{
+            width:calc(100% - 148px);
+            color:#fff;
+        }
+        .audio-bar .info .label-title{
+            font-size:16px;
+        }
+        .audio-bar .info #sub-title{
+            padding-top: 10px;
+            font-size:16px;
+        }
+    </style>
+</head>
+<body>
+{include file="header"/}
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+    <div class="crumbs-min">
+        <a href="/" title="首页">首页</a> &gt;
+        <a href="/course" rel="nofollow">全部</a> &gt;
+        <a href="/course/list{$spread['sorts']['id']}" rel="nofollow">{$spread['sorts']['name']}</a> &gt;
+        {$spread.title}
+    </div>
+</div>
+<!-- 面包削End -->
+<div class="container">
+    <!-- 音频区域 start -->
+    <div id="play">
+        <div class="containers">
+            <div class="plays">
+                <div class="audio-wrap">
+                    <div class="audio-bar">
+                        <div class="thumb">
+                            <img src="{$spread.thumb}" width="128px" height="108px"/>
+                        </div>
+                        <div class="info">
+                            <div class="label-title">当前收听：</div>
+                            <div id="sub-title">购买后可收听全部内容</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 提示2(付费提示) -->
+                <div class="tips tips-pay">
+                    <small>本课程为付费课程，购买后可收听全部内容</small>
+                    <i class="price">￥{$spread['re_price']>0?$spread['re_price']:$spread['price']}</i>
+                    <a href="javascript:;" title="加入学习" class="btn btn-next btn-join" id="btn_buy">立即购买</a>
+                </div>
+
+                <!-- 提示4(需要登录) -->
+                <div class="tips tips-login">
+                    <small>本课程为免费试听课程，请登录后继续学习</small>
+                    <a href="javascript:;" title="立即登录" class="btn btn-next btn-login" id="btn_login">立即登录</a>
+                </div>
+                <div id="mse"></div>
+            </div>
+            <!-- 右边课程目录 -->
+            <div class="class-right">
+                <div class="scller">
+                    <div class="class-list">
+                        <ul>
+                            <li class="Jlist"><a href="javascript:;"><span>目录({$spread.audio_num}节)</span></a></li>
+                        </ul>
+                    </div>
+                    <ul class="zp-list">
+                        {volist name="spread.audio_list" id="v"}
+                            <li id="audio_{$v['id']}" {if $vid==$v.id}class="zsp{$key+1} on"{else/} class="zsp{$key+1}"{/if}>
+                                <a href="/course/video/{$spread['id']}/s{$v['id']}" title="{$v.title}" class="zp_lin" rank="0">
+                                    <div class="name"><i class="icon icon-bofang2"></i>{$v.title}</div>
+                                    <div class="info">
+                                        {if !empty($v.times)}<span class="shipin">{$v.times}</span>{/if}
+                                        <span class="Ffei">
+                                          {if $spread.is_auth==0}
+                                              {if $v.is_try==1}
+                                                  <em class="Mfei">试听</em>
+                                              {/if}
+                                          {/if}
+                                        </span>
+                                    </div>
+                                </a>
+                            </li>
+                        {/volist}
+                    </ul>
+                </div>
+            </div>
+            <!-- 右边课程目录 End -->
+        </div>
+    </div>
+    <!-- 播放区域 end -->
+    <!-- 推荐课程 -->
+    <div class="recommend">
+        <h3 class="recommend-title">推荐课程</h3>
+        <div class="recommend-row">
+            {volist name="$topInfo" id="item"}
+            <div class="recommend-item">
+                <a href="/course/show/{$item['rid']}.html" class="link" title="{$item['title']}" target="_blank">
+                    <img class="course-thumb lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}" style="display: block;">
+                    <div class="course-card">
+                        <h3 class="course-title">{$item['title']}</h3>
+                        <div class="course-labels">
+                            <label class="labels">{:getLevelLabel($item['level'])}</label>
+                            {volist name=":getSortAttr($item['rid'])" id="v"}
+                            <label class="label">{$v.name}</label>
+                            {/volist}
+                        </div>
+                        <div class="course-desc">
+                                <span class="course-price">
+                                    {if $item['price']>0}
+                                        <em class="price">￥{$item['price']}</em>
+                                    {else/}
+                                        <em class="price">免费</em>
+                                    {/if}
+                                    <em class="cost-price">￥{$item['dis_price']}</em>
+                                </span>
+                            <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {/volist}
+        </div>
+    </div>
+</div>
+{include file="footer"/}
+<script type="text/javascript" src="__STATIC__/default/js/xg-3.0.index.min.js"></script>
+<script type="text/javascript" src="__STATIC__/default/js/xg-music-3.0.index.min.js"></script>
+<script>
+    WCCE.audioPlay('{$spread.id}','{$vid}','{$spread.rid}');
+    $('#btn_buy').on('click',function(){
+        var id='{$spread.id}';
+        window.location.href='/paycenter/order?id='+id;
+    });
+    $('#btn_login').on('click',function(){
+        window.location.href='/login?fromurl='+encodeURIComponent(window.location.href);
+    });
+</script>
+</body>
+</html>

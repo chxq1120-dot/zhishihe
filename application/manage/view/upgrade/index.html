@@ -1,0 +1,377 @@
+{include file="common/head"/}
+<style>
+    .layui-table-cell {
+        height: inherit;
+    }
+    .system-version{
+        background-color:#f8f8f8;
+        border: #eee 1px solid;
+        border-radius:5px;
+        padding:30px 30px;
+    }
+    .current-version .title{
+        font-weight:bold;
+        color:#39c17d;
+        font-size:14px;
+    }
+    .current-version .utime{
+        font-size:12px;
+        color:#9c9c9c;
+        padding: 10px 0 20px 0;
+    }
+    .current-version .desc{
+        border-top:#eee 1px solid;
+        padding:10px 10px;
+    }
+    .current-version .updated{
+        line-height:220%;
+    }
+    .current-version .ptime{
+        font-size:12px;
+        color:#9c9c9c;
+        padding: 10px 0;
+        border-top:#eee 1px solid;
+    }
+    .new-version{
+        background-color:#fff;
+        padding:20px 20px;
+        border-radius:5px;
+    }
+    .new-version .title{
+        font-weight:bold;
+        color:#000;
+        font-size:14px;
+    }
+    .new-version .utime{
+        font-size:12px;
+        color:#9c9c9c;
+        padding: 5px 0 10px 0;
+    }
+    .new-version .desc{
+        border-top:#eee 1px solid;
+        padding:10px 5px;
+    }
+    .new-version .updated{
+        background-color:#f6f6f6;
+        line-height:220%;
+        padding:20px;
+        border-radius:10px;
+    }
+    .new-version .ptime{
+        font-size:12px;
+        color:#9c9c9c;
+        padding: 10px 0;
+        border-top:#eee 1px solid;
+    }
+    .new-version .now-upgrade{
+        padding:10px 0;
+        display: flex;
+        justify-content: flex-start;
+    }
+    .new-version .up-progress{
+        display:block;
+    }
+    .new-version .progress-desc{
+        display:block;
+        padding:10px 10px;
+    }
+    .up-desc{
+        padding:20px 30px;
+        line-height:200%;
+    }
+    .admin-btn{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product_version{
+        margin-right:10px;
+        background-image: linear-gradient(to right, #FEDCB7,#FFEBDC);
+        border-radius:5px;
+        padding:8px 12px;
+        color:#98693d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product_version .product_name{
+        padding:0 5px;
+    }
+    .product_version .product_auth_no{
+        color:#f00;
+        padding:0 5px 0 0;
+    }
+    .product_version .product_auth_yes{
+        padding:0 5px 0 0;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="table-body">
+        <div class="layui-tab layui-tab-brief" lay-filter="upgrade">
+            <ul class="layui-tab-title">
+                <li class="layui-this">版本更新</li>
+                <li>更新日志</li>
+            </ul>
+            <div class="admin-btn">
+                <div class="product_version">
+                    <i class="icon icon-quality"></i>
+                    <span class="product_name">{:config('version.version_name')}</span>
+                    {if $authorize['authorized']==1}
+                        <span class="product_auth_yes">- {$authorize['data']['auth_name']}</span>
+                    {else/}
+                        <span class="product_auth_no">(产品未授权)</span>
+                    {/if}
+                    <span class="product_vers">{$currentVer.versions}</span>
+                </div>
+                <button class="layui-btn" id="auth-query">授权查询</button>
+                <button class="layui-btn" id="docs-query">使用手册</button>
+            </div>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <div class="system-version">
+                        <div class="current-version">
+                            <div class="title">当前版本：{$currentVer.versions}</div>
+                            <div class="utime">发布于:{$currentVer.ptime_text}</div>
+                            <div class="desc">
+                                <div class="updated">{$currentVer.content|raw}</div>
+                            </div>
+                            <div class="ptime">上次更新时间:{$currentVer.ctime}</div>
+                        </div>
+                        <div class="new-version" id="new-version" style="display: none;">
+                            <div class="title">最新版本：<span id="version-num"></span></div>
+                            <div class="utime">发布于:<span id="version-ptime"></span></div>
+                            <div class="desc">
+                                <div class="updated" id="version-desc"></div>
+                            </div>
+                            <div class="now-upgrade">
+                                <button class="layui-btn" id="onUpgrade" style="display:flex;align-items:center;">
+                                    <div class="sk-fading-circle" id="loader" style="display: none;padding-right:10px;">
+                                        <span class="sk-circle1 sk-circle"></span>
+                                        <span class="sk-circle2 sk-circle"></span>
+                                        <span class="sk-circle3 sk-circle"></span>
+                                        <span class="sk-circle4 sk-circle"></span>
+                                        <span class="sk-circle5 sk-circle"></span>
+                                        <span class="sk-circle6 sk-circle"></span>
+                                        <span class="sk-circle7 sk-circle"></span>
+                                        <span class="sk-circle8 sk-circle"></span>
+                                        <span class="sk-circle9 sk-circle"></span>
+                                        <span class="sk-circle10 sk-circle"></span>
+                                        <span class="sk-circle11 sk-circle"></span>
+                                        <span class="sk-circle12 sk-circle"></span>
+                                    </div>
+                                    <span id="loadtext">开始更新</span>
+                                </button>
+                            </div>
+                            <view class="up-progress">
+                                <div class="layui-progress layui-progress-big" lay-showPercent="yes" lay-filter="progress">
+                                    <div class="layui-progress-bar" lay-percent="0%"></div>
+                                </div>
+                            </view>
+                            <view class="progress-desc" id="progress-desc"></view>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="list" lay-filter="list"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm" lay-event="views">
+        <i class="icon icon-view"></i> 查看日志
+    </a>
+    <a class="layui-btn layui-btn-sm layui-bg-blue" lay-event="download">
+        <i class="icon icon-sale"></i> 下载更新包
+    </a>
+</script>
+<script>
+    var Timer = 0;
+    var auth_query='{:config("version.auth_url")}/auth/query';
+    var docs_query='{:config("version.docs_url")}';
+    layui.use(['element','table'], function () {
+        var $ = layui.jquery, element = layui.element,table = layui.table;
+        $('#auth-query').on('click',function(){
+            window.open(auth_query,'_blank');
+        });
+        $('#docs-query').on('click',function(){
+            window.open(docs_query,'_blank');
+        });
+        $.get('{:url("index")}', function (res) {
+            if (res.status === 1) {
+                $("#new-version").show();
+                $("#version-num").html(res.data.versions);
+                $("#version-ptime").html(res.data.ctime);
+                $("#version-desc").html(res.data.explain);
+            }else if(res.status === 0){
+                layer.msg(res.msg);
+            }
+        });
+        $("#onUpgrade").on('click', async function () {
+            $(this).attr('disabled','disabled');
+            $('#loader').show();
+            $('#loadtext').text('更新中...');
+            Timer = setInterval(function(){
+                update_process();
+            }, 1000);
+            try{
+                await handleUpgrade();
+            }catch(error){
+                console.error("更新失败:", error);
+                clearInterval(Timer);
+                layer.msg("更新过程中发生错误，请检查日志！");
+            }
+        });
+        //主体更新程序
+        async function handleUpgrade(){
+            //请求更新包
+            const result= await $.post('{:url("getUpList")}',{});
+            if(result.status===1){
+                var vlist = result.data.list;
+                var vnums= result.data.nums;
+                if (vlist.length === 0) {
+                    clearInterval(Timer);
+                    return;
+                }
+                for (var item of vlist) {
+                    var version_name = item.versions;
+                    var version_nums = item.versions_nums;
+                    var version_desc = item.explain;
+                    var version_ptime = item.ctime;
+                    var file_zip = item.file;
+                    var isError = false;
+                    //下载更新包
+                    await dowload_package({file: file_zip, version_nums: version_nums,nums:vnums,versions:version_name});
+                    //执行复制文件
+                    await copy_package({version_nums: version_nums,nums:vnums,versions:version_name});
+                    //执行数据更新
+                    await handle_package({version_nums: version_nums,nums:vnums,versions:version_name});
+                    //更新本地版本
+                    await update_version({versions:version_name,version_nums:version_nums,version_desc:version_desc,version_ptime:version_ptime,nums:vnums});
+                }
+                //更新完成重载页面
+                clearInterval(Timer);
+                window.location.reload();
+            }else{
+                clearInterval(Timer);
+                $("#progress-desc").html(result.msg);
+            }
+        }
+        //执行下载更新包
+        function dowload_package(data) {
+            return new Promise(function(resolve, reject) {
+                $.post("{:url('updateFile')}",data,function(res){
+                    if (res.status==0) {
+                        $("#progress-desc").html(res.msg);
+                        reject(new Error(res.msg));
+                    }else {
+                        clearInterval(Timer);
+                        resolve(res);
+                    }
+                });
+            });
+        }
+        //执行复制文件
+        function copy_package(data) {
+            return new Promise(function(resolve, reject) {
+                $.post("{:url('copyFile')}",data,function (res) {
+                    if (res.status==0) {
+                        $("#progress-desc").html(res.msg);
+                        reject(new Error(res.msg));
+                    }else {
+                        clearInterval(Timer);
+                        resolve(res);
+                    }
+                });
+            });
+        }
+        //执行更新数据
+        function handle_package(data) {
+            return new Promise(function(resolve, reject) {
+                $.post("{:url('update')}", data, function (res) {
+                    if (res.status == 0) {
+                        $("#progress-desc").html(res.msg);
+                        reject(new Error(res.msg));
+                    }else {
+                        clearInterval(Timer);
+                        resolve(res);
+                    }
+                });
+            });
+        }
+        //执行更新版本
+        function update_version(data) {
+            return new Promise(function(resolve, reject) {
+                $.post("{:url('upVersions')}",data,function(res){
+                    if(res.status==0){
+                        $("#progress-desc").html(res.msg);
+                        reject(new Error(res.msg));
+                    }else {
+                        clearInterval(Timer);
+                        resolve(res);
+                    }
+                });
+            });
+        }
+        /**
+         * 轮询获取更新进度
+         * */
+        function update_process() {
+            $.get("{:url('getUpgradeLog')}", function (res) {
+                if (res.status==1) {
+                    element.progress("progress", (res.data.progress + '%'));
+                    $("#progress-desc").html(res.data.desc);
+                } else {
+                    clearInterval(Timer);
+                    layer.msg(res.msg);
+                }
+            });
+        }
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("upgradeLog")}',
+            skin:'line',
+            method:'get',
+            page:true,
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            cols: [[
+                {field: 'id',title:'ID',align:'center',width:50},
+                {field: 'versions',title: '版本名称',align:'center',width:140},
+                {field: 'vnums',title:'版本号',align:'center',width:90},
+                {field: 'content',title:'更新内容',align:'center',width:350},
+                {field: 'ptime_text', align: 'center',title: '发布时间',width:150},
+                {field: 'ctime', align: 'center',title: '更新时间',width:150},
+                {align: 'center',toolbar:'#action',title: '操作'}
+            ]]
+        });
+        
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var that = this;
+            var data = obj.data;
+           if(obj.event === 'views'){
+                layer.open({
+                    title:'更新日志',
+                    type:2,
+                    area:['60%','500px'],
+                    content:'{:url("showlog")}?ids='+data.id,
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }else if(obj.event==='download'){
+                window.open(data.package,'_blank');
+            }
+        });
+    });
+    
+</script>

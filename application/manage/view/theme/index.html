@@ -1,0 +1,156 @@
+{include file="common/head"/}
+<style>
+    .layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">首页布局列表</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <input type="text" name="search" class="layui-input" placeholder="标题">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn" lay-submit="" lay-filter="search">
+                        <i class="layui-icon">&#xe615;</i>
+                    </button>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn">
+                <a href="javascript:;" class="add layui-btn layui-bg-blue layui-btn-small">
+                    <i class="layui-icon layui-icon-addition"></i>
+                    {:lang('add')}布局
+                </a>
+            </div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-sm layui-bg-blue" lay-event="setting">设置布局</a>
+    <a class="layui-btn layui-btn-sm" lay-event="edit">{:lang('edit')}</a>
+    {{# if(d.id!==1){ }}
+        <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del">{:lang('del')}</a>
+    {{# } }}
+</script>
+<script>
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form,element = layui.element;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            cols: [[
+                {type: 'checkbox',title:'ID',align:'center',width:50},
+                {field: 'name',title: '页面名称',align:'center',width:300},
+                {field: 'code',title:'编码',align:'center',width:150},
+                {field: 'desc',title:'描述',align:'center',width:380},
+                {field: 'ctime', align: 'center',title: '添加时间',width:150},
+                {align: 'center',toolbar:'#action',width:300}
+            ]]
+        });
+        form.on('submit(search)', function(data){
+            table.reload('list', {
+                url: "{:createUrl('index')}",
+                method:'post',
+                where:data.field,
+            });
+            return false;
+        });
+        //选择日期
+        laydate.render({
+            elem: '#startDate',
+            type:'datetime'
+        });
+        laydate.render({
+            elem: '#endDate',
+            type:'datetime'
+        });
+        //监听添加
+        $('#func-btn .add').on('click',function () {
+            layer.open({
+                title:'添加布局',
+                type:2,
+                maxmin: true,
+                content:'{:createUrl("add")}',
+                area:['900px','550px'],
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'setting'){
+                window.location.href='{:createUrl("saveTheme")}?code='+data.code;
+            }else if(obj.event === 'del'){
+                layer.confirm('确定删除吗',{icon: 3},function(index){
+                    $.post("{:createUrl('del')}",{ids:data.id},function(res){
+                        if(res.status==200){
+                            layer.msg(res.msg,{time: 1000, icon: 1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg(res.msg,{time: 1000, icon: 2});
+                        }
+                    });
+                });
+            }else if(obj.event === 'edit'){
+                layer.open({
+                    title:'编辑布局',
+                    type:2,
+                    maxmin: true,
+                    content:'{:createUrl("edit")}?ids='+data.id,
+                    area:['900px','550px'],
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }
+        });
+
+        //头工具栏事件批量操作
+        table.on('toolbar(list)', function(obj){
+            var checkStatus = table.checkStatus('list');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o){
+                ids.push(o.id);
+            });
+            if(ids.length===0){
+                return false;
+            }
+            switch(obj.event){
+                //自定义头工具栏右侧图标 - 提示
+                case 'delAll':
+                    layer.confirm('确定删除吗',{icon: 3},function(index){
+                        $.post("{:createUrl('del')}",{ids:ids},function(res){
+                            if(res.status==200){
+                                layer.msg('删除成功', {time: 1000, icon: 1});
+                                tableIn.reload();
+                            }else{
+                                layer.msg(res.msg, {time: 1000, icon: 2});
+                            }
+                        });
+                    });
+                    break;
+            }
+        });
+    })
+</script>

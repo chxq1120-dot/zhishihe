@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+{include file="header"/}
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+    <div class="crumbs-min">
+        <a href="/" title="首页">首页</a> &gt;
+        <a href="/user" rel="nofollow">用户中心</a> &gt; 微信支付
+    </div>
+</div>
+<div class="container">
+    <div class="wechat-code">
+        <div class="code-info">
+            <div class="title">
+                <img style="width:36px;" src="__STATIC__/default/img/wei.png"/>微信支付
+            </div>
+            <div class="ordno">订单号：{$order['ordno']}</div>
+            <div class="price">￥{$order['money']}</div>
+            <div class="code">
+                {if $wechat_pay_type==1}
+                    <img src="/paycenter/qrcode?txt={$code}" style="width:256px;height:256px" alt="">
+                {else/}
+                    <img src="{$code}" style="width:256px;height:256px" alt="">
+                {/if}
+            </div>
+            <div class="tips" id="pay-tips">10分钟之内,请尽快扫码支付</div>
+
+        </div>
+        <div class="code-tips">
+            <img src="__STATIC__/default/img/wechat_pay.png" alt="">
+        </div>
+    </div>
+</div>
+{include file="footer"/}
+<script>
+setInterval(function () {
+    WCCE.checkOrder('{$order["ordno"]}');
+},1500);
+</script>
+</body>
+</html>

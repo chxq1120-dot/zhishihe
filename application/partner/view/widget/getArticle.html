@@ -1,0 +1,74 @@
+<style>
+    body,html{
+        background:#fff;
+    }
+    .layui-table-cell{height: inherit;}
+    .layui-table, .layui-table-view{
+        margin:5px 0;
+    }
+</style>
+<form class="layui-form seller-form"  action="" >
+    <div class="layui-form-item" style="display:flex;align-items: center;padding:10px 0 0 15px;margin-bottom:0;">
+        <div class="layui-inline">标题：</div>
+        <div class="layui-inline">
+            <input type="text" name="title" lay-verify="title" placeholder="标题关键字" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn" lay-submit lay-filter="article_search">提交</button>
+        </div>
+        <input type="hidden" id="article_id_key" value="{$article_id_key}">
+        <input type="hidden" id="article_name_key" value="{$article_name_key}">
+    </div>
+</form>
+<div style="padding:0 10px;">
+    <table id="articleTable" lay-filter="articleTable"></table>
+</div>
+<script>
+    layui.use(['table','form','layer','laydate'],function(){
+        var layer = layui.layer, table = layui.table,form = layui.form,date = layui.laydate;
+        //执行渲染
+        table.render({
+            elem: '#articleTable', //指定原始表格元素选择器（推荐id选择器）
+            height: '330',
+            cellMinWidth: '80',
+            page: 'true',
+            limit:'20',
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            id:'articleTable',
+            url: "{:createUrl('Widget/tagNotice')}",
+            cols: [[ //标题栏
+                {type: 'numbers',title: '编号',width:60},
+                {field: 'thumb', title: '封面',width:100,align:'center',templet:function (d) {
+                    if(d.thumb){
+                        return '<img src="'+d.thumb+'" width="64" height="auto"/>';
+                    }else{
+                        return '<img src="__STATIC__/admin/images/default.png" width="64" height="auto"/>';
+                    }
+                }},
+                {field: 'title', title: '标题',width:280,align:'left'},
+                {field: 'views', title: '浏览',width:90,align:'center'},
+                {field: 'ctime', title: '时间',align:'center',width:150},
+                {title:'操作',align:'center', toolbar:'#articleBar'}
+            ]]
+        });
+        //搜索
+        form.on('submit(article_search)', function(data){
+            layui.table.reload('articleTable', {
+                where: data.field
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    })
+</script>
+<script type="text/html" id="articleBar">
+    <a class="layui-btn layui-btn-xs" lay-event="selectArticle">选择</a>
+</script>

@@ -1,0 +1,33 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">市场消息</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+
+<script>
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form,element = layui.element;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("news")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,           
+            cols: [[
+                {field: 'id',title: '标题',align:'center',width:90},
+                {field: 'title',title: '标题',align:'center',width:150},
+                {field: 'content',title: '内容',align:'left'},
+                {field: 'ctime', align: 'center',title: '发布时间',width:180}
+            ]]
+        });
+    })
+</script>

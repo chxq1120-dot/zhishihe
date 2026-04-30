@@ -1,0 +1,72 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid layui-tab layui-tab-brief" lay-filter="tabMenus">
+    <ul class="layui-tab-title admin-head">
+        <li class="layui-this">SVIP购买记录</li>
+        <li>SVIP任务记录</li>
+    </ul>
+    <div class="layui-tab-content table-body">
+        <div class="layui-tab-item layui-show">
+            <table id="list" lay-filter="list"></table>
+        </div>
+        <div class="layui-tab-item">
+            <table id="list1" lay-filter="list1"></table>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+
+<script>
+    layui.use(['table','element','form'],function(){
+        var table = layui.table, $ = layui.jquery,element=layui.element;
+        element.on('tab(tabMenus)', function(data){
+            console.log(data);
+        });
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("usersvip")}?ids={:input("ids")}&type=1',
+            toolbar:'#table-toolbar',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id',title: 'ID',align:'center',width:100},
+                {title: '会员等级名称',align:'center',width:200,templet:function(d){
+                    return d.svip.name;
+                }},
+                {field: 'ordno',title: '订单号',align:'center',width:200},
+                {field: 'money',title: '金额',align:'center',width:150},
+                {title:'类型',align:'center',templet:function(d){
+                    if(d.type==2){
+                        return '购买会员';
+                    }else{
+                        return '任务升级';
+                    }
+                }},
+                {field: 'ptime_text', align: 'center',title: '购买时间',width:150},
+                {field: 'ctime', align: 'center',title: '下单时间',width:150},
+            ]]
+        });
+        var tableIn1 = table.render({
+            id: 'list1',
+            elem: '#list1',
+            url: '{:createUrl("usersvip")}?ids={:input("ids")}&type=2',
+            toolbar:'#table-toolbar',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id',title: 'ID',align:'center',width:100},
+                {title: '会员等级名称',align:'center',width:200,templet:function(d){
+                    return d.svip.name;
+                }},
+                {field: 'nums',title: '邀请人数',align:'center',width:200},
+                {title:'类型',align:'center',templet:function(d){
+                    return '任务升级';
+                }},
+                {field: 'ctime', align: 'center',title: '下单时间',width:180},
+            ]]
+        });
+    })
+</script>

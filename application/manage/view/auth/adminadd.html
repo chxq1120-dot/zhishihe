@@ -1,0 +1,91 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="table-body">
+       <div class="layui-card-header">{$title}</div>
+       <div class="layui-card" style="padding-top:20px;">
+            <form class="layui-form layui-form-pane" lay-filter="formbar">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="text" name="row[username]" lay-verify="required" lay-reqText="请输入用户名" placeholder="{:lang('pleaseEnter')}用户名" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">登录密码</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="password" name="row[password]" lay-verify="required" lay-reqText="请输入登录密码" placeholder="{:lang('pleaseEnter')}登录密码" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属用户组</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <select name="row[group_id]" lay-verify="required" lay-filter="groups">
+                            {volist name="groups" id="v"}
+                                <option value="{$v['id']}">{$v['title']}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户头像</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="hidden" name="row[avatar]" id="thumb" value="">
+                        <div class="layui-upload">
+                            <div class="layui-upload-list" id="uploadImg" style="cursor: pointer;">
+                                <img class="layui-upload-img" width="76" height="76" src="{$row['avatar']|default='__ADMIN__/images/default.png'}" id="Image">
+                                <p id="preview"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">手机号码</label>
+                    <div class="layui-input-inline from-inline-3">
+                        <input type="number" name="row[mobile]" placeholder="{:lang('pleaseEnter')}手机号码" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系邮箱:</label>
+                    <div class="layui-input-inline from-inline-3">
+                         <input type="text" name="row[email]" placeholder="{:lang('pleaseEnter')}联系邮箱" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" lay-submit="" lay-filter="submit">{:lang('submit')}</button>
+                        <a href="{:createUrl('adminlist')}" class="layui-btn layui-btn-primary">{:lang('back')}</a>
+                    </div>
+                </div>
+            </form>
+       </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form', 'layer', 'upload'], function () {
+        var form = layui.form,$= layui.jquery;
+        $("#uploadImg").on('click',function(){
+            layer.open({
+                title:'选择头像',
+                type:2,
+                maxmin: true,
+                area:['80%','500px'],
+                content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image',
+            });
+        });
+        form.on('submit(submit)', function (data) {
+            loading =layer.load(1, {shade: [0.1,'#fff']});
+            $.post("",data.field, function (res) {
+                layer.close(loading);
+                if(res.status==200){
+                    layer.msg(res.msg, {time: 1800, icon: 1}, function () {
+                        location.href = res.url;
+                    });
+                } else {
+                    layer.msg(res.msg, {time: 1800, icon: 2});
+                }
+            });
+        });
+
+    });
+</script>

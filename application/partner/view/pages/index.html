@@ -1,0 +1,79 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">全部页面</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <div class="search-tool">
+            <form class="layui-form">
+                <div class="layui-inline">
+                   <input type="text" class="layui-input" placeholder="检索日期" id="ondate" style="width:200px;">
+                    <span class="item-icon"><i class="layui-icon layui-icon-date"></i></span>
+                </div>
+                <div class="layui-inline">
+                    <input type="text" class="layui-input" placeholder="页面名称" id="search" style="width:200px;" />
+                    <span class="item-icon" id="onsearch"><i class="icon icon-search"></i></span>
+                </div>
+            </form>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    var dateVal='',statusVal='',searchVal='';
+    layui.use(['table','element','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            toolbar:'#table-toolbar',
+            method:'get',
+            page:true,
+            response:{
+                statusName:'status',
+                statusCode:200,
+                msgName:'msg',
+                countName:'total',
+                dataName:'data',
+            },
+            cols: [[
+                {type: 'checkbox',title:'ID',align:'center',width:50},
+                {field: 'id',title: 'ID',align:'center',width:80},
+                {field: 'name',align:'center',title: '页面名称',width:350},
+                {field: 'path',align:'center',title: '页面路径'},
+                {field: 'remark',align:'center',title: '调用说明',width:350},
+                {field: 'ctime_text', align: 'center',title: '添加时间',width:180},
+            ]]
+        });
+        console.log(tableIn)
+        //选择日期
+        laydate.render({
+            elem: '#ondate',
+            range: '-',
+            done:function(value, date, endDate){
+                dateVal=value, searchVal=$('#search').val();
+                table.reload('list',{
+                    where:{
+                        date:dateVal,
+                        search:searchVal
+                    }
+                });
+            }
+        });
+        //搜索关键字
+        $('#onsearch').on('click',function(e){
+            console.log(e);
+            dateVal=$('#ondate').val(),searchVal=$('#search').val();
+            table.reload('list',{
+                where:{
+                    date:dateVal,
+                    search:searchVal
+                }
+            });
+        });
+    })
+</script>

@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "资源详情",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "go-top": "/components/goTop/goTop",
+    "mp-html": "/uni_modules/mp-html/components/mp-html/mp-html",
+    "uni-popup": "/uni_modules/uni-popup/components/uni-popup/uni-popup",
+    "navbar-side": "/components/wcce/navbar-side"
+  }
+}

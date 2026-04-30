@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+
+<body>
+  {include file="header"/}
+  <div class="container">
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+      {include file="usermenu"/}
+    </div>
+
+    <div class="Member-right">
+      <div class="Ml-right">
+      
+        <div class="zp-form-box">
+          <div class="zp-form-title">基本信息</div>
+          <div class="row">
+
+            <div class="col-xs-12 col-sm-12 col-md-12">
+              <!-- 默认 上传 -->
+              <span class="zp-btn avatarinfo">
+                <label for="type-gravatar">
+                  <img src="__STATIC__/default/img/avatar.png" height="50" class="mr-2" id="avatarImg">
+                  <a class="upload"><i class="icon icon-edit"></i>
+                    <input type="file" name="addPic" id="addPic" accept=".jpg,.gif, .png">
+                  </a></label>
+                  <input type="hidden" id="avatar" value="">
+              </span>
+            <div class="zpU">
+              <div class="zp-form-group">
+                <label for="nickname">昵称</label>
+                <input type="text" class="form-control" name="nickname" id="nickname" value="" >
+              </div>
+              <div class="zp-form-group">
+                <label for="phone">电话</label>
+                <input type="text" class="form-control" id="phone" value="" disabled="disabled">
+              </div>
+              <div class="zp-form-group">
+                <label for="vip">会员等级</label>
+                <input type="text" class="form-control" id="vip" value="" disabled="disabled">
+              </div>
+              <div class="zp-form-group">
+                <label for="login">登录时间</label>
+                <input type="text" class="form-control" id="logintime" value="" disabled="disabled">
+              </div>
+              <div class="zp-form-group">
+                <label for="register">注册时间</label>
+                <input type="text" class="form-control" id="regtime" value="" disabled="disabled">
+              </div>
+              <button type="button" etap="submit_info" class="button3">保存</button>
+            </div>
+          </div>
+        </div>
+    <!-- 右侧功能定位 End -->
+
+  </div>
+  </div>
+  </div>
+</div>
+  {include file="footer"/}
+</body>
+<script>
+  WCCE.avatar();//请求接口
+  WCCE.saveInfo();//保存头像
+  WCCE.getUserInfo(function (data) {
+      $('#avatarImg').attr('src',data.avatar);
+      $('#avatar').val(data.avatar);
+      $('#nickname').val(data.nickname);
+      $('#vip').val(data.svip.name);
+      $('#IP').val(data.phone);
+      $('#phone').val(data.mobile);
+      $('#logintime').val(data.login_time_text);
+      $('#regtime').val(data.ctime_text);
+  });
+</script>
+</html>

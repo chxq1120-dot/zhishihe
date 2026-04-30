@@ -1,0 +1,887 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<script src="__STATIC__/common/js/jquery.min.js"></script>
+<script>
+    var type = "{:input('type/d',0)}";
+    var vname ="{:input('name/s','')}";
+    var prename ="{:input('prename/s','')}";
+    var is_thumb ="{:input('is_thumb/d',0)}";
+    var is_water ="{:input('is_water/d',0)}";
+    var upload_Image = "{:createUrl('Attachment/upload')}";
+</script>
+<div id="app" class="layui-fluid" :style="vname?'':'background-color:#f2f2f2'">
+    <div class="table-body" :style="vname?'border:0;':''">
+        <el-container>
+            <!-- 左边菜单 -->
+            <el-aside>
+                <el-tree :highlight-current="true" :data="sortList" :current-node-key="0" node-key="id" ref="tree" @node-click="getViewFile">
+                    <template v-slot="{ node, data }">
+                      <span class="custom-tree-node">
+                        <i class="icon icon-wiki"></i>
+                        <div class="label">{{ data.name }}</div>
+                        <el-dropdown trigger="click" v-if="data.id!==0">
+                          <i class="el-icon-more"></i>
+                          <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native.stop="addCat(data.id)">新增分类</el-dropdown-item>
+                            <el-dropdown-item @click.native.stop="removeCat(data.id)">删除分类</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </el-dropdown>
+                          <!-- 添加分类 -->
+                        <el-dialog title="添加分类" :visible.sync="visible" append-to-body>
+                          <el-form :model="form">
+                            <el-form-item label="上级分类：" :label-width="formLabelWidth">
+                              <el-cascader v-model="form.selected" :options="modifiedList" style="width: 400px;"
+                                           :props="{ checkStrictly: true,value: 'id',label: 'name',children: 'children' }"
+                                           :show-all-levels="false" placeholder="请选择分类"
+                                           @change="handleChange">
+                              </el-cascader>
+                            </el-form-item>
+                            <el-form-item label="分类名称：" :label-width="formLabelWidth">
+                              <el-input style="width: 400px;" v-model="form.name" autocomplete="off"></el-input>
+                            </el-form-item>
+                          </el-form>
+                          <div slot="footer" class="dialog-footer">
+                            <el-button @click="cancelCat">取 消</el-button>
+                            <el-button type="primary" @click="AddConfirm">确 定</el-button>
+                          </div>
+                        </el-dialog>
+                      </span>
+                    </template>
+                </el-tree>
+            </el-aside>
+            <!-- 图片 -->
+            <el-main>
+                <div class="head-ctr">
+                    <div class="btns">
+                        <el-button size="small" type="primary" @click="picVisible=true">上传文件</el-button>
+                        <el-button size="small" @click="removeAll" :disabled="buttonVisible">删除文件</el-button>
+                        <el-button size="small" v-if="selectName" type="primary" @click="selectedFile" :disabled="buttonVisible">使用选中文件
+                        </el-button>
+                    </div>
+                    <div class="btn_ctr">
+                        <el-input v-model="query.search" size="small" suffix-icon="el-icon-search" clearable placeholder="请输入文件名" @clear="handleSearch" @change="handleSearch"></el-input>
+                    </div>
+                </div>
+                <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+                <el-dialog title="上传" append-to-body :visible.sync="picVisible">
+                    <el-form ref="Picform" :model="Picform" label-width="100px" label-position="right">
+                        <el-form-item label="上传方式:" size="mini" >
+                            <el-radio v-model="Picform.radio" label="1">本地上传</el-radio>
+                            <el-radio v-model="Picform.radio" label="2">网络上传</el-radio>
+                        </el-form-item>
+                        <el-form-item label="上传至分组:" size="mini" >
+                            <el-cascader v-model="Picform.selected" :options="modifiedList" :props="{ checkStrictly: true,value: 'id',label: 'name',children: 'children' }" :show-all-levels="false"
+                                         placeholder="请选择分类" @change="onChange">
+                            </el-cascader>
+                        </el-form-item>
+                        <el-form-item label="上传文件:" v-if="Picform.radio==='1' ">
+                            <el-upload class="uploader"
+                                       :action="upload_Image"
+                                       :data="{pid:Picform.selected[0],is_thumb:is_thumb,is_water:is_water}"
+                                       list-type="picture-card"
+                                       :on-change="handleChange"
+                                       :on-progress="handleProgress"
+                                       :on-success="handleSuccess"
+                                       :on-error="handleError"
+                                       :file-list="fileList"
+                                       multiple
+                                       :auto-upload="false"
+                                       ref="mYupload"
+                            >
+                                <i slot="default" class="el-icon-plus"></i>
+                                <div slot="file" slot-scope="{file}">
+                                    <template v-if="file.percentage>0">
+                                        <template v-if="file.status==='success'">
+                                            <template v-if="isImage(file.name)">
+                                                <img class="el-upload-list__item-thumbnail" :src="file.url">
+                                                <span class="is_success"><i class="el-icon-upload-success el-icon-check"></i></span>
+                                                </img>
+                                            </template>
+                                            <template v-else>
+                                                <img class="el-upload-list__item-thumbnail" src="__STATIC__/admin/images/file.png">
+                                                <span class="is_success"><i class="el-icon-upload-success el-icon-check"></i></span>
+                                                </img>
+                                            </template>
+                                        </template>
+                                        <template v-else-if="file.status==='error'">
+                                            <img class="el-upload-list__item-thumbnail" src="__STATIC__/admin/images/file.png">
+                                            <i class="el-icon-upload-error el-icon-close"></i>
+                                            </img>
+                                        </template>
+                                        <template v-else>
+                                            <el-progress type="circle" width="100" :percentage="file.percentage"></el-progress>
+                                        </template>
+                                    </template>
+                                    <template v-else>
+                                        <template v-if="isImage(file.name)">
+                                            <img class="el-upload-list__item-thumbnail" :src="file.url">
+                                            <span class="el-upload-list__item-actions">
+                                                    <span class="el-upload-list__item-preview" @click="handlePreview(file)">
+                                                        <i class="el-icon-zoom-in"></i>
+                                                    </span>
+                                                    <span class="el-upload-list__item-delete" @click="handleRemove(file)">
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </span>
+                                            </img>
+                                        </template>
+                                        <template v-else>
+                                            <img class="el-upload-list__item-thumbnail" src="__STATIC__/admin/images/file.png">
+                                            <span class="el-upload-list__item-actions">
+                                                    <span class="el-upload-list__item-delete" @click="handleRemove(file)">
+                                                        <i class="el-icon-delete"></i>
+                                                    </span>
+                                                </span>
+                                            </img>
+                                        </template>
+                                    </template>
+                                </div>
+                            </el-upload>
+                        </el-form-item>
+                        <el-form-item label="网络地址:" v-if="Picform.radio==='2' ">
+                            <el-input v-model="Picform.pic" style="width: 60%;" placeholder="请网络地址" clearable></el-input>
+                            <el-button style="margin-left: 10px;cursor: pointer;" @click="Addpic">提取文件</el-button>
+                            <div class="Picture">
+                                <div class="pic-item" v-if="Picform.picture">
+                                    <template v-if="isImage(Picform.picture)">
+                                        <img :src="Picform.picture">
+                                    </template>
+                                    <template v-else>
+                                        <img src="__STATIC__/admin/images/file.png" width="108px" height="auto">
+                                    </template>
+                                    <i class="el-icon-error" @click="deletePic()"></i>
+                                </div>
+                            </div>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="UploagCancel">取 消</el-button>
+                        <el-button type="primary" @click="submitUpload" :loading="loading" :disabled="uploadSure">确 定</el-button>
+                    </div>
+                </el-dialog>
+                <ul v-if="pictureList && pictureList.length >0" class="pictureList">
+                    <li v-for="(item,index) in pictureList" :key="index" :style="vname?'width:105px;':''">
+                        <div  @click="taggle(index)" :class="item.showTaggle ? 'taggleImage image'  : 'image'" :style="vname?'width:105px;height:105px;':''">
+                            <template v-if="['jpg','png','gif','bmp','ico','jpeg'].indexOf(item.att_type)>=0">
+                                <el-image :src="item.satt_dir" fit="contain" :alt="item.name" lazy>
+                                    <div slot="placeholder" class="image-slot">
+                                        <img src="__STATIC__/admin/images/image.png" :alt="item.name">
+                                    </div>
+                                </el-image>
+                            </template>
+                            <template v-else-if="['mp4','3gp','m3u8'].indexOf(item.att_type)>=0">
+                                <el-image src="__STATIC__/admin/images/video.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <template v-else-if="['m4a','wav','mp3','aac'].indexOf(item.att_type)>=0">
+                                <el-image src="__STATIC__/admin/images/audio.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <template v-else-if="['doc','docx'].indexOf(item.att_type)>=0">
+                                <el-image src="__STATIC__/admin/images/doc.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <template v-else-if="['ppt','pptx'].indexOf(item.att_type)>=0">
+                                <img src="__STATIC__/admin/images/ppt.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <template v-else-if="['xls','xlsx'].indexOf(item.att_type)>=0">
+                                <el-image src="__STATIC__/admin/images/xls.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <template v-else-if="['pdf'].indexOf(item.att_type)>=0">
+                                <el-image src="__STATIC__/admin/images/pdf.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <template v-else>
+                                <el-image src="__STATIC__/admin/images/file.png" :alt="item.name" lazy></el-image>
+                            </template>
+                            <div class="btn">
+                                <i @click.stop="viewFile(item)" class="el-icon-zoom-in"></i>
+                                <i @click.stop="removeFile(item.id)" class="el-icon-delete"></i>
+                            </div>
+                            <img class="bottom" src="__STATIC__/ueditor/dialogs/image/images/success.png" alt="">
+                        </div>
+                        <div class="name">{{ item.real_name }}</div>
+
+                    </li>
+                </ul>
+                <div class="nodata" v-else>
+                    <img src="__STATIC__/admin/images/nodata.png" alt="">
+                    <span class="msg">-- 素材库为空 --</span>
+                </div>
+                <!-- 查看 -->
+                <el-dialog title="查看" :visible.sync="CheckVisible" append-to-body>
+                    <img :src="thumb" style="max-width:100%;display:block;margin:0 auto;height: auto; object-fit: fill;" alt="">
+                </el-dialog>
+                <el-pagination v-if="query.total >0" background :page-size="query.size" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                               :current-page="query.page" layout="total, prev, pager, next,jumper" :total="query.total">
+                </el-pagination>
+
+            </el-main>
+        </el-container>
+    </div>
+</div>
+<script>
+    Vue.config.productionTip = false;
+    Vue.config.lang = 'zh-CN';
+    new Vue({
+        el: '#app',
+        data: {
+            selectName:vname,
+            buttonVisible: true,
+            dialogVisible_image: false,//打开上传
+            visible: false,//添加分类
+            picVisible: false,//上传图片
+            nameVisible: false,//改名
+            CheckVisible: false,//查看
+            Name: '',// 改名
+            thumb: '',//查看
+            Index: 0,
+            fileList: [],
+            pictureList: [],
+            form:{
+                name:'',
+                selected: [0],
+            },
+            search:'',
+            Picform: {
+                radio: '1',
+                selected: [0],
+                pic: '',
+                picture:''
+            },
+            dialogImageUrl: '',
+            dialogVisible: false,
+            disabled: false,
+            loading:false,
+            sortList: [],
+            formLabelWidth: '120px',
+            modifiedList: [],
+            uploadSure: false,
+            sort:0,
+            query: {
+                search: '',
+                page: 1,
+                size: 24,
+                total: 0
+            },
+        },
+        created() {
+            this.getSortList();
+        },
+        mounted() {
+            // 在子页面中获取 index
+            this.getList();
+        },
+        methods: {
+            handleSearch(){
+                this.getList();
+            },
+            submitUpload() {
+                let self = this;
+                if (self.Picform.radio === '1') {
+                    if (!self.fileList.length) return self.$message.warning('请先选择文件');
+                    if (self.fileList.length) {
+                        if(self.loading) return;
+                        self.loading = true;
+                        self.uploadSure=true;
+                        self.$refs['mYupload'].submit();
+                    }
+                }else{
+                    if (!self.Picform.pic) return self.$message.warning('请请输入文件地址');
+                    self.loading=true;
+                    self.uploadSure=true;
+                    $.post('{:createUrl("download")}',{pid:self.Picform.selected[0],url:self.Picform.pic,is_thumb:is_thumb,is_water:is_water},function (res){
+                        if (res.status === 200) {
+                            self.query.page = 1;
+                            self.getList();
+                            self.loading=false;
+                            self.uploadSure=false;
+                            self.Picform = {
+                                radio: '1',
+                                selected: self.Picform.selected,
+                                pic: '',
+                            };
+                            self.picVisible = false;
+                        } else {
+                            self.$message.error(res.msg);
+                        }
+                    });
+                }
+            },
+            handleChange(file,fileList){
+                this.fileList = fileList;
+            },
+            handlePreview(file){
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            handleRemove(file){
+                let index = this.fileList.findIndex((e) => {
+                    return e.url == file.url;
+                });
+                this.fileList.splice(index, 1);
+            },
+            isImage(url){
+                return /\.(jpg|jpeg|png|gif|bmp|ico)$/i.test(url);
+            },
+            isDocs(url){
+                return /\.(docx|doc|pdf|ppt|pptx|xls|xlsx|txt)$/i.test(url);
+            },
+            //获取分类
+            getSortList() {
+                let self = this;
+                $.get("{:createUrl('getAttachSort')}", {}, (res) => {
+                    if (res.status === 200) {
+                        self.sortList = JSON.parse(JSON.stringify(res.data));
+                        self.sortList.unshift({id:0,name:'全部文件'});
+                        self.modifiedList = JSON.parse(JSON.stringify(res.data));
+                    } else {
+                        console.log(res.msg);
+                    }
+                });
+            },
+            // 取消
+            rescind() {
+                this.pictureList.forEach((item) => {
+                    item.showTaggle = false;
+                });
+                this.buttonVisible = true;
+                this.dialogVisible_image = false;
+                var index = window.parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index); //再执行关闭
+            },
+            // 使用选中图片
+            selectedFile() {
+                let list = [];
+                this.pictureList.forEach((item) => {
+                    if (item.showTaggle == true) {
+                        list.push(item)
+                    }
+                });
+                if (list.length==0 || list.length > 1) {
+                    this.$message.error('请选择一个文件');
+                } else {
+                    if(type==='1'){
+                        // 创建自定义事件
+                        const attachEvent = new CustomEvent("attachmentIn", {
+                            bubbles: true,
+                            cancelable: true,
+                            detail: {type:vname,org_url:list[0].satt_dir,tags:prename},
+                        });
+                        window.parent.document.dispatchEvent(attachEvent);
+                    }else{
+                        if(vname){
+                            $("#"+vname, window.parent.document).val(list[0].satt_dir);
+                        }
+                        if(prename){
+                            $("#"+prename, window.parent.document).attr("src", list[0].satt_dir);
+                        }
+                    }
+                    this.buttonVisible = true;
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭
+                }
+            },
+            // 图片列表
+            getList() {
+                let self = this;
+                let loading=self.$loading({target:'pictureList'});
+                $.get('{:createUrl("getFileList")}', {sort:self.sort,page: self.query.page, limit: self.query.size,search:self.query.search}, (res) => { // 使用箭头函数
+                    loading.close();
+                    if (res.status === 200) {
+                        self.query.total = res.total;
+                        const listWithShowTaggle = res.data.map(item => ({
+                            ...item,
+                            showTaggle: false
+                        }));
+                        self.pictureList = listWithShowTaggle;
+                    }
+                });
+            },
+            // 分页
+            handleSizeChange(val) {
+                this.query.size = val;
+                this.getList();
+            },
+            handleCurrentChange(val) {
+                this.query.page = val;
+                this.getList();
+            },
+            // 取消上传
+            UploagCancel() {
+                this.Picform = {
+                    radio: '1',
+                    selected:this.Picform.selected,
+                    pic: '',
+                    picture:''
+                };
+                if (this.$refs['mYupload'] && this.$refs['mYupload'].clearFiles) {
+                    this.$refs['mYupload'].clearFiles(); // 清空上传文件
+                }
+                this.picVisible = false;
+            },
+            handleProgress(event,file,fileList){
+                //console.log(event,file,fileList);
+            },
+            handleError(err, file, fileList){
+                console.log(err,file,fileList);
+            },
+            handleSuccess(res, file,fileList) {
+                let self = this;
+                let upload_status=file.status;
+                fileList.forEach((item,index)=>{
+                    if(item.status!=='success'){
+                        upload_status='uploading';
+                    }
+                });
+                if(upload_status==='success'){
+                    if(res.status===200){
+                        if (self.$refs['mYupload'] && self.$refs['mYupload'].clearFiles) {
+                            self.$refs['mYupload'].clearFiles(); // 清空上传文件
+                        }
+                        self.picVisible = false;
+                        self.query.page = 1;
+                        self.getList();
+                        self.loading = false;
+                        self.uploadSure = false;
+                    }else{
+                        if (self.$refs['mYupload'] && self.$refs['mYupload'].clearFiles) {
+                            self.$refs['mYupload'].clearFiles(); // 清空上传文件
+                        }
+                        self.picVisible = false;
+                        self.loading = false;
+                        self.uploadSure = false;
+                        self.$message.error(res.msg);
+                    }
+                }
+            },
+            // 删除图片按钮
+            removeAll() {
+                let self=this;
+                self.$confirm('此操作将永久删除该图片, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    center: true
+                }).then(() => {
+                    var ids=[];
+                    self.pictureList.forEach((item) => {
+                        if (item.showTaggle === true) {
+                            ids.push(item.id);
+                        }
+                    });
+                    $.post('{:createUrl("delFiles")}', {ids: ids.join(',')}, function (res) {
+                        if(res.status===200){
+                            self.getList();
+                            self.$message({ type: 'success',message: '删除成功!'});
+                        }else{
+                            self.$message({type: 'error',message: res.msg});
+                        }
+                    });
+                    self.buttonVisible = true;
+                }).catch(() => {
+                    self.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            // 删除图片
+            removeFile(id) {
+                let self = this;
+                this.$confirm('此操作将永久删除该图片, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    center: true
+                }).then(() => {
+                    $.post('{:createUrl("delFile")}',{id:id},function (res){
+                        if(res.status === 200){
+                            self.buttonVisible = true;
+                            self.getList();
+                            self.$message({type: 'success',message: '删除成功!'});
+                        }else{
+                            self.$message.error(res.msg);
+                            return false;
+                        }
+                    },'json');
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            // 是否选中
+            taggle(index){
+                this.pictureList[index].showTaggle = !this.pictureList[index].showTaggle;
+                const hasTrueShowTaggle = this.pictureList.some(item => item.showTaggle === true);
+                this.buttonVisible = !hasTrueShowTaggle;
+            },
+            // 查看图片
+            viewFile(item) {
+                if(['jpg','png','gif','bmp','ico','jpeg'].indexOf(item.att_type)>=0){
+                    this.CheckVisible = true;
+                    this.thumb = item.satt_dir;
+                }
+            },
+            // 添加地址文件
+            Addpic() {
+                if (this.Picform.pic && this.Picform.pic.length> 0) {
+                    this.Picform.picture= this.Picform.pic;
+                    this.uploadSure=false;
+                } else {
+                    this.$message.error('请输入文件地址');
+                }
+            },
+            // 删除网址图片
+            deletePic() {
+                this.Picform.pic = '';
+                this.Picform.picture='';
+                this.uploadSure=true;
+            },
+            //取消添加分类
+            cancelCat() {
+                this.form.selected = [];
+                this.form.name = '';
+                this.visible = false;
+            },
+            // 确定添加分类
+            AddConfirm() {
+                let self = this;
+                // 如果是顶级分类
+                if (self.form.selected.length ===0) {
+                    self.$message.error('请选择分类');
+                    return false;
+                }
+                if(self.form.name === '' || !self.form.name){
+                    self.$message.error('请输入分类名称');
+                    return false;
+                }
+                $.post('{:createUrl("handleSort")}',{pid:self.form.selected[0],name:self.form.name},function (res){
+                    if(res.status === 200){
+                        self.form.selected = [];
+                        self.form.name = '';
+                        self.visible = false;
+                        self.getSortList();
+                    }else{
+                        self.$message.error(res.msg);
+                        return false;
+                    }
+                },'json');
+            },
+            handleClose() {
+                this.dialogVisible = false;
+            },
+            // 打开添加分类
+            addCat() {
+                this.visible = true;
+            },
+            // 删除分类
+            removeCat(id) {
+                let self = this;
+                self.$confirm("此操作将永久删除该分类, 是否继续?", "提示", {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning",
+                }).then(() => {
+                    $.post('{:createUrl("delSort")}',{id:id},function (res){
+                        if(res.status === 200){
+                            self.getSortList();
+                        }else{
+                            self.$message.error(res.msg);
+                            return false;
+                        }
+                    },'json');
+                }).catch(() => {
+                    self.$message({type: "info",message: "已取消删除"});
+                });
+            },
+            onChange(value) {
+                console.log(value);
+            },
+            // 获取树形节点
+            getViewFile(node, e) {
+                let self = this;
+                self.sort=node.id;
+                self.form.selected = [node.id];
+                self.Picform.selected= [node.id];
+                self.query.page=1;
+                self.getList();
+            },
+        }
+    });
+</script>
+<style>
+    #app,
+    .el-container {
+        height: 100%;
+        background-color: #fff;
+    }
+    .el-aside {
+        width:240px!important;
+        height:100vh;
+        border-right: 1px solid #eee;
+    }
+    .el-aside .el-tree {
+        padding:0 10px;
+        height: 100%;
+    }
+    .el-main {
+        width:calc(85% - 240px);
+        padding: 0 0 30px 0;
+        margin-left: 20px;
+    }
+    .el-tree-node__expand-icon.expanded,
+    .el-checkbox__inner,
+    .el-tree-node__expand-icon {
+        display: none !important;
+    }
+    .custom-tree-node {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+    }
+    .custom-tree-node .icon-wiki{
+        color:#9c9c9c;
+        padding-right:5px;
+    }
+    .custom-tree-node .el-dropdown {
+        position: absolute;
+        right: 20px;
+        color: #606266;
+        font-size: 12px;
+    }
+    .el-tree-node__content {
+        position: relative;
+    }
+
+    .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content,
+    .el-tree-node__content {
+        padding: 10px 0;
+    }
+
+    .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+        color: #3b91ff;
+        background-color: #f0f7ff;
+
+    }
+    .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content .icon-wiki{
+        color: #3b91ff;
+    }
+    .uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        width: 108px;
+        height: 108px;
+        line-height: 108px;
+        text-align: center;
+        background-color:#f8f8f8;
+    }
+    .el-upload-list--picture-card .el-upload-list__item{
+        width: 108px !important;
+        height: 108px;
+        line-height: 108px;
+        text-align: center;
+    }
+    .el-upload-list--picture-card .el-progress{
+        width: inherit !important;
+    }
+    .uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .progress-bar{
+        text-align: center;
+    }
+    .is_success{
+        position: absolute;
+        right: -17px;
+        top: -7px;
+        width: 46px;
+        height: 26px;
+        background: #13ce66;
+        text-align: center;
+        transform: rotate(45deg);
+        box-shadow: 0 1px 1px #ccc;
+    }
+    .is_success i{
+        right:15px;
+        top:0;
+        position: absolute;
+        color: #fff;
+        font-size: 12px;
+        margin-top: 12px;
+        transform: rotate(-45deg);
+    }
+    .uploader .thumb {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    .el-icon-plus{
+        font-size:20px!important;
+    }
+    .el-dialog__body{
+        padding:10px 20px 30px 20px!important;
+    }
+    .nodata {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 80%;
+    }
+    .nodata img {
+        width: 108px;
+    }
+    .nodata .msg {
+        width: 108px;
+    }
+    .pictureList {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+        /* display: flex;
+        /* 使用 flex 布局 
+        flex-wrap: wrap;*/
+        /* 自动换行 */
+        gap: 5px 20px;
+        /* 图片之间的间隔 */
+        margin-top: 10px;
+    }
+    .pictureList li{
+        width:145px;
+        /* 图片下方的间隔 */
+        border: none;
+    }
+    .pictureList li .image{
+        background-color:#eee;
+        position: relative;
+        width:145px;
+        /* 图片宽度占满容器 */
+        height:145px;
+        display: flex;
+        /* 裁剪图片以填充容器 */
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    @media screen and (max-width: 1080px) {
+        .pictureList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
+        .pictureList li{
+            width:100px;
+        }
+        .pictureList li .image{
+            width:100px;
+            /* 图片宽度占满容器 */
+            height:100px;
+        }
+    }
+    .pictureList li .image .bottom {
+        width: 20px !important;
+        height: 20px !important;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        display: none;
+    }
+    .pictureList li .image img {
+        width: 100%;
+        height: auto;
+    }
+    .pictureList li .image .btn {
+        display: none;
+    }
+    .pictureList li .image .btn i{
+        font-size: 20px;
+    }
+    .pictureList li .image:hover .btn {
+        position: absolute;
+        display: flex;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        padding: 0 !important;
+    }
+    .pictureList li .image:hover .btn .el-icon-zoom-in{
+        margin-right: 20px;
+    }
+    .pictureList li .name{
+        padding:10px 0;
+        font-size:12px;
+        text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .pictureList li .taggleImage{
+        border: 2px solid #1094fa;
+        position: relative;
+        border-radius:5px;
+    }
+    .pictureList li .taggleImage .bottom{
+        display: block;
+        width: 30px !important;
+        height: 30px !important;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+    .el-form-item__label{
+        font-size: 12px;
+    }
+
+    .Picture {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+    .Picture  .pic-item {
+        width: 108px;
+        height: 108px;
+        margin-bottom: 10px;
+        border: 1px solid #c0ccda;
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+        text-align: center;
+    }
+    .Picture i {
+        position: absolute;
+        display: inline-block;
+        color: rgba(0, 0, 0, 0.25);
+        font-size: 16px;
+        right: 0;
+        top: 0;
+    }
+    .Picture img {
+        max-width: 100%;
+        height: auto;
+    }
+    .head-ctr{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .head-ctr .btns {
+        display: flex;
+        align-items: center;
+    }
+    .head-ctr .btn_ctr {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        margin-right: 10px;
+    }
+</style>

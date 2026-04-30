@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+  <script type="text/javascript" src="__STATIC__/default/js/jquery.lazyload.js"></script>
+</head>
+
+<body>
+  {include file="header"/}
+  <!-- top头部 End -->
+  <div class="container">
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+      {include file="usermenu"/}
+    </div>
+    <!-- 会员中心左侧 End -->
+    <div class="Member-right">
+      <div class="Ml-right">
+        <div class="Ml-box uc-main-box">
+          <div class="zp-conter zp-lister">
+            <div class="zp-right-box">
+              <h1 class="title">我的收藏</h1>
+            </div>
+            <!-- 右侧功能定位 -->
+            <div class="zp-quanbu">
+
+                <div class="recommend" style="width: 100%;">
+                    <div class="recommend-row" id="course-list" style="width: 100%;gap:16px;"></div>
+                </div>
+              <!-- 课程列表 End -->
+              <div class="nodata" style="display: none;">
+                <i class="icon icon-nodata"></i>
+                <span class="msg">暂时没有内容</span>
+              </div>
+            </div>
+          </div>
+          <!-- 课程 -->
+          <!-- 右侧功能定位 End -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {include file="footer"/}
+  <script>
+    WCCE.selectFav();//课程分类
+    WCCE.FavLazy();//滑动加载和图片懒加载
+  </script>
+  <!-- 网站导航 End -->
+  </body>
+</html>

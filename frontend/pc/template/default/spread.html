@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+    <script type="text/javascript" src="__STATIC__/default/js/clipboard.min.js"></script>
+
+</head>
+
+<body>
+{include file="header"/}
+<!-- top头部 End -->
+<div class="container">
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+        {include file="usermenu"/}
+    </div>
+    <!-- 会员中心左侧 End -->
+    <!-- 右侧功能定位 -->
+    <div class="Member-right">
+        <div class="Ml-box bag">
+            <div class="zp-conter zp-lister">
+                <div class="zp-right-box">
+                    <h1 class="title">推广中心</h1>
+                </div>
+                <div class="zp-open">
+                    <!-- 提现 -->
+                    <div class="tiXian" style="display: flex;justify-content: space-between;position:relative;">
+                        <div class="zp_tiXian" style="width: 70%;" id="spread"></div>
+                        <!-- 我的推广链接 -->
+                        <input type="hidden" id="invite_url" value="{$invite_url}"/>
+                        <div class="Zp-spread">
+                            <div class="spread-item" onclick="WCCE.spreadLink()">
+                                <i class="icon icon-fuzhiwenjian"></i>
+                                <span style="padding-left: 10px;">推广链接</span>
+                            </div>
+                            <div class="spread-item" onclick="WCCE.spreadPoster()">
+                                <i class="icon icon-icon_share"></i>
+                                <span>推广海报</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 我的推广链接 End -->
+                </div>
+                <!-- 提现 End -->
+                <!-- 收益/推广人数 -->
+                <div class="earnings-person clearfix" id="tui"></div>
+                <!-- 收益/推广人数 End -->
+                <!-- 功能列表 -->
+                <div class="person-list">
+                    <ul>
+                        <li>
+                            <a href="/user/income" class="my-item">收益明细</a>
+                        </li>
+                        <li>
+                            <a href="/user/cashlist" class="my-item my-item-left">提现记录</a>
+                        </li>
+                        <li><a href="/user/referrer" class="my-item my-item-left">我邀请的人</a></li>
+                    </ul>
+                </div>
+                <!--功能列表 End -->
+                <!-- 推广规则 -->
+                <div class="zp-gui">
+                    <h3>常见问题：</h3>
+                    <p><strong>1. 如何邀请用户？</strong></p>
+
+                    <p>首先你必须是注册用户,登录账号后,点击推广中心-生成我的邀请海报或复制推广链接。</p>
+
+                    <p><strong>2. 如何邀请用户才算成功？</strong></p>
+
+                    <p>邀请用户必须是没有注册过的新用户,一旦邀请用户注册成功并消费。可获得此用户注册之日起,永久的推广奖金。</p>
+
+                    <p><strong>3. 资源分销收益有多少？</strong></p>
+
+                    <p>只要你成为有分销特权的会员，你邀请的人付费购买了课程或者VIP会员,每次消费您都能得到对应的奖金。</p>
+
+                    <p><span style="color:#ff0000;">* 不同的会员SVIP分销佣金不同,得到的收益可随时提现。</span></p>
+
+                    <p><strong>4. 如何查看我邀请的好友是否付费？</strong></p>
+
+                    <p>收益明细有你邀请的用户,付费购买资源和VIP会员的相关记录,您可以在此栏目进行查看。</p>
+
+                    <p><strong>5. 奖金什么时候可以提现？</strong></p>
+
+                    <p>只要您的账号提现收益不低于{$zhicms.cash_min}元,随时都可以申请提现。金额将在1-3个工作日发放完成。</p>
+
+                    <p><strong>6. 如何快速的赚取奖金？</strong></p>
+
+                    <p>我们建议您把二维码推广海报,发送到微信朋友圈或者给自己身边有需求的朋友,成功率会更高。</p>
+                </div><!-- 推广规则 End -->
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 右侧功能定位 End -->
+{include file="footer"/}
+<script>
+    WCCE.incomeStat();//收益累计
+</script>
+<!-- 网站导航 End -->
+</body>
+</html>

@@ -1,0 +1,61 @@
+{include file="common/head"/}
+<body>
+<div class="layui-fluid">
+	<div class="table-body">
+		<form class="layui-form layui-form-pane" id="form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">选择数据包</label>
+				<div style="display:flex ;align-items: center;height: 38px;">
+					<input type="file" name="file">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">数据包类型</label>
+				<div class="layui-input-block">
+				  <input type="radio" name="type" value="1" title="excel" checked>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+				  <button class="layui-btn" lay-submit lay-filter="sub">立即提交</button>
+				  <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="msg" style="text-align: center;color:#f00;padding:20px 0;">温馨提示：请严格按照数据格式制作数据包，<a href="__STATIC__/admin/data.xlsx">数据格式下载</a></div>
+			</div>
+		</form>
+	</div>
+</div>
+{include file="common/foot"/}	
+	<script>
+layui.use(['form'], function(){
+  var $ = layui.jquery,form = layui.form;
+  form.on('submit(sub)', function(){
+  	loading = layer.load(1, { shade: [0.1, '#fff'] });
+  	$.ajax({
+  		url:'{:createUrl("batch")}',
+  		type:'post',
+  		data:new FormData($("#form")[0]),
+  		contentType: false,
+        processData: false,
+        success:function(res){
+        	layer.close(loading);
+	        if (res.status === 200){
+	            layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+	                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+	                parent.layer.close(index);//再执行关闭
+	            });
+	        } else {
+	            layer.msg(res.msg, { icon: 2, time: 1000 });
+	        }
+        }
+  	});
+  	// $.post('{:createUrl("batch")}',new FormData($("#form")[0]),function(res) {
+  		
+  	// });
+	  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	}); 
+});
+</script>
+</body>

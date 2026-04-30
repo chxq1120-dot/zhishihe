@@ -1,0 +1,78 @@
+{include file="common/head"/}
+<body>
+	<div class="layui-fluid">
+		<div class="table-body">
+			<form class="layui-form layui-form-pane">
+				<input type="hidden" name="row[id]" value="{$row['id']}"/>
+				<div class="layui-form-item">
+					<label class="layui-form-label">布局名称</label>
+					<div class="layui-input-inline from-inline-7">
+					  <input type="text" name="row[name]" required value="{$row['name']}" lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">编码</label>
+					<div class="layui-input-inline from-inline-7">
+						<input type="text" name="row[code]" required  lay-verify="required" readonly value="{$row['code']}" placeholder="请输入编码" autocomplete="off" class="layui-input">
+                        <div class="layui-word-aux">编码必须是唯一，且只能由英文字母、下划线、数字组成</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">布局封面</label>
+					<div class="layui-input-inline from-inline-7">
+						<input type="text" lay-verify="required" lay-reqText="请输入布局封面链接" class="layui-input" placeholder="{:lang('pleaseEnter')}布局封面链接" name="row[thumb]" id="thumb" value="{$row['thumb']}">
+						<div class="layui-upload">
+							<button type="button" class="layui-btn" id="uploadImg"  style="margin-top:10px;">上传封面</button>
+							<div class="layui-upload-list">
+								<img class="layui-upload-img" width="86" height="86" src="{$row['thumb']|default='__ADMIN__/images/default.png'}" id="Image">
+								<p id="preview"></p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">布局描述</label>
+					<div class="layui-input-inline from-inline-7">
+						<textarea name="row[desc]" placeholder="请输入布局描述" class="layui-textarea">{$row['desc']}</textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"></label>
+					<div class="layui-input-block">
+					  <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">立即提交</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+{include file="common/foot"/}
+<script>
+layui.use(['form','upload'], function(){
+  	var $ = layui.jquery,form = layui.form; //Tab的切换功能，切换事件监听等，需要依赖element模块
+	$("#uploadImg").on('click',function(){
+		layer.open({
+			title:'上传封面',
+			type:2,
+			maxmin: true,
+			area:['80%','500px'],
+			content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image',
+		});
+	});
+	form.on('submit(sub)', function(data){
+		loading = layer.load(1, { shade: [0.1, '#fff'] });
+		$.post('',data.field,function(res) {
+			layer.close(loading);
+			if (res.status === 200){
+				layer.msg('保存成功', { icon: 1, time: 1000 }, function () {
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+					parent.layer.close(index);//再执行关闭
+				});
+			} else {
+				layer.msg(res.msg, { icon: 2, time: 1000 });
+			}
+		});
+	  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+});
+</script>
+</body>

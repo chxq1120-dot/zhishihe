@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>购买资源</title>
+	<link rel="stylesheet" href="__STATIC__/layuiadmin/layui/css/layui.css">
+</head>
+<style>
+	.flex{
+		display: flex;
+	}
+</style>
+<body>
+	<div class="layui-container" style="margin-top:50px;">
+		<div style="font-size:36px;">购买资源</div>
+		<hr>
+		<div style="justify-content: center;margin-top: 50px;" class="flex">
+            <div class="flex">
+            	<img src="{$info.thumb}" style="width: 280px;height: 200px;">
+            </div>
+            <div class="flex" style="flex-wrap:wrap;flex-direction:column;justify-content:space-between;margin-left: 10px;">
+            	<div style="font-size:26px;">{$info.title}</div>
+            	<div><span style="color:#FF5722;font-size:26px;">￥:{$info.price}</span></div>
+            </div>	
+		</div>
+		<div style="justify-content: center;margin-top: 50px;" class="flex">
+			<button class="layui-btn" style="height:80px;font-size: 28px;width: 100%;" id="sub">立即支付</button>
+		</div>
+	</div>
+
+	<script src="__STATIC__/layuiadmin/layui/layui.js"></script>
+	<script>
+		layui.use(['layer'],function(){
+			var layer=layui.layer,$=layui.jquery;
+			$("#sub").on('click',function(){
+				var index=layer.load(1);
+				$.post("{:('unify')}",{ id:'{$data.id}',token:'{$data.token}',type:'{$data.type}' },function(res){
+					layer.close(index);
+					if(res.status===200){
+						WeixinJSBridge.invoke(
+							'getBrandWCPayRequest',JSON.parse(res.data),
+							function(res){
+							if(res.err_msg == "get_brand_wcpay_request:ok" ){
+
+							    layer.msg('支付成功');  
+							}else{
+								
+							} 
+					    });
+					}else{
+						layer.msg(res.msg);
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

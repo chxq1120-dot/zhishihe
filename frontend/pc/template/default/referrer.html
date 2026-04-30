@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+  {include file="header"/}
+  <!-- top头部 End -->
+  <div class="container">
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+      {include file="usermenu"/}
+    </div>
+    <!-- 会员中心左侧 End -->
+    <div class="Member-right">
+      <div class="Ml-box uc-main-box">
+          <div class="zp-conter zp-lister">
+            <div class="zp-right-box"><h1 class="title">我邀请的人</h1></div>
+            <div class="zp-right-box" id="teamlist"></div>
+            <div class="nodata" style="display: none;">
+              <i class="icon icon-nodata"></i>
+              <span class="msg">暂时没有内容</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- 右侧功能定位 -->
+  {include file="footer"/}
+  <script>
+    WCCE.teamlist();//好友邀请
+  </script>
+  </body>
+</html>

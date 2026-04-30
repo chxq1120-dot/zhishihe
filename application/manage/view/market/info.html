@@ -1,0 +1,92 @@
+{include file="common/head"/}
+<body>
+<style>
+	.layui-form-label{
+		color:#c9c9c9;
+	}
+	.layui-word-aux{
+		line-height:36px;
+		color:#3c3c3c!important;
+	}
+</style>
+	<div class="layui-fluid">
+		<div class="table-body">
+			<form class="layui-form layui-form-pane">
+            <div class="layui-form-item">
+			    <label class="layui-form-label">资源名称</label>
+			    <div class="layui-input-block from-inline-3">
+			        <div class="layui-word-aux">{$info.title}</div>
+			    </div>
+		    </div>
+		    <div class="layui-form-item">
+			    <label class="layui-form-label">资源封面</label>
+			    <div class="layui-input-block from-inline-3">
+			    	<img src="{$info.thumb}" style="max-height:300px;max-width: 300px;">
+			    </div>
+		    </div>
+		    <div class="layui-form-item">
+				<label class="layui-form-label">资源价格</label>
+				<div class="layui-input-inline from-inline-3">
+					<div class="layui-word-aux">{$info.price}</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">划线价格</label>
+				<div class="layui-input-inline from-inline-3">
+					<div class="layui-word-aux">{$info.dis_price}</div>
+				</div>
+			</div>
+            <div class="layui-form-item">
+				<label class="layui-form-label">资源类型</label>
+				<div class="layui-input-inline from-inline-3">
+					<div class="layui-word-aux">
+						{if ($info.type==1)}
+							网盘资源
+						{elseif ($info.type==2) /}
+							视频资源
+						{elseif ($info.type==3) /}
+							文章资源
+						{elseif ($info.type==4) /}
+							视频课程
+						{elseif ($info.type==5) /}
+							音频课程		
+						{/if}
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-form-item">
+					<label class="layui-form-label">简介</label>
+					<div class="layui-input-inline from-inline-7" style="padding-top:10px;">
+						{$info.desc}
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">资源分类</label>
+					<div class="layui-input-block">
+						{foreach $info.sort as $v}
+							<button type="button" class="layui-btn  layui-btn-primary layui-btn-radius">{$v.name}</button>
+						{/foreach}
+					</div>
+				</div>
+				{if($info.type==3)}
+					<div class="layui-form-item">
+						<label class="layui-form-label">免费内容</label>
+						<div class="layui-input-block">
+							{$info.free_content|raw}
+						</div>
+					</div>
+				{else /}
+					<div class="layui-form-item">
+						<label class="layui-form-label">资源详情</label>
+						<div class="layui-input-block">
+							<div style="font-size:14px;color:#3c3c3c;padding:20px 20px;background-color:#f8f8f8;border-radius:10px;">
+								{$info.content|raw}
+							</div>
+						</div>
+					</div>
+				{/if}
+		</div>
+	</div>
+{include file="common/foot"/}	
+</body>

@@ -1,0 +1,151 @@
+{include file="common/head"/}
+<body>
+<style>
+	html,body{
+		background-color:#fff;
+	}
+	.layui-fluid{
+		padding:5px;
+	}
+	.table-box{
+		border:0;
+		position: relative;
+		background: none;
+		padding:0 0 110px 0;
+	}
+	.layui-form-item{
+		display: flex;
+		align-items: center;
+		border-bottom:#eee 1px solid;
+		padding:10px 15px;
+		margin-bottom:0;
+		border-radius:5px;
+		background:#fff;
+	}
+	.layui-form-item .thumb{
+		width:80px;
+	}
+	.layui-form-item .info{
+		width:calc(100% - 150px);
+	}
+	.layui-form-item .price{
+		padding-top:10px;
+		color:#ff5600;
+	}
+	.layui-form-item .handle{
+		width:60px;
+		text-align: right;
+	}
+
+	.msgs{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		color:#9c9c9c;
+		font-size:14px;
+		padding:50px 0;
+	}
+	.footers{
+		position: fixed;
+		bottom:0;
+		left:0;
+		right:0;
+		background:#fff;
+		border-top:#eee 1px solid;
+	}
+	.footers .totals{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding:10px 20px;
+		font-size:14px;
+	}
+	.footers .totals .total-num{
+		color:#6c6c6c;
+	}
+	.footers .totals .nums{
+		color:#ff5600;
+		font-weight: bold;
+	}
+	.settle{
+		text-align: right;
+		padding:5px 15px 20px 0;
+	}
+</style>
+<div class="layui-fluid">
+	<div class="table-body table-box">
+		{empty name="$list"}
+			<div class="msgs">
+				购物车里空空如也！
+			</div>
+		{else/}
+			<form class="layui-form layui-form-pane">
+				{foreach $list as $v}
+					<div class="layui-form-item">
+						<div class="thumb">
+							<img src="{$v.thumb}" width="64" height="64">
+						</div>
+						<div class="info">
+							<div class="title">{$v.title}</div>
+							<div class="price">￥{$v.money}</div>
+						</div>
+						<div class="handle">
+							<a href="javascript:;" style="color: #FF5722;" data-id="{$v.id}" class="delcart">删除</a>
+						</div>
+					</div>
+				{/foreach}
+			</form>
+			<div class="footers">
+				<div class="totals">
+					<div class="remark"><button id="clearCart" class="layui-btn layui-btn-sm layui-btn-primary layui-btn-radius layui-border-blue">清空购物车</button></div>
+					<div class="total-num">
+						合计：<span class="nums">￥{$total}</span>
+					</div>
+				</div>
+				<div class="settle">
+					<button class="layui-btn layui-btn-normal layui-btn-radius " id="handleSettle">去结算</button>
+					<button class="layui-btn layui-btn-radius layui-btn-primary layui-border-blue" id="handleCancel">取消</button>
+				</div>
+			</div>
+		{/empty}
+	</div>
+</div>
+{include file="common/foot"/}	
+<script>
+var loading;
+layui.use(['form'], function(){
+	var $ = layui.jquery; //Tab的切换功能，切换事件监听等，需要依赖element模块
+    layer.close(loading);
+	$(".delcart").on('click',function(){
+		var id=$(this).attr('data-id');
+		$.post('{:createUrl("delcart")}',{id:id},function(res){
+			if(res.status===200){
+				location.reload();
+				layer.msg(res.msg,{time: 1000, icon: 1});
+			}else{
+				layer.msg(res.msg,{time: 1000, icon: 2});
+			}
+		});
+	});
+	$("#clearCart").on('click',function(){
+		$.post('{:createUrl("delcart")}',{id:'o'},function(res){
+			if(res.status===200){
+				location.reload();
+				layer.msg(res.msg,{time: 1000, icon: 1});
+			}else{
+				layer.msg(res.msg,{time: 1000, icon: 2});
+			}
+		});
+	});
+    $("#handleSettle").on('click',function(){
+        loading=layer.load(1, { shade: [0.1, '#fff'] });
+        window.location.href='{:createUrl("pay")}?cart=1';
+	});
+    $("#handleCancel").on('click',function(){
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index);//再执行关闭
+    });
+});
+</script>
+</body>

@@ -1,0 +1,132 @@
+{include file="common/head"/}
+<body>
+<div class="layui-fluid">
+    <div class="table-body">
+        <form class="layui-form layui-form-pane">
+            <div class="layui-form-item">
+                <label class="layui-form-label">特权名称</label>
+                <div class="layui-input-inline from-inline-6">
+                    <input type="text" name="name" lay-verify="required" autocomplete="off" class="layui-input" value="{$info.name}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">特权类别</label>
+                <div class="layui-input-inline from-inline-6">
+                    <select name="type" lay-filter="tq">
+                        {switch $info.type}
+                            {case 1}
+                                <option value="1">资源级别</option>
+                            {/case}
+                            {case 2}
+                                <option value="2">资源数量</option>
+                            {/case}
+                            {case 3}
+                                <option value="3">资源分类</option>
+                            {/case}
+                            {case 4}
+                                <option value="4">站内广告</option>
+                            {/case}
+                            {case 5}
+                                <option value="5">分销佣金</option>
+                            {/case}
+                        {/switch}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">特权图标</label>
+                <div class="layui-input-inline from-inline-6">
+                    <input type="hidden" name="url" id="thumb" value="{$info.url}">
+                    <div class="layui-upload">
+                        <div class="layui-upload-list" style="width:64px;height:64px;" id="uploadImg">
+                            <img class="layui-upload-img" width="64" height="64" src="{$info.url|default='__ADMIN__/images/default.png'}" id="Image">
+                        </div>
+                        <div id="preview"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">特权规则</label>
+                <div class="layui-input-inline from-inline-6">
+                    {switch $info.type}
+                        {case 1}
+                            {volist name="levels" id="v"}
+                                <input type="checkbox" name="level[{$v.id}]" value="{$v.name}" title="{$v.name}" {if isset($info['rule'][$v.id])}checked{/if}>
+                            {/volist}
+                        {/case}
+                        {case 2}
+                            <input type="text" name="num" class="layui-input" value="{$info.rule}">
+                        {/case}
+                        {case 3}
+                            <input type="checkbox" name="sort_id[]" title="不限" value="0" {if isset($info['rule'][0])}checked{/if}>
+                            {foreach $sort as $k=>$v}
+                            <input type="checkbox" name="sort_id[]" title="{$v.name}" value="{$v.id}" {if isset($info['rule'][$v['id']])}checked{/if}>
+                            {/foreach}
+                        {/case}
+                        {case 4}
+                            <input type="radio" name="adv" value="0" title="无广告" {if $info['rule']['status']==0}checked{/if}>
+                            <input type="radio" name="adv" value="1" title="有广告" {if $info['rule']['status']==1}checked{/if}>
+                        {/case}
+                        {case 5}
+                            <div class="level" style="display: flex;align-items: center;">
+                                <span class="label">一级：</span>
+                                <input type="text" name="sell" placeholder="请填写一级佣金" value="{$info.rule.sell}" class="layui-input" style="width:150px;">
+                                {if config('setting.commission_fee')=='2'}
+                                    <span class="label" style="padding-left:10px;">二级：</span>
+                                    <input type="text" name="sell2" placeholder="请填写二级佣金" value="{$info.rule.sell2}" class="layui-input" style="width:150px;">
+                                {/if}
+                            </div>
+                            <div class="layui-word-aux" style="padding-top:5px;">如设置5%填写0.05,两级必须小于1</div>
+                        {/case}
+                        {case 6}
+                            <input type="text" name="reward" class="layui-input" value="{$info.rule}">
+                            <div class="layui-word-aux" style="padding-top:5px;">元，邀请好友注册奖励</div>
+                        {/case}
+                    {/switch}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">特权简介</label>
+                <div class="layui-input-inline from-inline-6">
+                    <input type="text" name="desc" lay-verify="required" value="{$info.desc}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding-top: 10px;">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['element', 'form'], function () {
+        var $ = layui.jquery, form = layui.form; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        $("#uploadImg").on('click',function(){
+            layer.open({
+                title:'上传图标',
+                type:2,
+                maxmin: true,
+                area:['80%','500px'],
+                content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image',
+            });
+        });
+        form.on('submit(sub)', function (data) {
+            loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post('', data.field, function (res) {
+                layer.close(loading);
+                if (res.status == 200) {
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    });
+</script>
+</body>

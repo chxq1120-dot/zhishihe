@@ -1,0 +1,194 @@
+{include file="common/head"/}
+<body>
+<div class="layui-fluid">
+    <div class="table-body">
+        <form class="layui-form layui-form-pane">
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>会员名称</label>
+                <div class="layui-input-inline from-inline-4">
+                    <input type="text" placeholder="请输入会员名称" name="name" lay-verify="required" lay-reqText="请输入会员名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>有效期</label>
+                <div class="layui-input-inline from-inline-4">
+                    <div class="layui-inline">
+                        <input type="number" placeholder="请输入会员有效期" name="days" lay-verify="required" lay-reqText="请输入会员有效期，9999为永久" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-inline">天，9999为永久</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>价格</label>
+                <div class="layui-input-inline from-inline-4">
+                    <div class="layui-inline">
+                        <input type="number" placeholder="请输入会员价格" name="price" lay-verify="required" lay-reqText="请输入会员价格" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-inline">元</div>
+                    <div class="layui-word-aux">会员价格不能低于<span class="red">{$min_price}</span>元</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>会员折扣</label>
+                <div class="layui-input-inline from-inline-4">
+                    <div class="layui-inline">
+                        <input type="number" name="discount" value="0" lay-verify="required" placeholder="请输入套餐折扣，0为免费" lay-reqText="请输入套餐折扣，0为免费" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-inline">折</div>
+                    <div class="layui-word-aux">此会员购买资源时的折扣，折扣为小数，如：0.8，0为免费</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>升级人数</label>
+                <div class="layui-input-inline from-inline-4">
+                    <div class="layui-inline">
+                        <input type="number" name="invite_num" value="0" lay-verify="required" placeholder="请输入升级人数" lay-reqText="请输入升级人数" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-inline">人</div>
+                    <div class="layui-word-aux">SVIP自助升级邀请用户人数，0为不开启</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">会员级别</label>
+                <div class="layui-input-inline from-inline-4">
+                    <input type="number" name="level" value="1" lay-verify="required" placeholder="数字越小级别越高" lay-reqText="请输入套餐级别" autocomplete="off" class="layui-input">
+                    <div class="layui-word-aux">排序，数字越小级别越高</div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>选择特权</label>
+                <div class="layui-input-inline from-inline-8">
+                    <div id="tqlist"></div>
+                    <button type="button" class="layui-btn layui-btn-normal pr">
+                        <i class="layui-icon layui-icon-release"></i>
+                        选择特权
+                    </button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="red">*</span>会员权益介绍</label>
+                <div class="layui-input-inline from-inline-4">
+                    <textarea class="layui-textarea" name="content" placeholder="请输入会员权益介绍"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding-top: 10px;">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['element', 'form', 'upload', 'layedit', 'table'], function () {
+        var $ = layui.jquery, element = layui.element, form = layui.form, layedit = layui.layedit, table = layui.table; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        form.on('submit(sub)', function (data) {
+            loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post('', data.field, function (res) {
+                layer.close(loading);
+                if (res.status == 200) {
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+
+        var tableIn = table.render({
+            id: 'pop',
+            elem: '#pop',
+            url: '{:createUrl("getprivilege")}',
+            method: 'get',
+            cols: [[
+                {checkbox: true},
+                {field: 'id', title: 'ID', align: 'center', width: 80},
+                {field: 'name', title: '特权名称', align: 'center', width: 150},
+                {
+                    field: 'type', title: '特权类别', align: 'center', width: 80, templet: function (d) {
+                        if (d.type == 1) {
+                            return '资源级别';
+                        } else if (d.type == 2) {
+                            return '资源数量';
+                        } else if (d.type == 3) {
+                            return '资源分类';
+                        } else if (d.type == 4) {
+                            return '站内广告';
+                        } else if (d.type == 5) {
+                            return '分销佣金';
+                        } else if (d.type == 6) {
+                            return '注册奖励';
+                        }
+                    }
+                },
+                {
+                    field: '', title: '特权规则', width: 280, align: 'center', templet: function (d) {
+                        if (d.type == 1) {
+                            var str = '';
+                            for (let i in d.rule) {
+                                str += '<a class="layui-btn layui-btn-xs">' + d.rule[i].name + '</a>';
+                            }
+                            return str;
+                        } else if (d.type == 2) {
+                            return '<a class="layui-btn layui-btn-xs">数量:' + d.rule + '</a>';
+                        } else if (d.type == 3) {
+                            var str = '';
+                            for (let i in d.rule) {
+                                str += '<a class="layui-btn layui-btn-xs">' + d.rule[i].name + '</a>';
+                            }
+                            return str;
+                        } else if (d.type == 4) {
+                            if (d.rule.status == 0) {
+                                return '<a class="layui-btn layui-btn-xs">关闭</a>';
+                            } else if (d.rule.status == 1) {
+                                return '<a class="layui-btn layui-btn-xs">开启</a>';
+                            }
+                        } else if (d.type == 5) {
+                            var html='<a class="layui-btn layui-bg-blue layui-btn-xs">一级:'+d.rule.sell+'</a>';
+                            {if config('setting.commission_fee')=='2'}
+                                html+='<a class="layui-btn layui-bg-blue layui-btn-xs">二级:'+d.rule.sell2+'</a>';
+                            {/if}
+                            return html;
+                        }else if (d.type == 6) {
+                            return '<a class="layui-btn layui-btn-xs">奖励:' + d.rule + '</a>';
+                        }
+                    }
+                }
+            ]]
+        });
+        $(".pr").on('click', function () {
+            var index=layer.open({
+                title: '选择特权',
+                type: 1,
+                content: $("#tq"),
+                area: ['60%', '480px'],
+                btn: ['确认', '关闭'],
+                yes: function (index, layero) {
+                    var checkStatus = table.checkStatus('pop').data;
+                    var str = '';
+                    for (let i in checkStatus) {
+                        str += '<input type="checkbox" name="pid[]" title="' + checkStatus[i].name + '" value="' + checkStatus[i].id + '" checked>';
+                    }
+                    $("#tqlist").empty();
+                    $("#tqlist").append(str);
+                    form.render();
+                    $('#tq').hide();
+                    layer.close(index);
+                },
+                end: function(){
+                    $('#tq').hide();
+                    layer.close(index);
+                }
+            });
+        });
+    });
+</script>
+<div style="display:none;padding:0 10px;" id="tq">
+    <table id="pop" lay-filter="test"></table>
+</div>
+</body>

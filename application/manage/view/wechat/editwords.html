@@ -1,0 +1,479 @@
+{include file="common/head"/}
+<link rel="stylesheet" href="__STATIC__/admin/custom/element/index.css">
+<script src="__STATIC__/admin/custom/js/vue.min.js"></script>
+<script src="__STATIC__/admin/custom/js/sortable.min.js"></script>
+<script src="__STATIC__/admin/custom/js/vuedraggable.min.js"></script>
+<script src="__STATIC__/admin/custom/element/index.js"></script>
+<style>
+    .wrapper {
+        padding: 10px 30px;
+        background-color: #fff;
+        display: flex;
+        justify-content: space-between;
+        min-height: 500px;
+    }
+
+    .main-wrapper {
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 500px;
+    }
+
+    .main-header {
+        height: 64px;
+    }
+
+    .main-body {
+        height: calc(100% - 114px);
+        background-color: #F4F5F9;
+    }
+
+    .main-menus {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: url("__STATIC__/admin/custom/images/keyboard.png") center center no-repeat;
+        border: #e9e9e9 1px solid;
+        border-top: 0;
+    }
+
+    .main-menus .ico-keyboard {
+        width: 44px;
+    }
+
+    .main-menus .menu-bar {
+        width: calc(100% - 45px);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .menu-bar .menu_bottom {
+        position: relative;
+        float: left;
+        display: inline-block;
+        box-sizing: border-box;
+        width: 100px;
+        text-align: center;
+        background-color: #e2e2e2;
+        border: 1px solid #ebedee;
+        cursor: pointer;
+    }
+
+    .menu-bar .menu_addicon {
+        height: 46px;
+        line-height: 46px;
+    }
+
+    .menu_bottom .menu_item {
+        height: 44px;
+        line-height: 44px;
+        /*padding: 14px 0;*/
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .menu-bar .active {
+        border: 1px solid #2bb673;
+    }
+
+    .menu-bar .menu_subItem {
+        height: 44px;
+        line-height: 44px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    .submenu {
+        position: absolute;
+        width: 100px;
+        bottom: 45px;
+    }
+
+    .submenu .subtitle {
+        background-color: #e8e7e7;
+        box-sizing: border-box;
+        margin-bottom: 2px;
+    }
+
+    .menu-config {
+        width: calc(100% - 350px);
+        height: 500px;
+        background-color: #fff;
+    }
+
+    .menu-config .config_page {
+        padding: 20px 30px;
+    }
+
+    .config-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 10px 20px;
+    }
+
+    .config-item .label {
+        width: 10%;
+    }
+
+    .config-item .form-item {
+        width: 60%;
+    }
+    .config-item .form-item .media-opt{
+        display: flex;
+        align-items: center;
+    }
+    .config-item .form-item .el-button{
+        margin-left:5px;
+    }
+    .config-item .keyword {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        border-radius: 4px;
+        border: 1px solid #DCDFE6;
+    }
+
+    .config-item .keyword .tags-item {
+        padding-top: 4px;
+        margin-left: 10px;
+        max-width: 74%;
+    }
+
+    .config-item .keyword .el-tag {
+        margin: 0 4px 4px 0;
+    }
+
+    .config-item .keyword:hover {
+        border-color: #C0C4CC;
+    }
+
+    .config-item .keyword:focus {
+        border-color: #409EFF;
+    }
+
+    .config-item .keyword .words {
+        width: 25%;
+        border: 0 !important;
+    }
+
+    .config-item .keyword .el-input__inner {
+        border: 0 !important;
+        padding: 0;
+    }
+
+    .menu-config .media-type {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .menu-config .media-type .media-item {
+        padding: 8px 20px;
+        background-color: #eee;
+        border-radius: 5px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .menu-config .media-type .on {
+        background-color: #ecf5ff;
+        color: #409EFF;
+    }
+
+    .menu-config p {
+        padding: 20px 0;
+    }
+
+    .el-dialog__header {
+        border-bottom: #eee 1px solid;
+    }
+
+    .el-dialog__body {
+        padding: 5px 15px !important;
+    }
+
+    .dialog-header {
+        text-align: right;
+        border-bottom: #eee 1px solid;
+        padding: 10px 5px;
+    }
+
+    .el-pagination {
+        margin: 20px;
+        text-align: center;
+    }
+</style>
+<div id="app" class="wrapper">
+    <div class="main-wrapper">
+        <div class="main-header">
+            <img src="__STATIC__/admin/custom/images/wechat-header.png">
+        </div>
+        <div class="main-body"></div>
+        <div class="main-menus">
+            <div class="ico-keyboard"></div>
+            <div class="menu-bar"></div>
+        </div>
+    </div>
+    <div class="menu-config">
+        <div class="config_page">
+            <div class="config-item">
+                <span class="label">关键字：</span>
+                <div class="form-item">
+                    <div class="keyword">
+                        <div class="tags-item">
+                            <el-tag :key="tag" v-for="tag in words.tags" closable size="small"
+                                    :disable-transitions="false"
+                                    @close="handleClose(tag)">
+                                {{tag}}
+                            </el-tag>
+                        </div>
+                        <el-input class="words" v-model="keyword" maxlength="20" placeholder="输入后回车"
+                                  @keyup.enter.native="handleConfirm" @blur="handleConfirm"></el-input>
+                    </div>
+                </div>
+            </div>
+            <div class="config-item">
+                <span class="label">状态：</span>
+                <div class="form-item">
+                    <el-radio-group v-model="words.status">
+                        <el-radio :label="1">启用</el-radio>
+                        <el-radio :label="0">禁用</el-radio>
+                    </el-radio-group>
+                </div>
+            </div>
+            <div class="config-item">
+                <span class="label">消息类型：</span>
+                <div class="form-item">
+                    <div class="media-type">
+                        <div :class="words.type=='text'?'on media-item':'media-item'"
+                             @click="changeMediaType('text')">文字
+                        </div>
+                        <div :class="words.type=='image'?'on media-item':'media-item'"
+                             @click="changeMediaType('image')">图片
+                        </div>
+                        <div :class="words.type=='voice'?'on media-item':'media-item'"
+                             @click="changeMediaType('voice')">音频
+                        </div>
+                        <div :class="words.type=='video'?'on media-item':'media-item'"
+                             @click="changeMediaType('video')">视频
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="config-item">
+                <span class="label">消息内容：</span>
+                <div class="form-item">
+                    <div class="media-text" v-if="words.type=='text'">
+                        <el-input type="textarea" :rows="3" class="input_width" v-model="words.text"
+                                  placeholder="请输入消息内容"></el-input>
+                    </div>
+                    <div class="media-img" v-if="words.type=='image'">
+                        <div class="media-opt">
+                            <el-input class="input_width" v-model="words.image" placeholder="选择图片"
+                                      :disabled="true"></el-input>
+                            <el-upload action="{:createUrl('uploadMedia')}"
+                                       :data="{type:'image'}"
+                                       accept="image/*"
+                                       :show-file-list="false"
+                                       :http-request="handleUpload"
+                                       :before-upload="beforeUpload">
+                                <el-button type="primary">上传图片</el-button>
+                            </el-upload>
+                        </div>
+                    </div>
+                    <div class="media-audio" v-if="words.type=='voice'">
+                        <div class="media-opt">
+                            <el-input class="input_width" v-model="words.audio" placeholder="上传音频"
+                                      :disabled="true"></el-input>
+                            <el-upload action="{:createUrl('uploadMedia')}"
+                                       :data="{type:'voice'}"
+                                       accept="audio/*"
+                                       :show-file-list="false"
+                                       :http-request="handleUpload"
+                                       :before-upload="beforeUpload">
+                                <el-button type="primary">上传音频</el-button>
+                            </el-upload>
+                        </div>
+                    </div>
+                    <div class="media-video" v-if="words.type=='video'">
+                        <div class="media-opt">
+                            <el-input class="input_width" v-model="words.video" placeholder="上传视频"
+                                      :disabled="true"></el-input>
+                            <el-upload action="{:createUrl('uploadMedia')}"
+                                       :data="{type:'video'}"
+                                       accept="video/*"
+                                       :show-file-list="false"
+                                       :http-request="handleUpload"
+                                       :before-upload="beforeUpload">
+                                <el-button type="primary">上传视频</el-button>
+                            </el-upload>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="config-item">
+                <span class="label"></span>
+                <div class="form-item">
+                    <el-button class="save_btn" type="primary" @click="saveWechat">保存并发布</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/javascript">
+    var words={$words|raw};
+    Vue.config.productionTip = false;
+    Vue.config.lang = 'zh-CN';
+    new Vue({
+        el: '#app',
+        data: {
+            words: words,
+            keyword: '',
+            listLoading: false,
+            mediaShow: false,
+            query: {
+                page: 1,
+                limit: 5
+            },
+            total: 0,
+            tableList: [] //素材内容弹框数据
+        },
+        methods: {
+            handleUpload(param) {
+                let self = this;
+                const formData = new FormData();
+                formData.append('file', param.file);
+                formData.append('type', param.data.type);
+                $.ajax({
+                    url: "{:createUrl('uploadMedia')}",
+                    dataType: 'json',
+                    async: false,
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    method: 'POST',
+                    success(res) {
+                        if (res.code == 1) {
+                            self.$message.success(res.msg);
+                            if(param.data.type=='image'){
+                                self.words.image = res.data.media_id;
+                            }else if(param.data.type=='voice'){
+                                self.words.audio = res.data.media_id;
+                            }else{
+                                self.words.video = res.data.media_id;
+                            }
+                        } else {
+                            self.$message.error(res.msg);
+                        }
+                    },
+                    error(err) {
+                        console.log(err);
+                    },
+                });
+            },
+            beforeUpload(file) {
+                console.log(file);
+
+            },
+            handleClose(tag) {
+                let self = this;
+                self.words.tags.splice(self.words.tags.indexOf(tag), 1);
+            },
+            handleConfirm() {
+                let self = this;
+                let keyword = self.keyword;
+                let len = self.words.tags.length;
+                if (keyword && len <= 10) {
+                    self.words.tags.push(keyword);
+                }
+                self.keyword = '';
+            },
+            changeMediaType(type) {
+                this.words.type = type;
+                this.getMedialist();
+            },
+            getMedialist() {
+                let self = this;
+                var type = self.words.type;
+                if (type == 'news') {
+                    self.listLoading = true;
+                    $.post("{:createUrl('menus')}", {
+                        act: 'medialist',
+                        type: type,
+                        page: self.query.page,
+                        limit: self.query.limit
+                    }, function (res) {
+                        self.listLoading = false;
+                        if (res.status == 200) {
+                            self.tableList = res.data.item;
+                            self.total = res.data.total_count;
+                        } else {
+                            self.$message({
+                                type: 'error',
+                                message: res.msg
+                            });
+                        }
+                    }, 'json');
+                }
+            },
+            // 素材内容弹框的选择按钮函数
+            handleEdit(index, row) {
+                this.words.news = row.media_id;
+                this.mediaShow = false;
+            },
+            saveWechat() {
+                let self = this;
+                if (self.words.tags.length == 0) {
+                    self.$message({
+                        type: 'error',
+                        message: '请输入关键字'
+                    });
+                    return false;
+                }
+                switch (self.words.type) {
+                    case 'text':
+                        self.words.content=self.words.text;
+                        break;
+                    case 'image':
+                        self.words.content=self.words.image;
+                        break;
+                    case 'voice':
+                        self.words.content=self.words.audio;
+                        break;
+                    case 'video':
+                        self.words.content=self.words.video;
+                        break;
+                    case 'news':
+                        self.words.content=self.words.news;
+                        break;
+                }
+                if (!self.words.content) {
+                    self.$message({
+                        type: 'error',
+                        message: '请输入消息内容'
+                    });
+                    return false;
+                }
+                var loading = layer.load(1, {shade: [0.1, '#fff']});
+                $.post("{:createUrl('editwords')}", self.words, function (res) {
+                    layer.close(loading);
+                    if (res.status == 200) {
+                        layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            parent.layer.close(index);//再执行关闭
+                        });
+                    } else {
+                        layer.msg(res.msg, {icon: 2, time: 1000});
+                    }
+                }, 'json');
+            },
+        },
+    });
+</script>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+
+<body>
+  {include file="header"/}
+  <div class="container">
+
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+      {include file="usermenu"/}
+    </div>
+    <!-- 面包削 -->
+    <div class="crumbs clearfix" style="display: none;">
+      <div class="crumbs-min"> 用户中心</div>
+    </div>
+    <!-- 面包削 End -->
+
+    <div class="Member-right">
+      <div class="Ml-right">
+      <div class="Ml-box uc-main-box">
+        <div class="zp-conter zp-lister">
+          <div class="zp-right-box">
+            <!-- 用户信息 -->
+            <div class="zp-Uinfo" style=" padding-left: 25px;padding-top: 35px;">
+              <img class="zp-Uinfo-logo" id="avatar" src="__STATIC__/default/img/avatar.png">
+              <div class="zp-Uinfo-wrap">
+                <div class="user-info"></div>
+                <div class="zp-tips" id="svip_info"></div>
+              </div>
+            </div>
+            <div class="recommend">
+                 <div class="recommend-title">新课上线 </div>
+                 <div class="recommend-row" style="width: 100%;gap: 16px;">
+                     {zhi:list table="spread" order="ctime desc" limit="8" where="status=1 and admin_id=$admin_id" id="item" key="k"}
+                          <div class="recommend-item" style="width: 200px;">
+                              <a href="/course/show/{$item['id']}" class="link" title="{$item['title']}" target="_blank">
+                                  <img class="course-thumb lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}">
+                                  <div class="course-card">
+                                      <div class="course-title">{$item['title']}</div>
+                                      <div class="course-desc">
+                                          {if $item['price']>0}
+                                            <em class="price">￥{$item['price']}</em>
+                                          {else/}
+                                             <em class="price">免费</em>
+                                          {/if}
+                                          <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                                      </div>
+                                  </div>
+                              </a>
+                          </div>
+                      {/zhi:list}
+                 </div>
+            </div>
+            <!-- 课程列表 End -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- 右侧功能定位 End -->
+  {include file="footer"/}
+  <script>
+    WCCE.getUserInfo(function (data) {
+        $('#avatar').attr('src',data.avatar);
+        if(data.svip.id>0){
+            $('.user-info').html('<span class="nkname">'+data.nickname+'</span><span class="ico on"><i class="icon icon-icon"></i></span>');
+            var svip_info='<span class="vip-name">'+data.svip.name+'</span><span class="date">'+data.svip.exp_name+'</span>';
+            $('#svip_info').html(svip_info);
+        }else{
+            $('.user-info').html('<span class="nkname">'+data.nickname+'</span><span class="ico"><i class="icon icon-icon"></i></span>');
+            var svip_info='<span class="name">'+data.svip.name+'</span><span class="date">'+data.svip.exp_name+'</span>';
+            $('#svip_info').html(svip_info);
+        }
+    });
+  </script>
+</body>
+</html>

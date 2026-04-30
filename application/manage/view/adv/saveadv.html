@@ -1,0 +1,80 @@
+{include file="common/head"/}
+<body>
+<div class="layui-fluid">
+    <div class="table-body">
+        <form class="layui-form layui-form-pane">
+            <div class="layui-form-item">
+                <label class="layui-form-label">广告位名称</label>
+                <div class="layui-input-inline from-inline-6">
+                    <input type="text" name="name" lay-verify="required" lay-reqText="请输入广告位名称" placeholder="请输入广告位名称" autocomplete="off" class="layui-input"
+                           value="{notempty name="info"}{$info.name}{/notempty}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">广告位ID</label>
+                <div class="layui-input-inline from-inline-6">
+                    <input type="text" name="advid" lay-verify="required" lay-reqText="请输入广告位ID" placeholder="请输入广告位ID" autocomplete="off" class="layui-input"
+                           value="{notempty name="info"}{$info.advid}{/notempty}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">广告类型</label>
+                <div class="layui-input-inline from-inline-6">
+                    <select name="type">
+                        <option value="1" {notempty name="info" }{if ($info.type==1)}selected{/if}{/notempty}>banner广告
+                        </option>
+                        <option value="2" {notempty name="info" }{if ($info.type==2)}selected{/if}{/notempty}>激励广告
+                        </option>
+                        <option value="3" {notempty name="info" }{if ($info.type==3)}selected{/if}{/notempty}>插屏广告
+                        </option>
+                        <option value="4" {notempty name="info" }{if ($info.type==4)}selected{/if}{/notempty}>视频广告
+                        </option>
+                        <option value="5" {notempty name="info" }{if ($info.type==5)}selected{/if}{/notempty}>格子广告
+                        </option>
+                        <option value="6" {notempty name="info" }{if ($info.type==6)}selected{/if}{/notempty}>封面广告
+                        </option>
+                        <option value="7" {notempty name="info" }{if ($info.type==7)}selected{/if}{/notempty}>原生模板广告
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline from-inline-6">
+                    <input type="radio" name="status" title="开启" value="1" {notempty name="info" }{if
+                           ($info.status==1)}checked{/if}{/notempty}>
+                    <input type="radio" name="status" title="禁用" value="0" {notempty name="info" }{if
+                           ($info.status==0)}checked{/if}{/notempty}>
+                </div>
+            </div>
+            <div class="layui-form-item" style="padding-top: 10px;">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['element', 'form', 'upload', 'layedit'], function () {
+        var $ = layui.jquery, element = layui.element, form = layui.form; //Tab的切换功能，切换事件监听等，需要依赖element模块
+        form.on('submit(sub)', function (data) {
+            loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post('', data.field, function (res) {
+                layer.close(loading);
+                if (res.status == 200) {
+                    layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index);//再执行关闭
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+
+    });
+</script>
+</body>

@@ -1,0 +1,332 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">公共资源市场</li>
+        </ul>
+    </div>
+    <style>
+        .tool-option{}
+        .option-item{
+            display: flex;
+            border-bottom:#eee 1px solid;
+            padding:15px 0;
+            font-size:14px;
+        }
+        .option-item .option-label{
+            width:100px;
+            text-align:center;
+            color:#c9c9c9;
+        }
+        .option-item .option-list{
+            width:calc(100% - 100px);
+        }
+        .option-item .option-big{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .option-item .option-list a{
+            padding:2px 10px;
+            margin-right:10px;
+            color:#3c3c3c;
+        }
+        .option-item .option-list a.on{
+            color:#1E9FFF;
+        }
+        .option-item .option-list a:hover{
+            color:#1E9FFF;
+        }
+        .option-item .option-small{
+            padding:10px 10px;
+            background-color:#f8f8f8;
+            border-radius:5px;
+            margin-top:10px;
+        }
+        .option-item .option-small a{
+            display: inline-block;
+            font-size:12px;
+            padding:2px 10px;
+            margin-right:10px;
+        }
+    </style>
+    <div class="table-body">
+        <div class="tool-option">
+            {notempty name="sortList"}
+            <div class="option-item">
+                <div class="option-label">资源类别</div>
+                <div class="option-list">
+                    <div class="option-big">
+                        <a {eq name=":input('sid/d',0)" value="0"}class="on"{/eq} href="{:createUrl('index',['sid'=>0,'cid'=>0,'type'=>input('type/d',0),'price'=>input('price/d',0)])}" title="全部">全部</a>
+                        {volist name="sortList" id="v"}
+                        <a {eq name=":input('sid/d',0)" value="$v.id"}class="on"{/eq} href="{:createUrl('index',['sid'=>$v.id,'cid'=>0,'type'=>input('type/d',0),'price'=>input('price/d',0)])}" title="{$v.name}">{$v.name}</a>
+                        {/volist}
+                    </div>
+                    {notempty name="smallList"}
+                    <div class="option-small">
+                        {volist name="smallList" id="v"}
+                        <a {eq name=":input('cid/d',0)" value="$v.id"}class="on"{/eq} href="{:createUrl('index',['sid'=>input('sid/d',0),'cid'=>$v.id,'type'=>input('type/d',0),'price'=>input('price/d',0)])}" title="{$v.name}">{$v.name}</a>
+                        {/volist}
+                    </div>
+                    {/notempty}
+                </div>
+            </div>
+            {/notempty}
+            <div class="option-item">
+                <div class="option-label">资源类型</div>
+                <div class="option-list">
+                    <a {eq name=":input('type/d',0)" value="0"}class="on"{/eq} href="{:createUrl('index',['type'=>0,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="全部类型">全部</a>
+                    <a {eq name=":input('type/d',0)" value="1"}class="on"{/eq} href="{:createUrl('index',['type'=>1,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="网盘资源">网盘资源</a>
+                    <a {eq name=":input('type/d',0)" value="2"}class="on"{/eq} href="{:createUrl('index',['type'=>2,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="视频资源">视频资源</a>
+                    <a {eq name=":input('type/d',0)" value="3"}class="on"{/eq} href="{:createUrl('index',['type'=>3,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="文章资源">文章资源</a>
+                    <a {eq name=":input('type/d',0)" value="4"}class="on"{/eq} href="{:createUrl('index',['type'=>4,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="文库资源">文库资源</a>
+                    <a {eq name=":input('type/d',0)" value="5"}class="on"{/eq} href="{:createUrl('index',['type'=>5,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="音频资源">音频资源</a>
+                    <a {eq name=":input('type/d',0)" value="6"}class="on"{/eq} href="{:createUrl('index',['type'=>6,'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>input('price/d',0)])}" title="课程资源">课程资源</a>
+                </div>
+            </div>
+            <div class="option-item">
+                <div class="option-label">资源价格</div>
+                <div class="option-list">
+                    <a {eq name=":input('price/d',0)" value="0"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>0])}" title="全部类型">全部</a>
+                    <a {eq name=":input('price/d',0)" value="1"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>1])}" title="免费">免费</a>
+                    <a {eq name=":input('price/d',0)" value="2"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>2])}" title="0-10元">0-10元</a>
+                    <a {eq name=":input('price/d',0)" value="3"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>3])}" title="10-20元">10-20元</a>
+                    <a {eq name=":input('price/d',0)" value="4"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>4])}" title="20-30元">20-30元</a>
+                    <a {eq name=":input('price/d',0)" value="5"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>5])}" title="30-50元">30-50元</a>
+                    <a {eq name=":input('price/d',0)" value="6"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>6])}" title="50-100元">50-100元</a>
+                    <a {eq name=":input('price/d',0)" value="7"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>7])}" title="100-200元">100-200元</a>
+                    <a {eq name=":input('price/d',0)" value="8"}class="on"{/eq} href="{:createUrl('index',['type'=>input('type/d',0),'sid'=>input('sid/d',0),'cid'=>input('cid/d',0),'price'=>8])}" title="200元以上">200元以上</a>
+                </div>
+            </div>
+        </div>
+        <div class="search-tool" style="padding-top:10px;">
+            <form class="layui-form">
+                <div class="layui-form-item" style="padding-left:20px;margin-bottom:0;">
+                    <div class="layui-inline" style="color:#9c9c9c;">查找资源</div>
+                    <div class="layui-inline">
+                        <input type="text" name="search" style="border-radius:10px;width:300px;" class="layui-input" placeholder="请输入关键字">
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-bg-blue" lay-submit="" lay-filter="search">
+                            <i class="layui-icon">&#xe615;</i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="func-btn" id="func-btn">
+                <div class="layui-inline" style="margin-right:20px;cursor: pointer;">
+                    <div id="shopping-cart">
+                        <img src="__ADMIN__/images/shopping-cart.png" alt=""><span class="layui-badge">{$num}</span>
+                    </div>
+                </div>
+                {if (empty($admin['api_token']))}
+                    <a href="javascript:;" class="rz layui-btn layui-bg-blue layui-btn-small">
+                        <i class="layui-icon layui-icon-addition"></i>
+                        申请入驻市场
+                    </a>
+                {/if}
+            </div>
+        </div>
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+{include file="common/foot"/}
+<script type="text/html" id="action">
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="buy">
+        <i class="layui-icon layui-icon-add-circle"></i>
+        购买
+    </a>
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="cart">
+        <i class="layui-icon layui-icon-cart"></i>
+        加入购物车
+    </a>
+    <a class="layui-btn layui-btn-sm" lay-event="detail">详情</a>
+</script>
+<script type="text/html" id="table-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn" lay-event="cartAll"><i class="icon icon-qiyong"></i> 批量添加购物车</button>
+    </div>
+</script>
+<script>
+    var sid="{:input('sid/d',0)}";
+    var cid="{:input('cid/d',0)}";
+    var type="{:input('type/d',0)}";
+    var price="{:input('price/d',0)}";
+    layui.use(['table','form','laydate'],function(){
+        var table = layui.table, $ = layui.jquery,laydate = layui.laydate,form=layui.form;
+        var api_token="{$admin['api_token']}";
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("index")}',
+            method:'get',
+            toolbar:'#table-toolbar',
+            where:{
+                sid:sid,
+                cid:cid,
+                type:type,
+                price:price
+            },
+            page:true,
+            cols: [[
+                {type: 'checkbox', title: 'ID', align: 'center', width: 50},
+                {field: 'id',title: 'ID',align:'center',width:80},
+                {field: 'title',title: '标题',align:'center',width:300},
+                {field: 'realname',title: '上传者',align:'center',width:150},
+                {field: 'thumb',title: '封面',align:'center',width:80,templet:function(d){
+                    return '<a href="'+d.thumb+'" target="_blank"><img  src="'+d.thumb+'" width="32" height="32"/></a>';
+                }},
+                {field: 'money',title:'价格',align:'center',width:100,templet:function(d){
+                   return '<span class="orange">¥'+d.money+'</span>';
+                }},
+                {field: 'market_sales',title:'销量',align:'center',width:100},
+
+                {field: 'type', align: 'center',title: '资源类型',width:80,templet:function(d){
+                    if(d.type==1){
+                        return '网盘';
+                    }else if(d.type==2){
+                        return '视频';
+                    }else if(d.type==3){
+                        return '文章';
+                    }else if(d.type==4){
+                        return '视频课程';
+                    }else if(d.type==5){
+                        return '音频课程'
+                    }
+                }},
+                {align: 'center',toolbar:'#action',width:280},
+                {field: 'ctime', align: 'center',title: '发布时间',width:150},
+            ]]
+        });
+        //加载分类
+        form.on('submit(search)', function(data){
+            table.reload('list', {
+                url: "{:createUrl('index')}",
+                method:'post',
+                where:data.field,
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+        //选择日期
+        laydate.render({
+            elem: '#startDate',
+            type:'datetime'
+        });
+        laydate.render({
+            elem: '#endDate',
+            type:'datetime'
+        });
+        //监听添加
+        $('#func-btn .rz').on('click',function () {
+            layer.open({
+                title:'申请入驻',
+                type:2,
+                content:'{:createUrl("register")}',
+                area:['500px','360px'],
+                end:function(){
+                    window.location.reload();
+                }
+            });
+        });
+        //购物车
+        $("#shopping-cart").on('click',function (){
+            if(api_token){
+                layer.open({
+                    title:'购物车',
+                    type:2,
+                    content:'{:createUrl("cart")}',
+                    area:['40%','450px'],
+                    end:function(){
+                        location.reload();
+                    },
+                });
+            }else{
+                layer.msg('请入驻市场后操作',{time: 1000, icon: 2});
+            }
+        });
+        //头工具栏事件批量操作---删除
+        table.on('toolbar(list)', function(obj){
+            var checkStatus = table.checkStatus('list');
+            var cart_list = [];
+            $(checkStatus.data).each(function (i, o){
+                cart_list.push(o);
+            });
+            if(cart_list.length===0){
+                layer.msg('请选择相关资源',{time: 1000, icon: 2});
+                return false;
+            }
+            switch(obj.event){
+                case 'cartAll':
+                    if(api_token){
+                        $.post("{:createUrl('batchCart')}",{cart:cart_list},function(res){
+                            if(res.status==200){
+                                var num=$(".layui-badge").html();
+                                $(".layui-badge").html(parseInt(num)+cart_list.length);
+                                layer.msg(res.msg,{time: 1000, icon: 1});
+                            }else{
+                                layer.msg(res.msg,{time: 1000, icon: 2});
+                            }
+                        });
+                    }else{
+                        layer.msg('请入驻市场后操作',{time: 1000, icon: 2});
+                    }
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+
+                    break;
+            }
+        });
+        //行列表操作项事件
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if(obj.event === 'buy'){
+                if(api_token){
+                    layer.open({
+                        title:'购买',
+                        type:2,
+                        maxmin: true,
+                        content:'{:createUrl("pay")}?ids='+data.id+'&money='+data.money,
+                        area:['40%','450px'],
+                        end:function(){
+                            tableIn.reload();
+                        }
+                    });
+                }else{
+                    layer.msg('请入驻市场后操作',{time: 1000, icon: 2});
+                }
+            }else if(obj.event === 'cart'){
+                if(api_token){
+                    $.post("{:createUrl('addcart')}",{data:data},function(res){
+                        if(res.status==200){
+                            var num=$(".layui-badge").html();
+                            $(".layui-badge").html(parseInt(num)+1);
+                            layer.msg(res.msg,{time: 1000, icon: 1});
+                        }else{
+                            layer.msg(res.msg,{time: 1000, icon: 2});
+                        }
+                    });
+                }else{
+                    layer.msg('请入驻市场后操作',{time: 1000, icon: 2});
+                }
+            }else if(obj.event==='detail'){
+                var detail=layer.open({
+                    title:'资源详情',
+                    type:2,
+                    maxmin: true,
+                    content:'{:createUrl("info")}?id='+data.id,
+                    area:['80%','550px'],
+                    end:function(){
+                        tableIn.reload();
+                    }
+                });
+            }
+        });
+    });
+
+</script>

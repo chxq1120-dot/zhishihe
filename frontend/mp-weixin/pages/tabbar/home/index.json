@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "首页",
+  "onReachBottomDistance": 150,
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "wcce": "/components/wcce/wcce",
+    "go-top": "/components/goTop/goTop",
+    "uni-popup": "/uni_modules/uni-popup/components/uni-popup/uni-popup",
+    "wccetabbar": "/components/wcce/wcce-tabbar"
+  }
+}

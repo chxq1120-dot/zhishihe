@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+<body>
+{include file="header"/}
+<!-- top头部 End -->
+<div class="zp_banner">
+    <div class="conLayout zpPar">
+        <h5 class="zp_banner_title">{$zhicms.coms_svip_title}</h5>
+        <p class="zpBtips">{$zhicms.coms_svip_desc}</p>
+        <p class="zpBtn"><a href="/user/mysvip" target="_blank" class="zpBtnKai">立即开通</a></p>
+    </div>
+</div>
+<div class="conLayout">
+    <div class="svip-list">
+        <div class="svip-title">SVIP会员套餐</div>
+        <div class="svip-head">
+            <div class="name">会员名称</div>
+            <div class="days">有效期</div>
+            <div class="price">价格</div>
+            <div class="desc">会员特权</div>
+            <div class="btns">操作</div>
+        </div>
+        {volist name="sviplist" id="item"}
+            <div class="svip-item">
+                <div class="name">{$item['name']}</div>
+                <div class="days">{$item['days']}</div>
+                <div class="price">{$item['price']}</div>
+                <div class="desc">
+                    {$item['content']}
+                </div>
+                <div class="btns">
+                    <a class="btn-open" href="/user/mysvip">开通</a>
+                </div>
+            </div>
+        {/volist}
+    </div>
+    <div class="svip-desc">
+        {$svipinfo.content|raw}
+    </div>
+</div>
+{include file="footer"/}
+</body>
+</html>

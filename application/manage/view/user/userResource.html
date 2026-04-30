@@ -1,0 +1,49 @@
+{include file="common/head"/}
+<style>
+.layui-table-cell{height: inherit;}
+</style>
+<div class="layui-fluid">
+    <div class="admin-head">
+        <ul>
+            <li class="on">资源获取记录</li>
+        </ul>
+    </div>
+    <div class="table-body">
+        <table id="list" lay-filter="list"></table>
+    </div>
+</div>
+
+{include file="common/foot"/}
+
+<script>
+    layui.use(['table','element','laydate'],function(){
+        var table = layui.table, $ = layui.jquery;
+        var tableIn = table.render({
+            id: 'list',
+            elem: '#list',
+            url: '{:createUrl("userResource")}?ids={:input("ids")}',
+            toolbar:'#table-toolbar',
+            method:'post',
+            page:true,
+            cols: [[
+                {field: 'id', title: 'ID',align: 'center',width:100},
+                {title: '资源名称',align:'center',templet:function(d){
+                    return d.spread.title;
+                }},
+                {title: '价格',align:'center',width:150,templet:function(d){
+                    return d.spread.price;
+                }},
+                {field: 'type',title:'类型',align:'center',width:150,templet:function(d){
+                    if(d.type==1){
+                        return '购买获取';
+                    }else if(d.type==2){
+                        return '任务获取';
+                    }else{
+                        return '会员获取';
+                    }
+                }},
+                {field: 'ctime', align: 'center',width:180,title: '发布时间'},
+            ]]
+        });
+    })
+</script>

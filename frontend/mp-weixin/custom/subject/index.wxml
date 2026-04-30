@@ -1,0 +1,1 @@
+<view class="content" style="padding-top:0rpx;"><block wx:if="{{config}}"><wcce vue-id="63975e72-1" wdata="{{pageData}}" bind:__l="__l"></wcce></block></view>

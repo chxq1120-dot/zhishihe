@@ -1,0 +1,18 @@
+{
+  "component": true,
+  "usingComponents": {
+    "wcceimg-slide": "/components/wcce/wcce-imgSlide",
+    "wccesearch": "/components/wcce/wcce-search",
+    "wccenotice": "/components/wcce/wcce-notice",
+    "wcceblank": "/components/wcce/wcce-blank",
+    "wccetextarea": "/components/wcce/wcce-textarea",
+    "wccevideo": "/components/wcce/wcce-video",
+    "wcceimg-window": "/components/wcce/wcce-imgWindow",
+    "wcceimg-single": "/components/wcce/wcce-imgSingle",
+    "wcceresource": "/components/wcce/wcce-resource",
+    "wccearticle": "/components/wcce/wcce-article",
+    "wccearticle-sort": "/components/wcce/wcce-articleSort",
+    "wccenav-bar": "/components/wcce/wcce-navBar",
+    "wccesort": "/components/wcce/wcce-sort"
+  }
+}

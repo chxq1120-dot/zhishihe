@@ -1,0 +1,1615 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$title}</title>
+    <meta name="keywords" content="{$keyword}">
+    <meta name="description" content="{$desc}">
+    <link href="__STATIC__/default/css/index_v3.css?v=3.2.1" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="__STATIC__/default/fonts/iconfont.css?v=3.2.1" media="all">
+    <link rel="stylesheet" href="__STATIC__/default/css/share.min.css" media="all">
+    <link rel="shortcut icon" href="{$zhicms.coms_favicon}">
+    <script type="text/javascript" src="__STATIC__/default/js/jquery.js"></script>
+    <script type="text/javascript" src="__STATIC__/common/layer/layer.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/main.js?v1.0.2"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/social-share.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/clipboard.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/jquery.lazyload.js"></script>
+    <script type="text/javascript" src="__STATIC__/default/js/qrcode.min.js"></script>
+    <style>
+        .course-bar {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            background-position: 50%;
+            background-color: hsla(0,0%,100%,.8);
+            background-size: cover;
+            -webkit-filter: blur(96px);
+            filter: blur(96px);
+            opacity: .1;
+            z-index:0;
+        }
+        /**
+        *网盘头部
+        **/
+        .course-head {
+            display: flex;
+            justify-content: space-between;
+            padding:0 0 20px 0;
+            width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .course-head .course-thumb {
+            width: 380px;
+            height: 260px;
+        }
+
+        .course-head .course-thumb .thumb {
+            width: 100%;
+            height: 260px;
+            border-radius:10px;
+        }
+
+        .course-head .course-item {
+            width: calc(100% - 410px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+
+        .course-head .course-item h1 {
+            font-size: 22px;
+        }
+        .course-head .course-item .desc{
+            font-size:14px;
+            color:#6c6c6c;
+            line-height: 26px;
+        }
+
+        .course-head .course-item .we-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-item .we-item .we-other {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .course-item .we-item .we-other .levels {
+            font-size: 14px;
+            background:#FFF3DC;
+            color:#CB913B;
+            padding: 2px 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .course-item .we-item .we-other .sales {
+            margin-left:20px;
+            font-size: 14px;
+            color: #9c9c9c;
+        }
+
+        .course-item .we-item .we-price {
+            padding:5px 10px;
+            border-radius:5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .course-item .we-item .we-price .now-price {
+            color: #9c9c9c;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .course-item .we-item .we-price .now-price .label{
+            padding-right:5px;
+        }
+        .course-item .we-item .we-price .now-price .price{
+            color: #f00;
+            font-size: 22px;
+            position: relative;
+        }
+        .course-item .we-item .we-price .now-price .pre{
+            padding-left:10px;
+        }
+        .course-item .we-item .we-price .now-price .pre::before{
+            position: absolute;
+            content:'¥';
+            left:0;
+            font-size:14px;
+            bottom:2px;
+        }
+        .we-price .svip-price{
+            margin:0 0 0 30px;
+            display: flex;
+            align-items: center;
+        }
+        .we-price .svip-price .ico-vip{
+            background-color:#000;
+            color:#fff3c6;
+            padding:2px 6px;
+            border-radius:5px;
+            font-size:12px;
+        }
+        .we-price .svip-price .price{
+            font-weight: bold;
+            padding-left:5px;
+            font-size:16px;
+        }
+        .course-item .we-item .we-price .cost-price {
+            color: #9c9c9c;
+            font-size: 14px;
+            text-decoration: line-through;
+            padding-left: 30px;
+        }
+
+        .course-item .btn-menu {
+            padding: 10px 0 10px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .course-item .btn-menu button {
+            color: #fff;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .course-item .btn-menu button:hover {
+            opacity: 0.9;
+        }
+        .course-item .btn-video{
+            background-color: #46C37B;
+            border-radius: 40px!important;
+        }
+        .course-item .btn-video .icon{
+            font-size:21px;
+            padding-right:5px;
+        }
+        .course-item .btn-video a{
+            padding: 15px 50px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+        .course-item .btn-free {
+            background-color: #FFB400;
+            padding: 15px 45px;
+        }
+        .course-item .btn-free .icon{
+            padding-right:5px;
+            font-size:18px;
+        }
+        .course-item .btn-buy {
+            margin-left: 20px;
+            padding: 15px 45px;
+            background-color: #FF8C00;
+        }
+        .course-item .btn-buy .icon{
+            padding-right:5px;
+            font-size:18px;
+        }
+        .course-item .btn-code {
+            border: #96ceff 1px solid;
+            color: #0095FF !important;
+            background-color: #fff;
+            padding: 15px 30px;
+            margin-right: 20px;
+        }
+        .course-item .btn-code .icon{
+            padding-right:5px;
+            font-size:20px;
+        }
+        .course-item .btn-down {
+            background-color: #46C37B;
+        }
+        .course-item .btn-down .icon{
+            font-size:20px;
+        }
+        .course-item .btn-down a {
+            padding: 15px 50px;
+            display: block;
+            color: #fff;
+        }
+        .course-item img{
+            display: block;
+            max-width:100%;
+        }
+        /**
+        *收藏
+        */
+        .course-favs {
+            position: absolute;
+            right: 5%;
+            top: 40%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .course-favs .icon {
+            font-size: 18px;
+        }
+
+        .course-favs .icon-shoucang11 {
+            color: #9c9c9c;
+        }
+        .course-favs .icon-shoucang1 {
+            color: #FF8D00;
+        }
+        .course-favs .name {
+            font-size: 12px;
+            color: #9c9c9c;
+        }
+        .course-content {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            width:1200px;
+            margin:0 auto;
+        }
+        .course-content .course-main {
+            width: calc(100% - 360px);
+            border-radius:13px 13px;
+            background-color: #fff;
+            padding: 10px 20px 50px 20px;
+            box-shadow: 0 3px 12px rgba(0,36,153,.06);
+        }
+
+        .course-content .tab-title{
+            height:50px;
+            line-height:50px;
+            border-bottom:#eee 1px solid;
+            position: relative;
+        }
+        .course-content .tab-title .qrcode{
+            position: absolute;
+            right:10px;
+            top:0;
+            cursor: pointer;
+            color:#9c9c9c;
+        }
+        .course-content .tab-title #qrcode-img{
+            display: none;
+            position: absolute;
+            top:40px;
+            right:0;
+            background-color:#fff;
+            padding:10px;
+            border:#eee 1px solid;
+            z-index:9;
+            border-radius:10px;
+            box-shadow: 0 3px 12px rgba(0,36,153,.03);
+        }
+        .course-content .tab-title ul{
+            display: flex;
+            align-items: center;
+            margin:0;
+            padding:0;
+        }
+        .course-content .tab-title li{
+            height:50px;
+            line-height:50px;
+            font-size:16px;
+            padding:0 25px;
+            position: relative;
+            cursor: pointer;
+        }
+        .course-content .tab-title li.on{
+            color:#000;
+            font-weight: bold;
+        }
+        .course-content .tab-title li.on::after{
+            position: absolute;
+            content: '';
+            left:35%;
+            right:35%;
+            bottom:-1px;
+            height:4px;
+            background-color: #FF8C00;
+            border-radius:10px;
+        }
+        .course-cont .card-list{
+            background-color:#f8f8f8;
+            border-radius:10px;
+            padding:15px 20px;
+            margin-top:20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .course-cont .card-list .card-item{
+            width:33%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-list .card-item .cdk-no{
+            font-size:14px;
+        }
+        .card-list .card-item .btn-code{
+            background-color:#46C37B;
+            color:#fff;
+            font-size:12px;
+            padding:2px 8px;
+            border-radius:5px;
+            cursor: pointer;
+        }
+
+        .course-content .course-item{
+            padding:20px 10px;
+        }
+        .course-item .video-item{
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding:15px 10px;
+            border-bottom:#f8f8f8 1px solid;
+            cursor: pointer;
+        }
+        .video-item .icons{
+            width:30px;
+        }
+        .video-item .icons .icon{
+            color:#c9c9c9;
+        }
+        .video-item .info{
+            width:85%;
+        }
+        .video-item .info .name{
+            font-size:14px;
+            color:#3c3c3c;
+        }
+        .video-item .info .time{
+            padding-top:5px;
+            font-size:14px;
+            color:#6c6c6c;
+        }
+        .video-item .status{
+            width:10%;
+            text-align: right;
+        }
+        .video-item .status .label-try{
+            background-color:#FFF5DF;
+            font-size:12px;
+            color:#FF8C00;
+            padding:2px 10px;
+            border-radius:10px;
+        }
+        .video-item .status .label-lock{
+            color:#c9c9c9;
+            font-size:18px;
+        }
+        /**
+        *文章头部
+        **/
+        .course-main .we-head {
+            border-bottom: #eee 1px solid;
+            padding: 20px 20px;
+            position: relative;
+        }
+        .course-main .we-head .qrcode{
+            position: absolute;
+            right:10px;
+            top:20px;
+            cursor: pointer;
+            color:#9c9c9c;
+        }
+        .course-main .we-head #qrcode-img{
+            display: none;
+            position: absolute;
+            top:20px;
+            right:0;
+            background-color:#fff;
+            padding:10px;
+            border:#eee 1px solid;
+            z-index:9;
+            border-radius:10px;
+            box-shadow: 0 3px 12px rgba(0,36,153,.03);
+        }
+        .course-main .we-head .level {
+            background-color: #FFC011;
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .course-main .we-head .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .course-main .we-head .we-item {
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .course-main .we-head .we-item .we-price {
+            color: #f50;
+            font-size: 24px;
+        }
+
+        .course-main .we-head .we-item .cost-price {
+            color: #9c9c9c;
+            font-size: 14px;
+            text-decoration: line-through;
+            padding-left: 15px;
+        }
+
+        .course-main .we-head .we-item .we-other {
+            font-size: 14px;
+        }
+
+        .course-main .we-head .we-item .sales {
+            color: #6c6c6c;
+        }
+
+        .we-content {
+            padding: 20px 20px;
+        }
+
+        .we-content img {
+            display: block;
+            max-width: 100%;
+            margin: 5px auto;
+        }
+
+        .we-content .line-lock {
+            text-align: center;
+            position: relative;
+        }
+
+        .we-content .line-lock span {
+            background-color: #fff;
+            position: relative;
+            z-index: 9;
+            font-size: 14px;
+            padding: 2px 5px;
+            color: #ff5600;
+        }
+
+        .we-content .line-lock i {
+            padding-right: 5px;
+            color: #ff5600;
+            font-size: 18px;
+        }
+
+        .we-content .line-lock::after {
+            position: absolute;
+            content: '';
+            left: 0;
+            right: 0;
+            bottom: 8px;
+            border-bottom: #eee 1px solid;
+            z-index: 1;
+        }
+
+        .share-bar {
+            margin: 50px auto;
+        }
+
+        .social-share {
+            text-align: center;
+        }
+        /**
+        交互操作按钮组
+         */
+        .we-content .we-work {
+            margin-top: 20px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+        .we-content .we-slide{
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width:60%;
+        }
+        .we-work .ctl-favs {
+            width: 50px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: #FFCE4E;
+            border-radius:10px;
+        }
+
+        .we-work .ctl-favs:hover {
+            opacity: 0.8;
+        }
+
+        .we-work .ctl-favs .favs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .we-work .ctl-favs .favs .icon {
+            font-size: 18px;
+        }
+
+        .ctl-favs .favs .icon-shoucang1 {
+            color: #333;
+        }
+
+        .we-work .ctl-favs .favs .name {
+            font-size: 12px;
+        }
+
+        .we-work .annex {
+            padding-left:10px;
+            width: calc(100% - 80px);
+        }
+
+        .we-work .ctl-button {
+            width:40%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .we-work .ctl-button button {
+            flex: 1;
+            height: 50px;
+            cursor: pointer;
+        }
+
+        .we-work .ctl-button button:hover {
+            opacity: 0.85;
+        }
+
+        .we-work .ctl-button .btn-free {
+            background-color: #FFB400;
+            color: #fff;
+            border-radius: 40px;
+            margin-right:10px;
+            flex: 1;
+            height: 50px;
+            cursor: pointer;
+        }
+        .we-work .ctl-button .btn-buy{
+            flex: 1;
+            height: 50px;
+            line-height:50px;
+            cursor: pointer;
+            color: #fff;
+            background-color: #46C37B;
+            font-weight: bold;
+            font-size:16px;
+            border-radius: 40px;
+            text-align: center;
+        }
+        .we-work .ctl-button .btn-buy:hover{
+            opacity: 0.85;
+        }
+        .we-work .ctl-button .btn-buy .icon{
+            font-size:20px;
+            padding-right:5px;
+        }
+        .course-side {
+            border-radius:13px 13px;
+            background-color: #fff;
+            width: 300px;
+            box-shadow: 0 3px 12px rgba(0,36,153,.06);
+        }
+        .course-side h3 {
+            font-size: 20px;
+            height: 60px;
+            line-height: 60px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .course-side h3::after {
+            position: absolute;
+            content: '';
+            left: 5%;
+            right: 5%;
+            bottom: 0;
+            border-bottom: #eee 1px solid;
+        }
+
+        .course-side .side-cont {
+            padding: 10px 40px;
+            margin: 0;
+        }
+
+        .course-side .side-cont li {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .course-side .side-cont img {
+            width: 240px;
+            height: 165px;
+            border-radius: 5px;
+        }
+
+        .course-side .side-cont .title {
+            width: 100%;
+            font-size: 14px;
+            padding: 10px 0;
+        }
+
+        .course-side .side-cont .sub-title {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .course-side .side-cont .sub-title .price {
+            color: #f00;
+        }
+
+        .course-side .side-cont .sub-title .sales {
+            color: #9c9c9c;
+            font-size: 12px;
+        }
+        .course-content .course-tips{
+            margin:20px auto;
+            background-color: #f8f8f8;
+            font-size:12px;
+            padding:15px 15px;
+            border-radius:10px;
+            color:#A1A9B2;
+            line-height:200%;
+        }
+    </style>
+</head>
+<body>
+{include file="header"/}
+<div class="course-bar" style="background-image:url('{$spread.thumb}');"></div>
+<!-- 面包削 -->
+<div class="crumbs clearfix">
+    <div class="crumbs-min">
+        <a href="/" title="首页">首页</a> &gt;
+        <a href="/course" rel="nofollow">全部</a> &gt;
+        {if !empty($spread['sorts'])}
+             <a href="/course/list{$spread['sorts']['id']}" rel="nofollow">{$spread['sorts']['name']}</a> &gt;
+        {else/}
+            未知
+        {/if}
+        {$spread.title}
+
+    </div>
+</div>
+<input type="hidden" id="rid" value="{$spread['id']}"/>
+{switch $spread.type}
+{case 1}
+<!--网盘-begin-->
+    <div class="course-head">
+        <div class="course-thumb">
+            <img class="thumb" src="{$spread['thumb']}"/>
+        </div>
+        <div class="course-item">
+            <h1>{$spread.title}</h1>
+            <div class="desc">{$spread.desc}</div>
+            <div class="we-item">
+                <div class="we-other">
+                    {volist name="sorts_list" id="item"}
+                        <span class="levels">
+                            {$item.name}
+                        </span>
+                    {/volist}
+                    <span class="levels">
+                        {$spread.level_name}
+                    </span>
+                    <span class="sales">
+                        {$spread['sales']}{$zhicms.sale_unit_text}
+                    </span>
+                </div>
+                <div class="we-price">
+                    <span class="now-price">
+                        <em class="label">价格:</em>
+                        {if $spread['price']>0}
+                            <em class="price pre">{$spread['price']}</em>
+                        {else/}
+                            <em class="price">免费</em>
+                        {/if}
+                    </span>
+                    {if $spread['re_price']>0}
+                        <span class="svip-price">
+                            <i class="ico-vip">SVIP</i>
+                            <em class="price">¥{$spread['re_price']}</em>
+                        </span>
+                    {/if}
+                    <span class="cost-price">
+                        原价:¥{$spread['dis_price']}
+                    </span>
+                </div>
+            </div>
+            <div class="btn-menu">
+                <div class="course-favs" onclick="WCCE.handleFav('.course-favs')">
+                    {if $spread['is_coll']==1}
+                    <i class="icon icon-shoucang1"></i>
+                    {else/}
+                    <i class="icon icon-shoucang11"></i>
+                    {/if}
+                    <span class="name">收藏</span>
+                </div>
+                {if $spread['is_auth']==1}
+                    <button class="btn-code" aria-code="{$spread['ext_code']}" aria-label="提取码复制成功,快去下载资源吧！">
+                        <i class="icon icon-yzm"></i>
+                        复制提取码
+                    </button>
+                    <script>
+                        var clipboard = new Clipboard('.btn-code', {
+                            text: function(trigger) {
+                                return trigger.getAttribute('aria-code');
+                            }
+                        });
+                        clipboard.on('success', function (e) {
+                            var msg = e.trigger.getAttribute('aria-label');
+                            WCCE.handleTips(msg);
+                            e.clearSelection();
+                        });
+                    </script>
+                    <button class="btn-down">
+                        <a href="{$spread['link']}" target="_blank">
+                            <i class="icon icon-download1"></i>
+                            提取资源
+                        </a>
+                    </button>
+                {else}
+                    {if $spread['invite']==1}
+                        <button class="btn-free" onclick="WCCE.handleTask()">
+                            <i class="icon icon-free"></i>
+                            免费获取
+                        </button>
+                    {/if}
+                    <button class="btn-buy" onclick="WCCE.handleBuy()">
+                        <i class="icon icon-buy"></i>
+                        立即购买
+                    </button>
+                {/if}
+
+            </div>
+        </div>
+    </div>
+    <div class="course-content">
+        <div class="course-main">
+            <div class="tab-title">
+                <ul>
+                    <li class="on">资源介绍</li>
+                </ul>
+                <div class="qrcode">
+                    <i class="icon icon-phone"></i>
+                    <span class="name">手机端访问</span>
+                    <div id="qrcode-img"></div>
+                </div>
+            </div>
+            <div class="course-cont">
+                <div class="course-item">
+                    {$spread['content']|raw}
+                </div>
+                <!--分享图标-->
+                <div class="share-bar">
+                    <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+                        <a href="#" class="social-share-icon icon-weibo"></a>
+                        <a href="#" class="social-share-icon icon-qq"></a>
+                        <a href="#" class="social-share-icon icon-qzone"></a>
+                        <a href="#" class="social-share-icon icon-douban"></a>
+                        <a href="#" class="social-share-icon icon-wechat"></a>
+                    </div>
+                </div>
+                <div class="course-tips">
+                    {$zhicms.coms_tips|htmlspecialchars_decode|raw}
+                </div>
+            </div>
+        </div>
+        <div class="course-side">
+            <h3>推荐资源</h3>
+            <ul class="side-cont">
+                {volist name="$topInfo" id="item"}
+                <li>
+                    <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">
+                        <img class="zp-line-img lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}"
+                             style="display: block;" alt="{$item['title']}">
+                    </a>
+                    <div class="title">
+                        <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">{$item['title']}</a>
+                    </div>
+                    <div class="sub-title" style="margin-bottom:15px;">
+                        {if $item['price']>0}
+                        <em class="price">￥{$item['price']}</em>
+                        {else/}
+                        <em class="price">免费</em>
+                        {/if}
+                        <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                    </div>
+                </li>
+                {/volist}
+            </ul>
+        </div>
+    </div>
+<!--网盘-end-->
+{/case}
+{case 2}
+<!--视频-begin-->
+<div class="course-head">
+    <div class="course-thumb">
+        <img class="thumb" src="{$spread['thumb']}" alt="{$spread.title}"/>
+    </div>
+    <div class="course-item">
+        <h1>{$spread.title}</h1>
+        <div class="we-item">
+            <div class="we-other">
+                {volist name="sorts_list" id="item"}
+                    <span class="levels">{$item.name}</span>
+                {/volist}
+                <span class="levels">{$spread.level_name}</span>
+                <span class="sales">
+                    {$spread['sales']}{$zhicms.sale_unit_text}
+                </span>
+            </div>
+            <div class="we-price">
+                    <span class="now-price">
+                        <em class="label">价格:</em>
+                        {if $spread['price']>0}
+                            <em class="price pre">{$spread['price']}</em>
+                        {else/}
+                            <em class="price">免费</em>
+                        {/if}
+                    </span>
+                {if $spread['re_price']>0}
+                <span class="svip-price">
+                            <i class="ico-vip">SVIP</i>
+                            <em class="price">¥{$spread['re_price']}</em>
+                        </span>
+                {/if}
+                <span class="cost-price">
+                        原价:¥{$spread['dis_price']}
+                    </span>
+            </div>
+        </div>
+        <div class="btn-menu">
+            {if $spread['is_auth']==1}
+                <button class="btn-video">
+                    <a href="/course/video/{$spread['id']}" rel="nofollow" target="_blank">
+                        <i class="icon icon-player"></i>
+                        开始学习
+                    </a>
+                </button>
+            {else}
+                {if $spread['invite']==1}
+                    <button class="btn-free" onclick="WCCE.handleTask()">
+                        <i class="icon icon-free"></i>
+                        免费获取
+                    </button>
+                {/if}
+                <button class="btn-buy" onclick="WCCE.handleBuy()">
+                    <i class="icon icon-buy"></i>
+                    立即购买
+                </button>
+            {/if}
+            <div class="course-favs" onclick="WCCE.handleFav('.course-favs')">
+                {if $spread['is_coll']==1}
+                    <i class="icon icon-shoucang1"></i>
+                {else/}
+                    <i class="icon icon-shoucang11"></i>
+                {/if}
+                <span class="name">收藏</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="course-content">
+    <div class="course-main">
+        <div class="tab-title">
+            <ul>
+                <li class="on">课程介绍</li>
+            </ul>
+            <div class="qrcode">
+                <i class="icon icon-phone"></i>
+                <span class="name">手机端访问</span>
+                <div id="qrcode-img"></div>
+            </div>
+        </div>
+        <div class="course-cont">
+            <div class="course-item">
+                {$spread['content']|raw}
+            </div>
+            <!--分享图标-->
+            <div class="share-bar">
+                <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+                    <a href="#" class="social-share-icon icon-weibo"></a>
+                    <a href="#" class="social-share-icon icon-qq"></a>
+                    <a href="#" class="social-share-icon icon-qzone"></a>
+                    <a href="#" class="social-share-icon icon-douban"></a>
+                    <a href="#" class="social-share-icon icon-wechat"></a>
+                </div>
+            </div>
+            <div class="course-tips">
+                {$zhicms.coms_tips|htmlspecialchars_decode|raw}
+            </div>
+        </div>
+    </div>
+    <div class="course-side">
+        <h3>推荐资源</h3>
+        <ul class="side-cont">
+            {volist name="$topInfo" id="item"}
+            <li>
+                <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">
+                    <img class="zp-line-img lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}"
+                         style="display: block;" alt="{$item['title']}">
+                </a>
+                <div class="title">
+                    <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">{$item['title']}</a>
+                </div>
+                <div class="sub-title" style="margin-bottom:15px;">
+                    {if $item['price']>0}
+                    <em class="price">￥{$item['price']}</em>
+                    {else/}
+                    <em class="price">免费</em>
+                    {/if}
+                    <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                </div>
+            </li>
+            {/volist}
+        </ul>
+    </div>
+</div>
+<!--视频-end-->
+{/case}
+{case 3}
+<!--文章-begin-->
+<div class="course-content">
+    <div class="course-main">
+        <div class="we-head">
+            <h1>
+                <span class="level">{$spread.level_name}</span>
+                <span class="title">{$spread.title}</span>
+                <div class="qrcode">
+                    <i class="icon icon-phone"></i>
+                    <span class="name">手机端访问</span>
+                    <div id="qrcode-img"></div>
+                </div>
+            </h1>
+            <div class="we-item">
+                <div class="we-price">
+                    <span class="now-price">
+                        {if $spread['price']>0}
+                            <em>￥{$spread['price']}</em>
+                        {else/}
+                            <em>免费</em>
+                        {/if}
+                    </span>
+                    {if $spread['re_price']>0}
+                        <span class="svip-price">
+                            <i class="ico-vip">SVIP</i>
+                            <em class="price">¥{$spread['re_price']}</em>
+                        </span>
+                    {/if}
+                    <span class="cost-price">
+                        ￥{$spread['dis_price']}
+                    </span>
+                </div>
+                <div class="we-other">
+                    <span class="sales">
+                        {$spread['sales']}{$zhicms.sale_unit_text}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="we-content">
+            {if $spread['is_auth']==1}
+                {$spread['content']|raw}
+            {else}
+                {$spread['free_content']|raw}
+                <!--剩余未完-->
+                <div class="line-lock" onclick="WCCE.handleTips('请完成任务或购买后查看全文');">
+                    <span class="name"><i class="icon icon-lock"></i>剩余未完，查看全文</span>
+                </div>
+            {/if}
+            <!--分享图标-->
+            <div class="share-bar">
+                <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+                    <a href="#" class="social-share-icon icon-weibo"></a>
+                    <a href="#" class="social-share-icon icon-qq"></a>
+                    <a href="#" class="social-share-icon icon-qzone"></a>
+                    <a href="#" class="social-share-icon icon-douban"></a>
+                    <a href="#" class="social-share-icon icon-wechat"></a>
+                </div>
+            </div>
+            <!--操作按钮-->
+            {if $spread['is_auth']==1}
+                {if $spread['ext_code']}
+                    <div class="we-work">
+                        <div class="we-slide">
+                            <div class="ctl-favs">
+                                <div class="favs" onclick="WCCE.handleFav('.favs')">
+                                    {if $spread['is_coll']==1}
+                                    <i class="icon icon-shoucang1"></i>
+                                    {else/}
+                                    <i class="icon icon-shoucang11"></i>
+                                    {/if}
+                                    <span class="name">收藏</span>
+                                </div>
+                            </div>
+                            <div class="annex">
+                                <i class="icon {$icon_ext}"></i>
+                                <span class="file-name">{$spread['title']}</span>
+                            </div>
+                        </div>
+                        <div class="ctl-button">
+                            <a class="btn-buy" href="{$spread['link']}" target="_blank">
+                                <i class="icon icon-download1"></i>
+                                立即下载
+                            </a>
+                        </div>
+                    </div>
+                {/if}
+            {else/}
+                <div class="we-work">
+                    <div class="we-slide">
+                        <div class="ctl-favs">
+                            <div class="favs" onclick="WCCE.handleFav()">
+                                {if $spread['is_coll']==1}
+                                <i class="icon icon-shoucang1"></i>
+                                {else/}
+                                <i class="icon icon-shoucang11"></i>
+                                {/if}
+                                <span class="name">收藏</span>
+                            </div>
+                        </div>
+                        <div class="annex">
+                            {if $spread['ext_code']}
+                                <i class="icon {$icon_ext}"></i>
+                                <span class="file-name">{$spread['title']}</span>
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="ctl-button">
+                        {if $spread['invite']==1}
+                            <button class="btn-free" onclick="WCCE.handleTask()">
+                                <i class="icon icon-free"></i>
+                                免费查看
+                            </button>
+                        {/if}
+                        {if $spread['ext_code']}
+                            <button class="btn-buy" onclick="WCCE.handleBuy()">
+                                <i class="icon icon-download1"></i>
+                                立即下载
+                            </button>
+                        {else/}
+                            <button class="btn-buy" onclick="WCCE.handleBuy()">
+                                <i class="icon icon-view"></i>
+                                查看全文
+                            </button>
+                        {/if}
+                    </div>
+                </div>
+            {/if}
+            <div class="course-tips">
+                {$zhicms.coms_tips|htmlspecialchars_decode|raw}
+            </div>
+        </div>
+    </div>
+    <div class="course-side">
+        <h3>推荐资源</h3>
+        <ul class="side-cont">
+            {volist name="$topInfo" id="item"}
+            <li>
+                <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">
+                    <img class="zp-line-img lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}"
+                         style="display: block;" alt="{$item['title']}">
+                </a>
+                <div class="title">
+                    <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">{$item['title']}</a>
+                </div>
+                <div class="sub-title" style="margin-bottom:15px;">
+                    {if $item['price']>0}
+                    <em class="price">￥{$item['price']}</em>
+                    {else/}
+                    <em class="price">免费</em>
+                    {/if}
+                    <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                </div>
+            </li>
+            {/volist}
+        </ul>
+    </div>
+</div>
+<!--文章-end-->
+{/case}
+{case 4}
+<!--视频课程-begin-->
+<div class="course-head">
+    <div class="course-thumb">
+        <img class="thumb" src="{$spread['thumb']}" alt="{$spread.title}"/>
+    </div>
+    <div class="course-item">
+        <h1>{$spread.title}</h1>
+        <div class="we-item">
+            <div class="we-other">
+                {volist name="sorts_list" id="item"}
+                <span class="levels">{$item.name}</span>
+                {/volist}
+                <span class="levels">{$spread.level_name}</span>
+                <span class="sales">
+                    {$spread['sales']}{$zhicms.sale_unit_text}
+                </span>
+            </div>
+            <div class="we-price">
+                    <span class="now-price">
+                        <em class="label">价格:</em>
+                        {if $spread['price']>0}
+                            <em class="price pre">{$spread['price']}</em>
+                        {else/}
+                            <em class="price">免费</em>
+                        {/if}
+                    </span>
+                {if $spread['re_price']>0}
+                <span class="svip-price">
+                            <i class="ico-vip">SVIP</i>
+                            <em class="price">¥{$spread['re_price']}</em>
+                        </span>
+                {/if}
+                <span class="cost-price">
+                        原价:¥{$spread['dis_price']}
+                    </span>
+            </div>
+        </div>
+        <div class="btn-menu">
+            {if $spread['is_auth']==1}
+                <button class="btn-video">
+                    <a href="/course/video/{$spread['id']}" rel="nofollow" target="_blank">
+                        <i class="icon icon-player"></i>
+                        开始学习
+                    </a>
+                </button>
+            {else}
+                {if $spread['invite']==1}
+                    <button class="btn-free" onclick="WCCE.handleTask()">
+                        <i class="icon icon-free"></i>
+                        免费学习
+                    </button>
+                {/if}
+                <button class="btn-buy" onclick="WCCE.handleBuy()">
+                    <i class="icon icon-buy"></i>
+                    立即购买
+                </button>
+            {/if}
+            <div class="course-favs" onclick="WCCE.handleFav('.course-favs')">
+                {if $spread['is_coll']==1}
+                <i class="icon icon-shoucang1"></i>
+                {else/}
+                <i class="icon icon-shoucang11"></i>
+                {/if}
+                <span class="name">收藏</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="course-content">
+    <div class="course-main">
+        <div class="tab-title">
+            <ul>
+                <li class="on">课程介绍</li>
+                <li>课程目录</li>
+            </ul>
+            <div class="qrcode">
+                <i class="icon icon-phone"></i>
+                <span class="name">手机端访问</span>
+                <div id="qrcode-img"></div>
+            </div>
+        </div>
+        <div class="course-cont">
+            <div class="course-item">
+                {$spread['content']|raw}
+            </div>
+            <div class="course-item" style="display:none;">
+                {volist name="$spread['video_list']" id="v"}
+                    {if $spread['is_auth']==1 || $v['is_try']==1}
+                        <a class="video-item" href="/course/video/{$spread['id']}/s{$v['id']}">
+                    {else/}
+                        <a class="video-item" onclick="WCCE.handleTips('请购买后解锁全部内容');">
+                    {/if}
+                        <div class="icons">
+                            <i class="icon icon-player"></i>
+                        </div>
+                        <div class="info">
+                            <div class="name">{$v['title']}</div>
+                            {if !empty($v['times'])}<div class="time">{$v['times']}</div>{/if}
+                        </div>
+                        <div class="status">
+                            {if $v['is_try']==1}
+                                <span class="label-try">试看</span>
+                            {else/}
+                                <span class="label-lock"><i class="icon icon-lock"></i></span>
+                            {/if}
+                        </div>
+                    </a>
+                {/volist}
+            </div>
+        </div>
+        <!--分享图标-->
+        <div class="share-bar">
+            <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+                <a href="#" class="social-share-icon icon-weibo"></a>
+                <a href="#" class="social-share-icon icon-qq"></a>
+                <a href="#" class="social-share-icon icon-qzone"></a>
+                <a href="#" class="social-share-icon icon-douban"></a>
+                <a href="#" class="social-share-icon icon-wechat"></a>
+            </div>
+        </div>
+        <div class="course-tips">
+            {$zhicms.coms_tips|htmlspecialchars_decode|raw}
+        </div>
+    </div>
+    <div class="course-side">
+        <h3>推荐资源</h3>
+        <ul class="side-cont">
+            {volist name="$topInfo" id="item"}
+            <li>
+                <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">
+                    <img class="zp-line-img lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}"
+                         style="display: block;" alt="{$item['title']}">
+                </a>
+                <div class="title">
+                    <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">{$item['title']}</a>
+                </div>
+                <div class="sub-title" style="margin-bottom:15px;">
+                    {if $item['price']>0}
+                    <em class="price">￥{$item['price']}</em>
+                    {else/}
+                    <em class="price">免费</em>
+                    {/if}
+                    <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                </div>
+            </li>
+            {/volist}
+        </ul>
+    </div>
+</div>
+<!--视频课程-end-->
+{/case}
+{case 5}
+<!--音频课程-begin-->
+<div class="course-head">
+    <div class="course-thumb">
+        <img class="thumb" src="{$spread['thumb']}" alt="{$spread.title}"/>
+    </div>
+    <div class="course-item">
+        <h1>{$spread.title}</h1>
+        <div class="we-item">
+            <div class="we-other">
+                {volist name="sorts_list" id="item"}
+                <span class="levels">{$item.name}</span>
+                {/volist}
+                <span class="levels">{$spread.level_name}</span>
+                <span class="sales">
+                    {$spread['sales']}{$zhicms.sale_unit_text}
+                </span>
+            </div>
+            <div class="we-price">
+                    <span class="now-price">
+                        <em class="label">价格:</em>
+                        {if $spread['price']>0}
+                            <em class="price pre">{$spread['price']}</em>
+                        {else/}
+                            <em class="price">免费</em>
+                        {/if}
+                    </span>
+                {if $spread['re_price']>0}
+                <span class="svip-price">
+                            <i class="ico-vip">SVIP</i>
+                            <em class="price">¥{$spread['re_price']}</em>
+                        </span>
+                {/if}
+                <span class="cost-price">
+                        原价:¥{$spread['dis_price']}
+                    </span>
+            </div>
+        </div>
+        <div class="btn-menu">
+            {if $spread['is_auth']==1}
+            <button class="btn-video">
+                <a href="/course/video/{$spread['id']}" rel="nofollow" target="_blank">
+                    <i class="icon icon-player"></i>
+                    开始学习
+                </a>
+            </button>
+            {else}
+                {if $spread['invite']==1}
+                    <button class="btn-free" onclick="WCCE.handleTask()">
+                        <i class="icon icon-free"></i>
+                        免费学习
+                    </button>
+                {/if}
+                <button class="btn-buy" onclick="WCCE.handleBuy()">
+                    <i class="icon icon-buy"></i>
+                    立即购买
+                </button>
+            {/if}
+            <div class="course-favs" onclick="WCCE.handleFav('.course-favs')">
+                {if $spread['is_coll']==1}
+                <i class="icon icon-shoucang1"></i>
+                {else/}
+                <i class="icon icon-shoucang11"></i>
+                {/if}
+                <span class="name">收藏</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="course-content">
+    <div class="course-main">
+        <div class="tab-title">
+            <ul>
+                <li class="on">课程介绍</li>
+                <li>课程目录</li>
+            </ul>
+            <div class="qrcode">
+                <i class="icon icon-phone"></i>
+                <span class="name">手机端访问</span>
+                <div id="qrcode-img"></div>
+            </div>
+        </div>
+        <div class="course-cont">
+            <div class="course-item">
+                {$spread['content']|raw}
+            </div>
+            <div class="course-item" style="display:none;">
+                {volist name="$spread['audio_list']" id="v"}
+                    {if $spread['is_auth']==1 || $v['is_try']==1}
+                        <a class="video-item" href="/course/video/{$spread['id']}/s{$v['id']}">
+                     {else/}
+                        <a class="video-item" onclick="WCCE.handleTips('请购买后解锁全部内容');">
+                     {/if}
+                        <div class="icons">
+                            <i class="icon icon-player"></i>
+                        </div>
+                        <div class="info">
+                            <div class="name">{$v['title']}</div>
+                            {if !empty($v['times'])}<div class="time">{$v['times']}</div>{/if}
+                        </div>
+                        <div class="status">
+                            {if $v['is_try']==1}
+                                <span class="label-try">试听</span>
+                            {else/}
+                                <span class="label-lock"><i class="icon icon-lock"></i></span>
+                            {/if}
+                        </div>
+                    </a>
+                {/volist}
+            </div>
+        </div>
+        <!--分享图标-->
+        <div class="share-bar">
+            <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+                <a href="#" class="social-share-icon icon-weibo"></a>
+                <a href="#" class="social-share-icon icon-qq"></a>
+                <a href="#" class="social-share-icon icon-qzone"></a>
+                <a href="#" class="social-share-icon icon-douban"></a>
+                <a href="#" class="social-share-icon icon-wechat"></a>
+            </div>
+        </div>
+        <div class="course-tips">
+            {$zhicms.coms_tips|htmlspecialchars_decode|raw}
+        </div>
+    </div>
+    <div class="course-side">
+        <h3>推荐资源</h3>
+        <ul class="side-cont">
+            {volist name="$topInfo" id="item"}
+            <li>
+                <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">
+                    <img class="zp-line-img lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}"
+                         style="display: block;" alt="{$item['title']}">
+                </a>
+                <div class="title">
+                    <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">{$item['title']}</a>
+                </div>
+                <div class="sub-title" style="margin-bottom:15px;">
+                    {if $item['price']>0}
+                    <em class="price">￥{$item['price']}</em>
+                    {else/}
+                    <em class="price">免费</em>
+                    {/if}
+                    <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                </div>
+            </li>
+            {/volist}
+        </ul>
+    </div>
+</div>
+<!--音频课程-end-->
+{/case}
+{case 6}
+<!--卡密-begin-->
+<div class="course-head">
+    <div class="course-thumb">
+        <img class="thumb" src="{$spread['thumb']}"/>
+    </div>
+    <div class="course-item">
+        <h1>{$spread.title}</h1>
+        <div class="we-item">
+            <div class="we-other">
+                {volist name="sorts_list" id="item"}
+                <span class="levels">{$item.name}</span>
+                {/volist}
+                <span class="levels">{$spread.level_name}</span>
+                <span class="sales">
+                    {$spread['sales']}{$zhicms.sale_unit_text}
+                </span>
+            </div>
+            <div class="we-price">
+                    <span class="now-price">
+                        <em class="label">价格:</em>
+                        {if $spread['price']>0}
+                            <em class="price pre">{$spread['price']}</em>
+                        {else/}
+                            <em class="price">免费</em>
+                        {/if}
+                    </span>
+                {if $spread['re_price']>0}
+                <span class="svip-price">
+                            <i class="ico-vip">SVIP</i>
+                            <em class="price">¥{$spread['re_price']}</em>
+                        </span>
+                {/if}
+                <span class="cost-price">
+                        原价:¥{$spread['dis_price']}
+                    </span>
+            </div>
+        </div>
+        <div class="btn-menu">
+            {if $spread['is_auth']==1}
+                <button class="btn-down">
+                    <a href="javascript:;" onclick="WCCE.handleCdk('{$spread.id}')">
+                        <i class="icon icon-download1"></i>
+                        获取卡密
+                    </a>
+                </button>
+            {else}
+                {if $spread['invite']==1}
+                    <button class="btn-free" onclick="WCCE.handleTask()">
+                        <i class="icon icon-free"></i>
+                        免费获取
+                    </button>
+                {/if}
+                <button class="btn-buy" onclick="WCCE.handleBuy()">
+                    <i class="icon icon-buy"></i>
+                    立即购买
+                </button>
+            {/if}
+            <div class="course-favs" onclick="WCCE.handleFav('.course-favs')">
+                {if $spread['is_coll']==1}
+                    <i class="icon icon-shoucang1"></i>
+                {else/}
+                    <i class="icon icon-shoucang11"></i>
+                {/if}
+                <span class="name">收藏</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="course-content">
+    <div class="course-main">
+        <div class="tab-title">
+            <ul>
+                <li class="on">资源介绍</li>
+            </ul>
+            <div class="qrcode">
+                <i class="icon icon-phone"></i>
+                <span class="name">手机端访问</span>
+                <div id="qrcode-img"></div>
+            </div>
+        </div>
+        <div class="course-cont">
+            <div class="card-list" id="card-list"></div>
+            <script>
+                WCCE.getCardList('{$spread.id}');
+                var clipboard = new Clipboard('.btn-code', {
+                    text: function(trigger) {
+                        return trigger.getAttribute('aria-code');
+                    }
+                });
+                clipboard.on('success', function (e) {
+                    var msg = e.trigger.getAttribute('aria-label');
+                    WCCE.handleTips(msg);
+                    e.clearSelection();
+                });
+            </script>
+            <div class="course-item">
+                {$spread['content']|raw}
+            </div>
+            <!--分享图标-->
+            <div class="share-bar">
+                <div class="social-share share-component" data-mode="prepend" data-initialized="true">
+                    <a href="#" class="social-share-icon icon-weibo"></a>
+                    <a href="#" class="social-share-icon icon-qq"></a>
+                    <a href="#" class="social-share-icon icon-qzone"></a>
+                    <a href="#" class="social-share-icon icon-douban"></a>
+                    <a href="#" class="social-share-icon icon-wechat"></a>
+                </div>
+            </div>
+            <div class="course-tips">
+                {$zhicms.coms_tips|htmlspecialchars_decode|raw}
+            </div>
+        </div>
+    </div>
+    <div class="course-side">
+        <h3>推荐资源</h3>
+        <ul class="side-cont">
+            {volist name="$topInfo" id="item"}
+            <li>
+                <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">
+                    <img class="zp-line-img lazy-img" data-original="{$item['thumb']}" src="{$item['thumb']}"
+                         style="display: block;" alt="{$item['title']}">
+                </a>
+                <div class="title">
+                    <a href="/course/show/{$item['rid']}.html" rel="nofollow" title="{$item['title']}">{$item['title']}</a>
+                </div>
+                <div class="sub-title" style="margin-bottom:15px;">
+                    {if $item['price']>0}
+                    <em class="price">￥{$item['price']}</em>
+                    {else/}
+                    <em class="price">免费</em>
+                    {/if}
+                    <em class="sales">{$item['sales']}{$zhicms.sale_unit_text}</em>
+                </div>
+            </li>
+            {/volist}
+        </ul>
+    </div>
+</div>
+<!--卡密-end-->
+{/case}
+{default /}
+{/switch}
+<!-- 课程列表内容 End -->
+{include file="footer"/}
+<script>
+    var config = {
+        sites: ['qzone', 'qq', 'weibo', 'wechat', 'douban'], // 启用的站点
+        disabled: ['google', 'facebook', 'twitter'], // 禁用的站点
+    };
+    var qrcode = new QRCode("qrcode-img", {
+        text: "{$mobile_url}",
+        width: 128,
+        height: 128,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+    socialShare('.social-share', config);
+    $('.tab-title li').on('click', function () {
+        $(this).addClass('on').siblings().removeClass('on');
+        $('.course-cont>div:eq(' + $(this).index() + ')').show().siblings().hide();
+    });
+    $('.qrcode').hover(function(){
+        $('#qrcode-img').show();
+    },function(){
+        $('#qrcode-img').hide();
+    });
+</script>
+</body>
+</html>

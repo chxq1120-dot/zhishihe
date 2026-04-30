@@ -1,0 +1,418 @@
+{include file="common/head"/}
+<script>
+    var manage_Image="{:createUrl('Ueditor/index')}";
+</script>
+<body>
+	<div id="app">
+	<div class="layui-fluid">
+		<div class="table-body">
+			<form class="layui-form layui-form-pane">
+			<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+			  <ul class="layui-tab-title">
+				<li class="layui-this">基本</li>
+				<li>详情</li>
+				<li>分销</li>
+				<li>配置</li>
+			  </ul>
+			  <div class="layui-tab-content" style="min-height: 100px;">
+				<div class="layui-tab-item layui-show">
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源类型：</label>
+						<div class="layui-input-inline from-inline-8">
+							<div class="resourceType-bar" id="selectedType">
+								{if $info.type==1}
+									<div class="items on" data-type="1">
+								{else/}
+									<div class="items" data-type="1">
+								{/if}
+									<i class="icon icon-wangpan"></i>
+									<span class="name">网盘资源</span>
+									<span class="desc">资源在网盘中</span>
+								</div>
+								{if $info.type==2}
+									<div class="items on" data-type="2">
+								{else/}
+									<div class="items" data-type="2">
+								{/if}
+									<i class="icon icon-video"></i>
+									<span class="name">视频资源</span>
+									<span class="desc">适合单个视频</span>
+								</div>
+								{if $info.type==3}
+									<div class="items on" data-type="3">
+								{else/}
+									<div class="items" data-type="3">
+								{/if}
+									<i class="icon icon-wenbenyu"></i>
+									<span class="name">文章文档</span>
+									<span class="desc">图文或文档</span>
+								</div>
+								{if $info.type==4}
+									<div class="items on" data-type="4">
+								{else/}
+									<div class="items" data-type="4">
+								{/if}
+									<i class="icon icon-shipinkc"></i>
+									<span class="name">视频课程</span>
+									<span class="desc">多章节的视频</span>
+								</div>
+								{if $info.type==5}
+									<div class="items on" data-type="5">
+								{else/}
+									<div class="items" data-type="5">
+								{/if}
+									<i class="icon icon-yinpinkc"></i>
+									<span class="name">音频课程</span>
+									<span class="desc">多章节的音频</span>
+								</div>
+								{if $info.type==6}
+									<div class="items on" data-type="6">
+								{else/}
+									<div class="items" data-type="6">
+								{/if}
+									<i class="icon icon-cdkey"></i>
+									<span class="name">卡密资源</span>
+									<span class="desc">激活码、序列号</span>
+								</div>
+							</div>
+							<input type="hidden" name="type" id="resType" value="{$info.type}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源名称：</label>
+						<div class="layui-input-inline from-inline-5">
+						  <input type="text" name="title" required lay-verify="required" lay-reqText="请输入资源标题" placeholder="请输入标题" class="layui-input" value="{$info.title}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">资源简介</label>
+						<div class="layui-input-inline from-inline-5">
+							<input type="text" class="layui-input" name="desc" placeholder="请输入资源简介" maxlength="251" value="{$info.desc}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源封面：</label>
+						<div class="layui-input-inline from-inline-5">
+							<div style="display: flex;align-items: center;">
+								<input type="text" lay-verify="required" lay-reqText="请输入资源封面" class="layui-input" placeholder="{:lang('pleaseEnter')}封面链接" name="thumb" id="thumb"
+									   value="{$info.thumb}">
+								<button type="button" class="layui-btn layui-bg-blue" id="uploadImg" style="margin-left:5px;"><i class="icon icon-tupian_huaban"></i> 选择图片</button>
+							</div>
+							<div class="layui-upload">
+								<div class="layui-upload-list">
+									<img class="layui-upload-img" width="86" height="86" src="{$info.thumb}" id="Image">
+									<p id="preview"></p>
+								</div>
+							</div>
+							<div class="layui-word-aux">建议尺寸：640*480，最多1张</div>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源价格：</label>
+						<div class="layui-input-inline from-inline-5">
+							<div class="layui-inline" style="margin-right:0;color:#6c6c6c;">现价</div>
+							<div class="layui-inline" style="width:155px">
+								<input type="text" lay-verify="required" lay-reqText="请输入资源价格" name="price" placeholder="请输入资源价格,默认免费" value="{$info.price}" class="layui-input">
+							</div>
+							<div class="layui-inline" style="margin-right:0;color:#6c6c6c;">原价</div>
+							<div class="layui-inline" style="width:155px">
+								<input type="text" lay-verify="required" lay-reqText="请输入资源划线价格" name="dis_price" placeholder="请输入划线价格" value="{$info.dis_price}" class="layui-input">
+							</div>
+						</div>
+					</div>
+
+					<div class="layui-form-item" id="reslink">
+						<label class="layui-form-label">资源地址：</label>
+						<div class="layui-input-inline from-inline-5" style="display:flex;align-items: center;">
+							<input type="text" name="link" id="links" placeholder="资源地址、文章附件内容、网盘资源" autocomplete="off" class="layui-input" value="{$info.link}">
+							<input type="text" name="ext_code" id="rescode" value="{$info.ext_code}" style="width:30%;margin-left:4px;" placeholder="网盘提取码" autocomplete="off" class="layui-input">
+							<button type="button" class="layui-btn layui-bg-blue" id="upFile" style="margin-left:5px;display:none;"><i class="icon icon-sale"></i> 选择文件
+							</button>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源分类：</label>
+						<div class="layui-input-inline from-inline-5">
+							<div id="sort"></div>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源状态：</label>
+						<div class="layui-input-inline">
+							<input type="radio" name="status" value="1" title="上架" {if $info.status==1}checked{/if}>
+							<input type="radio" name="status" value="0" title="下架" {if $info.status==0}checked{/if}>
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-tab-item">
+					<div class="layui-form-item" id="free_item" style="display: none;">
+						<label class="layui-form-label"><span class="red">*</span> 免费内容：</label>
+						<div class="layui-input-inline from-inline-8">
+							<textarea type="text/plain" name="free_content" id="free_content">{$info.info.free_content}</textarea>
+							<div class="layui-word-aux">文章类型资源需要填写免费内容</div>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label"><span class="red">*</span> 资源详情：</label>
+						<div class="layui-input-inline from-inline-8">
+							<textarea type="text/plain" lay-verify="required" lay-reqText="请输入资源详情" name="content" id="edit_content">{$info.info.content}</textarea>
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-tab-item">
+					<div class="layui-form-item">
+						<label class="layui-form-label">参与分销：</label>
+						<div class="layui-input-inline">
+							<input type="radio" name="is_fenxiao" value="1" title="参与" {if $info.is_fenxiao==1}checked{/if}>
+							<input type="radio" name="is_fenxiao" value="0" title="不参与" {if $info.is_fenxiao==0}checked{/if}>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">佣金设置：</label>
+						<div class="layui-input-inline" style="width: 260px;">
+							<input type="radio" lay-filter="commission" name="sell_set" value="1" title="按会员设置" {if $info.sell_set==1}checked{/if}>
+							<input type="radio" lay-filter="commission" name="sell_set" value="2" title="按此资源设置" {if $info.sell_set==2}checked{/if}>
+						</div>
+					</div>
+					<div id="allocation" class="layui-form-item" style="display: none;">
+						<label class="layui-form-label">分配方式：</label>
+						<div class="layui-input-inline from-inline-8">
+							<div class="layui-form-item">
+								<div style="display: flex;align-items: center">
+									<span class="layui-labels" style="padding-right:5px;">一级</span>
+									<select name="sell_type" style="width:100px;">
+										<option value="1" {if $info.sell_type==1}selected{/if}>百分比</option>
+										<option value="2" {if $info.sell_type==2}selected{/if}>固定金额</option>
+									</select>
+									<span class="layui-labels" style="padding-right:5px;">佣金</span>
+									<input style="width:100px;" type="text" name="sell" value="{$info.sell}" placeholder="佣金" autocomplete="off" class="layui-input">
+								</div>
+								<div class="layui-form-mid layui-word-aux">百分比填小数：例5%填0.05</div>
+							</div>
+							{if config('setting.commission_fee')=='2'}
+								<div class="layui-form-item">
+									<div style="display: flex;align-items: center">
+										<span class="layui-labels" style="padding-right:5px;">二级</span>
+										<select name="sell_type2" style="width:100px;">
+											<option value="1" {if $info.sell_type2==1}selected{/if}>百分比</option>
+											<option value="2" {if $info.sell_type2==2}selected{/if}>固定金额</option>
+										</select>
+										<span class="layui-labels" style="padding-right:5px;">佣金</span>
+										<input style="width:100px;" type="text" name="sell2" value="{$info.sell2}" placeholder="佣金" autocomplete="off" class="layui-input">
+									</div>
+									<div class="layui-form-mid layui-word-aux">百分比填小数：例5%填0.05</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-tab-item">
+					<div class="layui-form-item">
+						<label class="layui-form-label">默认销量：</label>
+						<div class="layui-input-inline from-inline-3">
+							<input type="text" name="sales" autocomplete="off" class="layui-input" placeholder="可填写虚拟销量" value="{$info.sales}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">资源级别：</label>
+						<div class="layui-input-inline from-inline-3">
+							{volist name="levels" id="v"}
+								<input type="radio" name="level" value="{$v.id}" title="{$v.name}" {if $info.level==$v.id}checked{/if}>
+							{/volist}
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">邀请任务：</label>
+						<div class="layui-input-inline from-inline-3">
+							<input type="radio" name="invite" value="1" title="开启" {if $info.invite==1}checked{/if}>
+							<input type="radio" name="invite" value="0" title="关闭" {if $info.invite==0}checked{/if}>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">邀请人数：</label>
+						<div class="layui-input-inline from-inline-3">
+							<input type="text" name="invite_num" autocomplete="off" class="layui-input" value="{$info.invite_num}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">激励视频：</label>
+						<div class="layui-input-inline">
+							<input type="radio" name="exc_video" value="1" title="开启" {if $info.exc_video==1}checked{/if}>
+							<input type="radio" name="exc_video" value="0" title="关闭" {if $info.exc_video==0}checked{/if}>
+						</div>
+					</div>
+				</div>
+			  </div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"></label>
+				<div class="layui-input-inline">
+				  <button type="submit" class="layui-btn" lay-submit="" lay-filter="sub">立即提交</button>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{include file="common/foot"/}
+<script src="__STATIC__/ueditor/ueditor.config.js?v=1.2.25"></script>
+<script src="__STATIC__/ueditor/ueditor.all.js?v=1.2.21"></script>
+<script src="__STATIC__/xm-select/dist/xm-select.js"></script>
+<script>
+$(function (){
+	var Ueditor = UE.getEditor('edit_content');
+	var Ueditor_free = UE.getEditor('free_content');
+});
+$.get("{:createUrl('gettreesort',['ids'=>input('get.ids')])}",function(info){
+	var sort = xmSelect.render({
+		el: '#sort',
+		language: 'zn',
+		autoRow: true,
+		name: 'sort_id',
+		layVerify: 'required',
+		layVerType: 'msg',
+		data: info,
+		prop:{name:'title',value:'id',selected:'checked'},
+		tree:{show:true},
+	});
+});
+$(function (){
+    var Ueditor = UE.getEditor('edit_content');
+    var Ueditor_free = UE.getEditor('free_content');
+});
+layui.use(['element','form'], function(){
+  var $ = layui.jquery,element = layui.element,form = layui.form;
+  	form.on('submit(sub)', function(data){
+		loading = layer.load(1, { shade: [0.1, '#fff'] });
+		$.post('',data.field,function(res) {
+			layer.close(loading);
+			if (res.status === 200){
+				layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+					var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+					parent.layer.close(index);//再执行关闭
+				});
+			} else {
+				layer.msg(res.msg, { icon: 2, time: 1000 });
+			}
+		});
+	  return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+	});
+	$("#uploadImg").on('click',function(){
+		layer.open({
+			title:'选择封面',
+			type:2,
+			maxmin: true,
+			area:['80%','540px'],
+			content:'{:createUrl("attachment/index")}?type=0&name=thumb&prename=Image&is_thumb=1',
+		});
+	});
+	$("#upFile").on('click',function(){
+		layer.open({
+			title:'选择文件',
+			type:2,
+			maxmin: true,
+			area:['80%','540px'],
+			content:'{:createUrl("attachment/index")}?type=0&name=links',
+		});
+	});
+  	//分销设置
+  	var commission='{$info.sell_set}';
+  	if(commission=='1'){
+        $('#allocation').hide();
+	}else{
+        $('#allocation').show();
+	}
+    form.on('radio(commission)',function (data) {
+        if(data.value==1){
+            $('#allocation').hide();
+        }else{
+            $('#allocation').show();
+        }
+    });
+    //初始化类型
+    var resType='{$info.type}';
+    if(resType=='1'){
+        $('#reslink').show();
+        $('#rescode').show();
+        $('#rescourse').hide();
+        $('#kammi').hide();
+        $('#upFile').hide();
+        $('#free_item').hide();
+    }else if(resType=='2'){
+        $('#reslink').show();
+        $('#rescode').hide();
+        $('#rescourse').hide();
+        $('#kammi').hide();
+        $('#upFile').show();
+        $('#free_item').hide();
+    }else if(resType=='3'){
+        $('#reslink').show();
+        $('#rescode').hide();
+        $('#rescourse').hide();
+        $('#kammi').hide();
+        $('#upFile').show();
+        $('#free_item').show();
+    }else if(resType=='4' || resType=='5'){
+        $('#reslink').hide();
+        $('#rescode').hide();
+        $('#rescourse').show();
+        $('#kammi').hide();
+        $('#upFile').hide();
+        $('#free_item').hide();
+    }else if(resType=='6'){
+        $('#reslink').hide();
+        $('#rescode').hide();
+        $('#rescourse').hide();
+        $('#kammi').show();
+        $('#upFile').hide();
+        $('#free_item').hide();
+    }
+	$('#selectedType .items').on('click', function() {
+		$('#selectedType .items').removeClass('on');
+		$(this).addClass('on');
+		var type = $(this).data('type');
+		$('#resType').val(type);
+		if(type==1){
+            $('#reslink').show();
+            $('#rescode').show();
+            $('#rescourse').hide();
+            $('#kammi').hide();
+            $('#upFile').hide();
+            $('#free_item').hide();
+        }else if(type==2){
+            $('#reslink').show();
+            $('#rescode').hide();
+            $('#rescourse').hide();
+            $('#kammi').hide();
+            $('#upFile').show();
+            $('#free_item').hide();
+        }else if(type==3){
+            $('#reslink').show();
+            $('#rescode').hide();
+            $('#rescourse').hide();
+            $('#kammi').hide();
+            $('#upFile').show();
+            $('#free_item').show();
+        }else if(type==4 || type==5){
+        	$('#reslink').hide();
+            $('#rescode').hide();
+            $('#rescourse').show();
+            $('#kammi').hide();
+            $('#upFile').hide();
+            $('#free_item').hide();
+        }else if(type==6){
+            $('#reslink').hide();
+            $('#rescode').hide();
+            $('#rescourse').hide();
+            $('#kammi').show();
+            $('#upFile').hide();
+            $('#free_item').hide();
+        }
+	});
+});
+</script>
+</body>

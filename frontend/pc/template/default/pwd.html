@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {include file="head" title="$title" keyword="$keyword" desc="$desc"/}
+</head>
+
+<body>{include file="header"/}
+<!-- top头部 End -->
+<div class="container">
+
+    <!-- 会员中心左侧 -->
+    <div class="Member-left">
+        {include file="usermenu"/}
+    </div>
+    <!-- 会员中心左侧 End -->
+    <!-- 右侧功能定位 -->
+    <div class="Member-right">
+        <div class="Ml-box uc-main-box">
+            <div class="zp-conter zp-lister">
+                <div class="zp-right-box"><h1 class="title">修改登录密码</h1></div>
+                <!-- 密码修改 -->
+                <div class="mima-content">
+                    <div>
+                        <input type="hidden" name="dopost" value="save">
+                        <div class="input_container">
+                            <label>原登录密码</label>
+                            <input name="oldpwd" type="password" id="opwd" class="newbtn" placeholder="请输入原密码" maxlength="20">
+                            <span style="color:red;"> *</span>
+                        </div>
+
+                        <div class="input_container">
+                            <label>设置新密码</label>
+                            <input name="userpwd" type="password" id="npwd" class="newbtn"
+                                   placeholder="请输入新密码，建议数字+字母组合(6-20位)" maxlength="20">
+                        </div>
+
+                        <div class="input_container">
+                            <label>确认新密码</label>
+                            <input name="userpwdok" type="password" id="epwd" class="newbtn" placeholder="请再次输入新密码" maxlength="20">
+                        </div>
+
+                        <div class="mima-act">
+                            <button class="formbutton" type="submit" onclick="WCCE.Pwd();" style="width: 80px;">保存
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 密码修改 End -->
+    </div>
+    <!-- 右侧功能定位 End -->
+</div>
+{include file="footer"/}
+<style>
+    @media only screen and (max-width: 767px) {
+        .footer-link {
+            display: none !important;
+        }
+        .uc-main-box {
+            min-height: 100%;
+        }
+    }
+</style>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "wcce-content": "/components/wcce/wcce-content"
+  }
+}

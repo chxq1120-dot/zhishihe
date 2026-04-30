@@ -1,0 +1,1 @@
+<view><view class="search-bar"><view data-event-opts="{{[['tap',[['goSearch']]]]}}" class="{{['search',wdata.params.style]}}" bindtap="__e"><text class="icon icon-search"></text><text class="txt placeholder">{{wdata.params.keywords}}</text></view></view></view>
