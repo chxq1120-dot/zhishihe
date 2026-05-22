@@ -203,7 +203,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param  mixed    $initial
      * @return mixed
      */
-    public function reduce(callable $callback, $initial = null)
+    public function reduce(?callable $callback, $initial = null)
     {
         return array_reduce($this->items, $callback, $initial);
     }
@@ -320,7 +320,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param  callable|null $callback
      * @return static
      */
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null)
     {
         if ($callback) {
             return new static(array_filter($this->items, $callback));
@@ -410,7 +410,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param  callable|null $callback
      * @return static
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         $items = $this->items;
 
@@ -476,16 +476,19 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     // ArrayAccess
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return array_key_exists($offset, $this->items);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->items[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
@@ -495,24 +498,28 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->items[$offset]);
     }
 
     //Countable
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->items);
     }
 
     //IteratorAggregate
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->items);
     }
 
     //JsonSerializable
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
