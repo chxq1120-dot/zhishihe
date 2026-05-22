@@ -24,7 +24,7 @@ class Command implements CommandInterface
     public function __construct(
         $name,
         array $args = [],
-        HandlerStack $handlerStack = null
+        ?HandlerStack $handlerStack = null
     ) {
         $this->name = $name;
         $this->data = $args;

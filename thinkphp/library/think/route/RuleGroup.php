@@ -55,7 +55,7 @@ class RuleGroup extends Rule
      * @param  array       $option   路由参数
      * @param  array       $pattern  变量规则
      */
-    public function __construct(Route $router, RuleGroup $parent = null, $name = '', $rule = [], $option = [], $pattern = [])
+    public function __construct(Route $router, ?RuleGroup $parent = null, $name = '', $rule = [], $option = [], $pattern = [])
     {
         $this->router  = $router;
         $this->parent  = $parent;

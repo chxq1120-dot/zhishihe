@@ -10,7 +10,7 @@ class Toolkit
     // Curl instance
     protected $_curl;
 
-    function setCurl(Curl $curl = null)
+    function setCurl(?Curl $curl = null)
     {
         $this->_curl = $curl;
         if (! isset($this->_curl)) {

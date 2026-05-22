@@ -37,7 +37,7 @@ class HttpException extends Exception
      * @param null     $formattedResponse
      * @param int|null $code
      */
-    public function __construct($message, ResponseInterface $response = null, $formattedResponse = null, $code = null)
+    public function __construct($message, ?ResponseInterface $response = null, $formattedResponse = null, $code = null)
     {
         parent::__construct($message, $code);
 

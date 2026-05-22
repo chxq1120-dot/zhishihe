@@ -181,7 +181,11 @@ class Handle
 
         ob_start();
         extract($data);
-        include Container::get('app')->config('exception_tmpl');
+        $exceptionTmpl = Container::get('app')->config('exception_tmpl');
+        if (empty($exceptionTmpl) || !is_file($exceptionTmpl)) {
+            $exceptionTmpl = __DIR__ . '/../../tpl/think_exception.tpl';
+        }
+        include $exceptionTmpl;
 
         // 获取并清空缓存
         $content  = ob_get_clean();

@@ -226,8 +226,8 @@ class Client extends GuzzleClient {
       return function (
         $retries,
         RequestInterface $request,
-        ResponseInterface $response = null,
-        \Exception $exception = null
+        ?ResponseInterface $response = null,
+        ?\Exception $exception = null
       ) {
         if ($retries >= $this->cosConfig['retry']) {
           return false;

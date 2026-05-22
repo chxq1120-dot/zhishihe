@@ -49,7 +49,7 @@ class Operation implements ToArrayInterface
      * @param DescriptionInterface  $description Service description used to resolve models if $ref tags are found
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $config = [], DescriptionInterface $description = null)
+    public function __construct(array $config = [], ?DescriptionInterface $description = null)
     {
         static $defaults = [
             'name' => '',

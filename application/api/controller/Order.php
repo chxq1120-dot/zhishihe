@@ -883,21 +883,15 @@ class Order extends Common
     protected function checkThrottle($uid, $id)
     {
         $key = md5($uid . '_' . $id);
-        $redis = new \Redis();
-        $redis->connect(config('redis.host'), config('redis.port'));
-        if (!empty(config('redis.auth'))) {
-            $redis->auth(config('redis.auth'));
+        $limit = config('redis.order') ?: 10;
+        $count = \think\facade\Cache::get($key, 0);
+        if ($count > $limit) {
+            return [false, '请勿重复提交'];
         }
-        $passed = $redis->exists($key);
-        if ($passed) {
-            $redis->incr($key);
-            $count = $redis->get($key);
-            if ($count > config('redis.order')) {
-                return [false, '请勿重复提交'];
-            }
+        if ($count > 0) {
+            \think\facade\Cache::inc($key);
         } else {
-            $redis->incr($key);
-            $redis->pExpire($key, 1000 * 60 * 60 * 24);
+            \think\facade\Cache::set($key, 1, 86400);
         }
         return [true, 'allow'];
     }

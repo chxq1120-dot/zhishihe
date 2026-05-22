@@ -448,7 +448,7 @@ class Request
      *
      * @return static
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
+    public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null)
     {
         $dup = clone $this;
         if (null !== $query) {
@@ -1648,7 +1648,7 @@ class Request
      *
      * @return string|null
      */
-    public function getPreferredLanguage(array $locales = null)
+    public function getPreferredLanguage(?array $locales = null)
     {
         $preferredLanguages = $this->getLanguages();
 
@@ -2052,7 +2052,7 @@ class Request
         return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR', ''), self::$trustedProxies);
     }
 
-    private function getTrustedValues(int $type, string $ip = null): array
+    private function getTrustedValues(int $type, ?string $ip = null): array
     {
         $clientValues = [];
         $forwardedValues = [];

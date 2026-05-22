@@ -66,7 +66,7 @@ class Encryptor
     /**
      * Constructor.
      */
-    public function __construct(string $appId, string $token = null, string $aesKey = null)
+    public function __construct(string $appId, ?string $token = null, ?string $aesKey = null)
     {
         $this->appId = $appId;
         $this->token = $token;

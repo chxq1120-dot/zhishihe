@@ -56,8 +56,8 @@ trait MockTrait
     public static function mockRequestException(
         $message,
         RequestInterface $request,
-        ResponseInterface $response = null,
-        Exception $previous = null,
+        ?ResponseInterface $response = null,
+        ?Exception $previous = null,
         array $handlerContext = []
     ) {
         self::$mockQueue[] = new RequestException(

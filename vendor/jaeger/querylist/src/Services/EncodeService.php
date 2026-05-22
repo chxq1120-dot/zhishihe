@@ -12,7 +12,7 @@ use QL\QueryList;
 
 class EncodeService
 {
-    public static function convert(QueryList $ql,string $outputEncoding,string $inputEncoding = null)
+    public static function convert(QueryList $ql,string $outputEncoding,?string $inputEncoding = null)
     {
         $html = $ql->getHtml();
         $inputEncoding || $inputEncoding = self::detect($html);

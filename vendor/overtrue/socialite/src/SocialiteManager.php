@@ -76,7 +76,7 @@ class SocialiteManager implements FactoryInterface
      * @param array        $config
      * @param Request|null $request
      */
-    public function __construct(array $config, Request $request = null)
+    public function __construct(array $config, ?Request $request = null)
     {
         $this->config = new Config($config);
 

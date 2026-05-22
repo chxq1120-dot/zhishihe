@@ -27,5 +27,5 @@ interface ProviderInterface
      *
      * @return \Overtrue\Socialite\User
      */
-    public function user(AccessTokenInterface $token = null);
+    public function user(?AccessTokenInterface $token = null);
 }

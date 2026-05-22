@@ -3,24 +3,37 @@ import urllib.request
 import urllib.error
 import os
 import json
-from urllib.parse import urlparse, parse_qs
+import subprocess
+import threading
+import time
 
-REMOTE_API = "https://wcce.51zhanma.cn"
 H5_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "h5")
+PHP_PORT = 8081
+PHP_HOST = "127.0.0.1"
 
-class ProxyHandler(http.server.SimpleHTTPRequestHandler):
+def start_php_server():
+    time.sleep(1)
+    proc = subprocess.Popen(
+        ["php", "-S", f"{PHP_HOST}:{PHP_PORT}", "-t", "/workspace/public", "/workspace/public/router.php"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    print(f"PHP backend started at http://{PHP_HOST}:{PHP_PORT}")
+    proc.wait()
+
+class LocalHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=H5_DIR, **kwargs)
 
     def do_GET(self):
         if self.path.startswith("/api/"):
-            self._proxy_request("GET")
+            self._forward_to_php("GET")
         else:
             super().do_GET()
 
     def do_POST(self):
         if self.path.startswith("/api/"):
-            self._proxy_request("POST")
+            self._forward_to_php("POST")
         else:
             super().do_POST()
 
@@ -29,9 +42,9 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
         self._set_cors_headers()
         self.end_headers()
 
-    def _proxy_request(self, method):
+    def _forward_to_php(self, method):
         try:
-            url = REMOTE_API + self.path
+            url = f"http://{PHP_HOST}:{PHP_PORT}{self.path}"
             headers = {}
             for key, value in self.headers.items():
                 if key.lower() not in ("host", "origin", "referer"):
@@ -54,32 +67,29 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(resp_body)
         except urllib.error.HTTPError as e:
+            resp_body = e.read()
             self.send_response(e.code)
             self._set_cors_headers()
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps({"code": e.code, "msg": str(e)}).encode())
+            self.wfile.write(resp_body)
         except Exception as e:
             self.send_response(502)
             self._set_cors_headers()
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps({"code": 502, "msg": f"Proxy error: {str(e)}"}).encode())
+            self.wfile.write(json.dumps({"code": 502, "msg": f"Backend error: {str(e)}"}).encode())
 
     def _set_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, token")
 
-    def end_headers(self):
-        if not self._headers_buffer:
-            pass
-        super().end_headers()
-
 if __name__ == "__main__":
+    threading.Thread(target=start_php_server, daemon=True).start()
     port = 8080
-    server = http.server.HTTPServer(("0.0.0.0", port), ProxyHandler)
-    print(f"Proxy server running at http://localhost:{port}")
+    server = http.server.HTTPServer(("0.0.0.0", port), LocalHandler)
+    print(f"Local server running at http://localhost:{port}")
     print(f"H5 static files from: {H5_DIR}")
-    print(f"API requests proxied to: {REMOTE_API}")
+    print(f"API requests forwarded to local PHP backend at http://{PHP_HOST}:{PHP_PORT}")
     server.serve_forever()

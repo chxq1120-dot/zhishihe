@@ -120,7 +120,7 @@ class Common extends Controller
      * @access public
      * @param Request $request Request 对象
      */
-    public function __construct(Request $request = null)
+    public function __construct(?Request $request = null)
     {
         parent::__construct();
         $this->request = is_null($request) ? Request::instance() : $request;

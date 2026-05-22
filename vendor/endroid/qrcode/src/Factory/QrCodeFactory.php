@@ -51,7 +51,7 @@ class QrCodeFactory implements QrCodeFactoryInterface
         'validate_result',
     ];
 
-    public function __construct(array $defaultOptions = [], WriterRegistryInterface $writerRegistry = null)
+    public function __construct(array $defaultOptions = [], ?WriterRegistryInterface $writerRegistry = null)
     {
         $this->defaultOptions = $defaultOptions;
         $this->writerRegistry = $writerRegistry;

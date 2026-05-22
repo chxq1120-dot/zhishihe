@@ -58,7 +58,7 @@ class Controller
      * 构造方法
      * @access public
      */
-    public function __construct(App $app = null)
+    public function __construct(?App $app = null)
     {
         $this->app     = $app ?: Container::get('app');
         $this->request = $this->app['request'];

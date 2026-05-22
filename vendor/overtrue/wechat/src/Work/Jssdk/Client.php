@@ -56,7 +56,7 @@ class Client extends BaseClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getAgentConfigArray(array $apis, $agentId, bool $debug = false, bool $beta = false, array $openTagList = [], string $url = null)
+    public function getAgentConfigArray(array $apis, $agentId, bool $debug = false, bool $beta = false, array $openTagList = [], ?string $url = null)
     {
         return $this->buildAgentConfig($apis, $agentId, $debug, $beta, false, $openTagList, $url);
     }
@@ -78,7 +78,7 @@ class Client extends BaseClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function buildAgentConfig(array $jsApiList, $agentId, bool $debug = false, bool $beta = false, bool $json = true, array $openTagList = [], string $url = null)
+    public function buildAgentConfig(array $jsApiList, $agentId, bool $debug = false, bool $beta = false, bool $json = true, array $openTagList = [], ?string $url = null)
     {
         $config = array_merge(compact('debug', 'beta', 'jsApiList', 'openTagList'), $this->agentConfigSignature($agentId, $url));
 
@@ -99,7 +99,7 @@ class Client extends BaseClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function agentConfigSignature($agentId, string $url = null, string $nonce = null, $timestamp = null): array
+    protected function agentConfigSignature($agentId, ?string $url = null, ?string $nonce = null, $timestamp = null): array
     {
         $url = $url ?: $this->getUrl();
         $nonce = $nonce ?: Support\Str::quickRandom(10);

@@ -38,7 +38,7 @@ class Transfer extends Message
     /**
      * Transfer constructor.
      */
-    public function __construct(string $account = null)
+    public function __construct(?string $account = null)
     {
         parent::__construct(compact('account'));
     }

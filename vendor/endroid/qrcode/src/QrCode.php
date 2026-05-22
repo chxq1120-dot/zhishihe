@@ -230,7 +230,7 @@ class QrCode implements QrCodeInterface
         return $this->logoPath;
     }
 
-    public function setLogoSize(int $logoWidth, int $logoHeight = null): void
+    public function setLogoSize(int $logoWidth, ?int $logoHeight = null): void
     {
         $this->logoWidth = $logoWidth;
         $this->logoHeight = $logoHeight;
@@ -256,7 +256,7 @@ class QrCode implements QrCodeInterface
         return $this->logoHeight;
     }
 
-    public function setLabel(string $label, int $labelFontSize = null, string $labelFontPath = null, string $labelAlignment = null, array $labelMargin = null): void
+    public function setLabel(string $label, ?int $labelFontSize = null, ?string $labelFontPath = null, ?string $labelAlignment = null, ?array $labelMargin = null): void
     {
         $this->label = $label;
 
@@ -338,7 +338,7 @@ class QrCode implements QrCodeInterface
         $this->writer = $writer;
     }
 
-    public function getWriter(string $name = null): WriterInterface
+    public function getWriter(?string $name = null): WriterInterface
     {
         if (!is_null($name)) {
             return $this->writerRegistry->getWriter($name);

@@ -136,7 +136,7 @@ class FeiShuProvider extends AbstractProvider implements ProviderInterface
      *
      * @return array|mixed
      */
-    public function user(AccessTokenInterface $token = null)
+    public function user(?AccessTokenInterface $token = null)
     {
         if (is_null($token) && $this->hasInvalidState()) {
             throw new InvalidStateException();

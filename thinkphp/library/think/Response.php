@@ -145,7 +145,7 @@ class Response
 
         if (!headers_sent() && !empty($this->header)) {
             // 发送状态码
-            http_response_code($this->code);
+            @http_response_code($this->code);
             // 发送头部信息
             foreach ($this->header as $name => $val) {
                 header($name . (!is_null($val) ? ':' . $val : ''));

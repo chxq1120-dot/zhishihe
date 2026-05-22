@@ -54,7 +54,7 @@ class Client extends BaseClient
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
-    public function buildConfig(array $jsApiList, bool $debug = false, bool $beta = false, bool $json = true, array $openTagList = [], string $url = null)
+    public function buildConfig(array $jsApiList, bool $debug = false, bool $beta = false, bool $json = true, array $openTagList = [], ?string $url = null)
     {
         $config = array_merge(compact('debug', 'beta', 'jsApiList', 'openTagList'), $this->configSignature($url));
 
@@ -77,7 +77,7 @@ class Client extends BaseClient
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
-    public function getConfigArray(array $apis, bool $debug = false, bool $beta = false, array $openTagList = [], string $url = null)
+    public function getConfigArray(array $apis, bool $debug = false, bool $beta = false, array $openTagList = [], ?string $url = null)
     {
         return $this->buildConfig($apis, $debug, $beta, false, $openTagList, $url);
     }
@@ -124,7 +124,7 @@ class Client extends BaseClient
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function configSignature(string $url = null, string $nonce = null, $timestamp = null): array
+    protected function configSignature(?string $url = null, ?string $nonce = null, $timestamp = null): array
     {
         $url = $url ?: $this->getUrl();
         $nonce = $nonce ?: Support\Str::quickRandom(10);

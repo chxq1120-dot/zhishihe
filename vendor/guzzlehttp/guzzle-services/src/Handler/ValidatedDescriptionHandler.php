@@ -24,7 +24,7 @@ class ValidatedDescriptionHandler
      * @param DescriptionInterface $description
      * @param SchemaValidator|null $schemaValidator
      */
-    public function __construct(DescriptionInterface $description, SchemaValidator $schemaValidator = null)
+    public function __construct(DescriptionInterface $description, ?SchemaValidator $schemaValidator = null)
     {
         $this->description = $description;
         $this->validator = $schemaValidator ?: new SchemaValidator();

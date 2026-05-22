@@ -115,7 +115,7 @@ class Query
      * 架构函数
      * @access public
      */
-    public function __construct(Connection $connection = null)
+    public function __construct(?Connection $connection = null)
     {
         if (is_null($connection)) {
             $this->connection = Db::connect();

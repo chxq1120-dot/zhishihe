@@ -9,26 +9,32 @@ use GuzzleHttp\Client;
 use think\Exception;
 use think\facade\Env;
 
-/**
- * 版本更新
- */
 class Upgrade extends Common
 {
     protected $current_version;
-    protected $redis;
+    protected $logFile;
     public function initialize(){
         parent::initialize();
         $this->model=new Versions();
         $this->current_version=$this->model->order('versions_nums desc')->find();
-        $this->redis = new \Redis();
-        $this->redis->connect(config('redis.host'), config('redis.port'));
-        if (!empty(config('redis.auth'))) {
-            $this->redis->auth(config('redis.auth'));
-        }
+        $this->logFile = runtime_path() . 'upgrade_log.json';
     }
-    public function __destruct()
+    protected function _readLog()
     {
-        $this->redis->close();
+        if (file_exists($this->logFile)) {
+            $content = file_get_contents($this->logFile);
+            $data = json_decode($content, true);
+            return is_array($data) ? $data : [];
+        }
+        return [];
+    }
+    protected function _writeLog($data)
+    {
+        $dir = dirname($this->logFile);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        file_put_contents($this->logFile, json_encode($data));
     }
     public function index()
     {
@@ -45,16 +51,10 @@ class Upgrade extends Common
         $this->assign('currentVer', $this->current_version);
         return $this->fetch();
     }
-    /**
-     * 更新日志
-     * @return [type] [description]
-     */
     public function upgradeLog()
     {
-         //设置过滤方法
          $this->request->filter(['strip_tags']);
          if ($this->request->isAjax()) {
-             //如果发送的来源是Selectpage，则转发到Selectpage
              if($this->request->request('keyField')){
                  return $this->selectpage();
              }
@@ -75,10 +75,6 @@ class Upgrade extends Common
              return json($result);
         }
     }
-    /**
-     * 显示更新日志
-     * @return [type] [description]
-     */
     public function showlog($ids = 0)
     {
         $row = $this->model->get($ids);
@@ -90,9 +86,6 @@ class Upgrade extends Common
         $this->view->assign("row", $row);
         return $this->view->fetch();
     }   
-    /**
-     * 获取更新列表包
-     */
     public function getUpList()
     {
         try{
@@ -112,53 +105,44 @@ class Upgrade extends Common
         }
     }
 
-    /**
-     * 获取更新进度以及日志信息
-     */
     public function getUpgradeLog($type=0)
     {
-        $first_log=$this->redis->lrange("upgrade_log",0,0);
-        if(empty($first_log)){
+        $logs = $this->_readLog();
+        if(empty($logs)){
             return callback(0, '暂无日志数据');
         }
-        $first_log=json_decode($first_log[0],true);
+        $first_log = $logs[0];
         $data=[
             'progress'=>$first_log['progress'],
             'desc'=>$first_log['desc'],
         ];
-        //类型为1直接返回数据
         if($type==1){
             return $data;
         }
         return callback(1, 'success','',$data);
     }
-    /**
-     * 写入更新进度日志
-     */
     protected function setUpgradeLog($logContent)
     {
         try{
-            $log_key="upgrade_log";
-            if($logContent['type']==1 && $this->redis->exists($log_key)){
-                $this->redis->del($log_key);
+            if($logContent['type']==1){
+                $logs = [];
+            } else {
+                $logs = $this->_readLog();
             }
             $logContent['time']=time();
-            $this->redis->lpush($log_key,json_encode($logContent));
+            array_unshift($logs, $logContent);
+            $this->_writeLog($logs);
             return true;
         }catch (\Exception $e){
             return false;
         }
     }
-    /**
-     * 下载更新包整个过程分配60%
-     * @return [type] [description]
-     */
     public function updateFile()
     {
         if($this->request->isPost()){
             try{
                 if(session_status() === PHP_SESSION_ACTIVE) {
-                    session_abort(); // 不保存且不锁定 Session
+                    session_abort();
                 }
                 $data = input('param.');
                 $progress=$this->getUpgradeLog(1);
@@ -202,16 +186,12 @@ class Upgrade extends Common
         }
         return callback(0, '版本更新失败，请稍后再试');
     }
-    /**
-     * 执行文件更新操作整个过程分配30%
-     * @return [type] [description]
-     */
     public function copyFile()
     {
         if($this->request->isPost()){
             try{
                 if(session_status() === PHP_SESSION_ACTIVE) {
-                    session_abort(); // 不保存且不锁定 Session
+                    session_abort();
                 }
                 $data = input('param.');
                 $progress=$this->getUpgradeLog(1);
@@ -220,28 +200,21 @@ class Upgrade extends Common
                 $zipFileName = 'v' . $data['version_nums'] . '.zip';
                 $logContent=['progress'=>$now_progress,'desc'=>'开始复制更新包'.$zipFileName.'文件...','type'=>0];
                 $this->setUpgradeLog($logContent);
-                #更新包目录
                 $zipFilePath = env('root_path') . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'package';
-                #解压目录
                 $toZipFilePath= env('root_path') . 'upgrade' . DIRECTORY_SEPARATOR . 'package';
-                #执行解压
                 $zip = new \ZipArchive();
                 if (!$zip->open($zipFilePath . DIRECTORY_SEPARATOR . $zipFileName)) {
                     return callback(0, '解压错误');
                 }
                 $zip->extractTo($toZipFilePath . DIRECTORY_SEPARATOR . 'v' . $data['version_nums']);
                 $zip->close();
-                #执行拷贝
                 $rootFrom = $toZipFilePath . DIRECTORY_SEPARATOR . 'v' . $data['version_nums'] . DIRECTORY_SEPARATOR . 'frame';
                 $rootTo = env('root_path');
-                #判断更新包内是否有小程序更新，有则执行删除本地小程序端文件
                 $originalPath = $rootFrom . DIRECTORY_SEPARATOR . 'frontend' . DIRECTORY_SEPARATOR . 'mp-weixin';
-                #删除冗余文件
                 $targetPath = $rootTo . 'frontend'.DIRECTORY_SEPARATOR .'mp-weixin'.DIRECTORY_SEPARATOR.'pages';
                 if (is_dir($originalPath)) {
                     removeDir($targetPath);
                 }
-                #开始复制文件
                 copyFiles($rootFrom, $rootTo);
                 $current_progress=bcadd($now_progress,$average,2);
                 $logContent=['progress'=>$current_progress,'desc'=>'更新包'.$zipFileName.'文件复制完成','type'=>0];
@@ -253,10 +226,6 @@ class Upgrade extends Common
         }
         return callback(0, '版本更新失败，请稍后再试');
     }
-    /**
-     * 执行数据更新操作,整个过程分配6%
-     * @return [type] [description]
-     */
     public function update()
     {
         if($this->request->isPost()){
@@ -290,10 +259,6 @@ class Upgrade extends Common
         }
         return callback(0, '版本更新失败，请稍后再试');
     }
-    /**
-     * 更新版本，整个过程分配2%
-     * @return [type] [description]
-     */
     public function upVersions()
     {
         if($this->request->isPost()){

@@ -133,7 +133,7 @@ class Client extends BaseClient
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function userIdToOpenid(string $userId, int $agentId = null)
+    public function userIdToOpenid(string $userId, ?int $agentId = null)
     {
         $params = [
             'userid' => $userId,

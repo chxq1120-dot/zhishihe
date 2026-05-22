@@ -43,9 +43,9 @@ class GuzzleClient extends ServiceClient
     public function __construct(
         ClientInterface $client,
         DescriptionInterface $description,
-        callable $commandToRequestTransformer = null,
-        callable $responseToResultTransformer = null,
-        HandlerStack $commandHandlerStack = null,
+        ?callable $commandToRequestTransformer = null,
+        ?callable $responseToResultTransformer = null,
+        ?HandlerStack $commandHandlerStack = null,
         array $config = []
     ) {
         $this->config = $config;

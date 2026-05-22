@@ -88,7 +88,7 @@ class SvgWriter extends AbstractWriter
         return $xml;
     }
 
-    private function addLogo(SimpleXMLElement $svg, int $imageWidth, int $imageHeight, string $logoPath, int $logoWidth = null, int $logoHeight = null, bool $forceXlinkHref = false): void
+    private function addLogo(SimpleXMLElement $svg, int $imageWidth, int $imageHeight, string $logoPath, ?int $logoWidth = null, ?int $logoHeight = null, bool $forceXlinkHref = false): void
     {
         $mimeType = $this->getMimeType($logoPath);
         $imageData = file_get_contents($logoPath);

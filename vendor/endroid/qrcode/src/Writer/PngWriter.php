@@ -108,7 +108,7 @@ class PngWriter extends AbstractWriter
         return $image;
     }
 
-    private function addLogo($sourceImage, string $logoPath, int $logoWidth = null, int $logoHeight = null)
+    private function addLogo($sourceImage, string $logoPath, ?int $logoWidth = null, ?int $logoHeight = null)
     {
         $mimeType = $this->getMimeType($logoPath);
         $logoImage = imagecreatefromstring(strval(file_get_contents($logoPath)));

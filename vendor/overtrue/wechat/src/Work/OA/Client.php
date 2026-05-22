@@ -136,7 +136,7 @@ class Client extends BaseClient
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function approvalRecords(int $startTime, int $endTime, int $nextNumber = null)
+    public function approvalRecords(int $startTime, int $endTime, ?int $nextNumber = null)
     {
         $params = [
             'starttime' => $startTime,

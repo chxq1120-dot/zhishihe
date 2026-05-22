@@ -32,7 +32,7 @@ use function EasyWeChat\Kernel\data_get;
  * @property \EasyWeChat\OpenPlatform\CodeTemplate\Client $code_template
  * @property \EasyWeChat\OpenPlatform\Component\Client    $component
  *
- * @method mixed handleAuthorize(string $authCode = null)
+ * @method mixed handleAuthorize(?string $authCode = null)
  * @method mixed getAuthorizer(string $appId)
  * @method mixed getAuthorizerOption(string $appId, string $name)
  * @method mixed setAuthorizerOption(string $appId, string $name, string $value)
@@ -67,7 +67,7 @@ class Application extends ServiceContainer
     /**
      * Creates the officialAccount application.
      */
-    public function officialAccount(string $appId, string $refreshToken = null, AccessToken $accessToken = null): OfficialAccount
+    public function officialAccount(string $appId, ?string $refreshToken = null, ?AccessToken $accessToken = null): OfficialAccount
     {
         $application = new OfficialAccount($this->getAuthorizerConfig($appId, $refreshToken), $this->getReplaceServices($accessToken) + [
             'encryptor' => $this['encryptor'],
@@ -88,7 +88,7 @@ class Application extends ServiceContainer
     /**
      * Creates the miniProgram application.
      */
-    public function miniProgram(string $appId, string $refreshToken = null, AccessToken $accessToken = null): MiniProgram
+    public function miniProgram(string $appId, ?string $refreshToken = null, ?AccessToken $accessToken = null): MiniProgram
     {
         return new MiniProgram($this->getAuthorizerConfig($appId, $refreshToken), $this->getReplaceServices($accessToken) + [
             'encryptor' => function () {
@@ -154,7 +154,7 @@ class Application extends ServiceContainer
         return 'https://mp.weixin.qq.com/safe/bindcomponent?'.http_build_query($queries).'#wechat_redirect';
     }
 
-    protected function getAuthorizerConfig(string $appId, string $refreshToken = null): array
+    protected function getAuthorizerConfig(string $appId, ?string $refreshToken = null): array
     {
         return $this['config']->merge([
             'component_app_id' => $this['config']['app_id'],
@@ -163,7 +163,7 @@ class Application extends ServiceContainer
         ])->toArray();
     }
 
-    protected function getReplaceServices(AccessToken $accessToken = null): array
+    protected function getReplaceServices(?AccessToken $accessToken = null): array
     {
         $services = [
             'access_token' => $accessToken ?: function ($app) {
