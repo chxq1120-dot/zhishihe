@@ -56,6 +56,9 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith("/api/"):
             self._forward_to_php("GET")
+        elif self.path == "/" or self.path == "/index.html":
+            self.path = "/test_home.html"
+            super().do_GET()
         else:
             super().do_GET()
 
@@ -88,10 +91,10 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
             with opener.open(req, timeout=15) as resp:
                 resp_body = resp.read()
                 self.send_response(resp.status)
+                self._set_cors_headers()
                 for key, value in resp.getheaders():
                     if key.lower() not in SKIP_HEADERS:
                         self.send_header(key, value)
-                self._set_cors_headers()
                 self.end_headers()
                 self.wfile.write(resp_body)
         except urllib.error.HTTPError as e:
