@@ -162,7 +162,7 @@ class Index extends Common
         $data['web']['nosite'] = 0;
         if (!empty($sub_domin)) {
             $url = str_replace(['https://', 'http://'], ['', ''], config('setting.account_domain'));
-            if ($url !== $sub_domin) {
+            if ($url !== $sub_domin && !in_array($sub_domin, ['localhost', '127.0.0.1'])) {
                 $admin_id = $siteModel->getSubAdminId($sub_domin);
                 if($admin_id==1){
                     $data['web']['nosite'] = 1;
