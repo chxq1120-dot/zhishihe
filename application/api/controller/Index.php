@@ -84,137 +84,128 @@ class Index extends Common
     {
         $data = [
             'web' => [
-                'name' => config('setting.web_name'),
-                'logo' => config('setting.web_logo'),
-                'qrcode' => config('setting.web_qrcode'),
-                'wechat' => config('setting.web_wechat'),
-                'phone' => config('setting.web_phone'),
-                'contact' => config('setting.web_contact'),
-                'url' => config('setting.account_domain'),
-                'view_type' => config('setting.view_type'),//访问方式
-                'view_nosite'=> config('setting.view_nosite'),//无分站域名默认跳转地址
+                'name' => '芝士盒',
+                'logo' => 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png',
+                'qrcode' => 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20250524/40efd6c86c974a7031f7e0206891d105.jpg',
+                'wechat' => '',
+                'phone' => '028-60225332',
+                'contact' => '',
+                'url' => 'http://localhost:8080/',
+                'view_type' => 0,
+                'view_nosite' => '',
             ],
             'subscribe' => [
-                'cash_id' => config('setting.subscribe_cashed_id'),
-                'new_id' => config('setting.subscribe_new_id'),
-                'task_id' => config('setting.subscribe_task_id')
+                'cash_id' => '',
+                'new_id' => '',
+                'task_id' => ''
             ],
             'share' => [
-                'title' => config('setting.wechat_share_title'),
-                'desc' => config('setting.wechat_share_desc'),
-                'img' => config('setting.wechat_share_img')
+                'title' => '芝士盒为您提供各类知识付费资源可免费领取！',
+                'desc' => '芝士盒为您提供副业项目、创业项目、技能、知识等资源',
+                'img' => 'http://zpcms.oss-cn-beijing.aliyuncs.com/public/uploads/20210520/a4ad53ad225876bbec6d337c48730726.jpg'
             ],
             'cash' => [
-                'video_ids' => config('setting.video_ids'),//激励视频ID
-                'try_see' => config('setting.try_see'),//视频试看时间
-                'cash_fee' => config('setting.cash_fee'),//提现手续费
-                'cash_iswechat' => config('setting.cash_iswechat'),//微信提现
-                'cash_isalipay' => config('setting.cash_isalipay'),//支付宝提现,
-                'cash_isbank' => config('setting.cash_isbank'),//支付宝提现,
-                'cash_min' => config('setting.cash_min'),//最低提现金额
-                'is_uptime' => config('setting.is_uptime'),//是否显示更新日期,
-                'hand_day_max' => config('setting.hand_day_max'),//每日助力限制
-                'hand_day_num' => config('setting.hand_day_num'),//每日资源获取次数
-                'ios_close' => config('setting.ios_close'),//是否关闭IOS虚拟支付
-                'ios_type' => config('setting.ios_type'),//ios支付开启辅助方式
-                'is_opendisk' => config('setting.is_opendisk'),//是否显示打开网盘
-                'is_groups' => config('setting.is_groups'),//开放站群加入
-                'is_jumps' => config('setting.is_jumps'),//开放跳转加入
-                'list_type' => config('setting.list_type'),//资源列表排列方式
-                'is_cdkey_pay' => config('setting.is_cdkey_pay'),//是否开启安卓卡密支付
-                'vip_article_id' => config('setting.vip_article_id'),//自定义VIP介绍文章ID
-                'sale_unit_text' => config('setting.sale_unit_text'),//自定义销量文字
-                'service_artice_id' => config('setting.service_artice_id'),//自定义用户注册服务文章ID
-                'privacy_artice_id' => config('setting.privacy_artice_id'),//自定义用户隐私协议文章ID
-                'resource_name' => config('setting.resource_name'),//资源页面自定义名称
-                'vip_cdkey_pay' => config('setting.vip_cdkey_pay'),//安卓端会员是否开启卡密支付
-                'is_wallet_person' => config('setting.is_wallet_person'),//是否显示我的钱袋菜单
-                'is_bind_mobile' => config('setting.is_bind_mobile'),//是否显示我的钱袋菜单
-                'is_wechat_pay' => config('setting.is_wechat_pay'),//是否显示微信支付
-                'is_quick_login' => config('setting.is_quick_login'),//是否开启一键快捷登录
-                'kefu_link' => config('setting.kefu_link'),//H5端平台客服投诉链接
-                'course_type' => config('setting.course_type'),//视频课程默认是课程在前或者目录在前
-                'is_wechat_login' => config('setting.is_wechat_login'),//微信登录显示方式
-                'is_passed_mode' => config('setting.is_passed_mode'),//过审模式
+                'video_ids' => '',
+                'try_see' => 10,
+                'cash_fee' => 0,
+                'cash_iswechat' => 2,
+                'cash_isalipay' => 1,
+                'cash_isbank' => 1,
+                'cash_min' => 1,
+                'is_uptime' => 1,
+                'hand_day_max' => 10,
+                'hand_day_num' => 0,
+                'ios_close' => 1,
+                'ios_type' => 3,
+                'is_opendisk' => 0,
+                'is_groups' => 1,
+                'is_jumps' => 1,
+                'list_type' => 1,
+                'is_cdkey_pay' => 1,
+                'vip_article_id' => 11,
+                'sale_unit_text' => '人学习',
+                'service_artice_id' => 3,
+                'privacy_artice_id' => 2,
+                'resource_name' => '',
+                'vip_cdkey_pay' => 0,
+                'is_wallet_person' => 1,
+                'is_bind_mobile' => 2,
+                'is_wechat_pay' => 2,
+                'is_quick_login' => 0,
+                'kefu_link' => '',
+                'course_type' => 0,
+                'is_wechat_login' => 0,
+                'is_passed_mode' => 0,
             ],
             'wechat' => [
-                'appid' => config('setting.account_appid'),//微信公众号
-                'auth_url' => config('setting.account_domain'),//微信网页授权域名url
-                'wechat_ptype' => config('setting.wechat_pay_type'),//公众号微信支付方式
-                'wxmini_ptype' => config('setting.wxnini_pay_type'),//小程序微信支付方式
-                'wechat_open' => config('setting.wechat_open'),//是否开启微信支付
-                'root_domains' => explode("\n", trim(config('setting.account_domains'))),//代理分站顶级域名库
+                'appid' => '',
+                'auth_url' => 'http://localhost:8080/',
+                'wechat_ptype' => 1,
+                'wxmini_ptype' => 1,
+                'wechat_open' => 2,
+                'root_domains' => [],
             ],
             'alipay' => [
-                'alipay_ptype' => config('setting.alipay_pay_type'),//支付宝支付方式
-                'alipay_open' => config('setting.alipay_open'),//是否开启支付宝支付
+                'alipay_ptype' => 2,
+                'alipay_open' => 1,
             ],
             'toutiao' => [
-                'video_ids' => config('setting.tt_video_ids'),//激励视频ID
-                'is_video' => config('setting.tt_isvideo'),//是否开启拍视频
+                'video_ids' => '',
+                'is_video' => 0,
             ]
         ];
         #获取代理联系方式
         $admin_id = $this->request->param('from_id');
+        if (empty($admin_id)) {
+            $admin_id = 1;
+        }
         #获取分站配置
-        $siteModel = new AdminSite();
         $sub_domin = $this->request->param('site');
         $data['web']['nosite'] = 0;
-        if (!empty($sub_domin)) {
-            $url = str_replace(['https://', 'http://'], ['', ''], config('setting.account_domain'));
-            if ($url !== $sub_domin && !in_array($sub_domin, ['localhost', '127.0.0.1'])) {
-                $admin_id = $siteModel->getSubAdminId($sub_domin);
-                if($admin_id==1){
-                    $data['web']['nosite'] = 1;
-                }
-            }
-        }
         $data['web']['webid'] = $admin_id;
-        $agent = Admin::where('id', $admin_id)->find();
-        if (!empty($agent)) {
-            if (!empty($agent->webname)) {
-                $data['web']['name'] = $agent->webname;
-            }
-            if (!empty($agent->realname)) {
-                $data['web']['contact'] = $agent->realname;
-            }
-            if (!empty($agent->qrcode)) {
-                $data['web']['qrcode'] = $agent->qrcode;
-            }
-            if (!empty($agent->wechat)) {
-                $data['web']['wechat'] = $agent->wechat;
-            }
-            if (!empty($agent->mobile)) {
-                $data['web']['phone'] = $agent->mobile;
-            }
-            $site = $siteModel->where('admin_id', $admin_id)->find();
-            if (!empty($site)) {
-                $data['web']['name'] = $site->webname;
-                $data['web']['contact'] = $site->realname;
-                $data['web']['qrcode'] = $site->qrcode;
-                $data['web']['wechat'] = $site->wechat;
-                $data['web']['phone'] = $site->mobile;
-            }
-            $data['web']['url'] = $siteModel->getSiteUrl($admin_id);
-        }
+        
         #获取主题配色
-        $data['theme_config'] = '';
-        $theme_config = ThemeConfig::where(['admin_id' => $admin_id, 'page' => 0])->value('params');
-        if (!empty($theme_config)) {
-            $data['theme_config'] = json_decode($theme_config, true);
-        }else{
-            $adminId = (new Admin())->getDefaultAdminId();
-            $theme_config = ThemeConfig::where(['admin_id' => $adminId, 'page' => 0])->value('params');
-            if(!empty($theme_config)){
-                $data['theme_config'] = json_decode($theme_config, true);
-            }
-        }
+        $data['theme_config'] = [
+            'themeColor' => '#FF9800',
+            'themeColorLight' => '#FFE0B2',
+            'tabbarColor' => '#666666',
+            'tabbarSelectColor' => '#FF9800'
+        ];
+        
         #tabbar配置
-        $data['tabbar'] = null;
-        list($res, $tabBar) = $this->widgetData($admin_id);
-        if ($res) {
-            $data['tabbar'] = $tabBar;
-        }
+        $data['tabbar'] = [
+            'color' => '#666666',
+            'selectedColor' => '#FF9800',
+            'backgroundColor' => '#ffffff',
+            'borderStyle' => 'white',
+            'list' => [
+                [
+                    'pagePath' => 'pages/tabbar/home/index',
+                    'text' => '首页',
+                    'iconPath' => '/static/img/tabbar/home.png',
+                    'selectedIconPath' => '/static/img/tabbar/home_on.png'
+                ],
+                [
+                    'pagePath' => 'pages/tabbar/sort/index',
+                    'text' => '分类',
+                    'iconPath' => '/static/img/tabbar/sort.png',
+                    'selectedIconPath' => '/static/img/tabbar/sort_on.png'
+                ],
+                [
+                    'pagePath' => 'pages/tabbar/vip/index',
+                    'text' => 'VIP',
+                    'iconPath' => '/static/img/tabbar/vip.png',
+                    'selectedIconPath' => '/static/img/tabbar/vip_on.png'
+                ],
+                [
+                    'pagePath' => 'pages/tabbar/my/index',
+                    'text' => '我的',
+                    'iconPath' => '/static/img/tabbar/my.png',
+                    'selectedIconPath' => '/static/img/tabbar/my_on.png'
+                ]
+            ]
+        ];
+        
         $this->success('success', $data);
     }
 
@@ -256,40 +247,84 @@ class Index extends Common
      */
     public function pageData()
     {
-        $admin_id = $this->request->param('from_id');
-        #获取首页布局配置
-        $view_id = Admin::where('id', $admin_id)->value('view_id');
-        $where = ['id' => $view_id];
-        if (empty($view_id)) {
-            $where = ['admin_id' => $admin_id];
-        }
-        $page_code = Theme::where($where)->value('code');
-        if (!empty($page_code)) {
-            $itemModel = new ThemeItems();
-            $result = $itemModel->getParams($page_code, $admin_id);
-            $pageConfig = [];
-            if ($result['data']) {
-                foreach ($result['data']['items'] as $key => $value) {
-                    $pageConfig[$key]['type'] = $value['widget_code'];
-                    $pageConfig[$key]['params'] = $value['params'];
-                }
-            }
-            $data = $pageConfig;
-        } else {
-            #默认布局ID=1
-            $page_code = Theme::where('id', 1)->value('code');
-            $itemModel = new ThemeItems();
-            $admin_id = (new Admin())->getDefaultAdminId();
-            $result = $itemModel->getParams($page_code, $admin_id);
-            $pageConfig = [];
-            if ($result['data']) {
-                foreach ($result['data']['items'] as $key => $value) {
-                    $pageConfig[$key]['type'] = $value['widget_code'];
-                    $pageConfig[$key]['params'] = $value['params'];
-                }
-            }
-            $data = $pageConfig;
-        }
+        $data = [
+            [
+                'type' => 'search',
+                'params' => [
+                    'placeholder' => '搜索资源',
+                    'style' => [
+                        'backgroundColor' => '#f5f5f5',
+                        'borderRadius' => 20
+                    ]
+                ]
+            ],
+            [
+                'type' => 'banner',
+                'params' => [
+                    'list' => [
+                        [
+                            'url' => 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png',
+                            'link' => ''
+                        ]
+                    ],
+                    'autoplay' => true,
+                    'interval' => 3000,
+                    'indicatorDots' => true
+                ]
+            ],
+            [
+                'type' => 'nav',
+                'params' => [
+                    'list' => [
+                        [
+                            'name' => '首页',
+                            'icon' => '/static/img/tabbar/home_on.png',
+                            'link' => '/pages/tabbar/home/index'
+                        ],
+                        [
+                            'name' => '分类',
+                            'icon' => '/static/img/tabbar/sort_on.png',
+                            'link' => '/pages/tabbar/sort/index'
+                        ],
+                        [
+                            'name' => 'VIP',
+                            'icon' => '/static/img/tabbar/vip_on.png',
+                            'link' => '/pages/tabbar/vip/index'
+                        ],
+                        [
+                            'name' => '我的',
+                            'icon' => '/static/img/tabbar/my_on.png',
+                            'link' => '/pages/tabbar/my/index'
+                        ]
+                    ],
+                    'column' => 4
+                ]
+            ],
+            [
+                'type' => 'title',
+                'params' => [
+                    'title' => '推荐资源',
+                    'moreText' => '更多',
+                    'moreLink' => '/pages/tabbar/sort/index'
+                ]
+            ],
+            [
+                'type' => 'goods',
+                'params' => [
+                    'list' => [
+                        [
+                            'id' => 1,
+                            'title' => '芝士盒知识付费系统',
+                            'price' => 99,
+                            'sales' => 100,
+                            'thumb' => 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png',
+                            'type' => 1
+                        ]
+                    ],
+                    'column' => 2
+                ]
+            ]
+        ];
         $this->success('success', $data);
     }
 

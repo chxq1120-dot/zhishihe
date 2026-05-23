@@ -20,8 +20,8 @@ return [
     'password'        => '',
     // 端口
     'hostport'        => '3306',
-    // 连接dsn
-    'dsn'             => 'mysql:unix_socket=/var/run/mysqld/mysqld.sock;charset=utf8mb4;dbname=zpwcce',
+    // 连接dsn - 使用TCP/IP连接而不是unix socket
+    'dsn'             => '',
     // 数据库连接参数
     'params'          => [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION],
     // 数据库编码默认采用utf8
