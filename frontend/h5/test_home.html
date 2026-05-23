@@ -44,6 +44,7 @@
     <script>
     var pageData = {
         siteName: '智创云享',
+        searchPlaceholder: '搜索资源',
         banner: { url: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' },
         navs: [
             { name: '首页', icon: '/static/img/tabbar/home_on.png' },
@@ -55,7 +56,8 @@
         goods: [
             { title: '芝士盒知识付费系统', price: '99', thumb: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' },
             { title: 'VIP会员特权', price: '299', thumb: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' }
-        ]
+        ],
+        tabbar: null
     };
     
     function img(path, fallback) {
@@ -67,7 +69,7 @@
     function render() {
         var html = '<div class="page">';
         html += '<div class="header">' + pageData.siteName + '</div>';
-        html += '<div class="search">搜索资源...</div>';
+        html += '<div class="search">' + (pageData.searchPlaceholder || '搜索资源') + '</div>';
         
         html += '<div class="module">';
         html += '<div class="banner">';
@@ -108,18 +110,26 @@
         html += '</div>';
         
         html += '<div class="tabbar">';
-        var tabs = [
-            { name: '首页', icon: '/static/img/tabbar/home_on.png' },
-            { name: '分类', icon: '/static/img/tabbar/sort.png' },
-            { name: 'VIP', icon: '/static/img/tabbar/vip.png' },
-            { name: '我的', icon: '/static/img/tabbar/my.png' }
-        ];
+        var tabs;
+        if (pageData.tabbar && pageData.tabbar.length > 0) {
+            tabs = pageData.tabbar.map(function(item, idx) {
+                return { name: item.text || item.name || '', icon: item.iconPath || item.icon || '', activeIcon: item.selectedIconPath || item.icon || '', link: item.pagePath || '' };
+            });
+        } else {
+            tabs = [
+                { name: '首页', icon: '/static/img/tabbar/home_on.png', activeIcon: '/static/img/tabbar/home_on.png', link: '/' },
+                { name: '分类', icon: '/static/img/tabbar/sort.png', activeIcon: '/static/img/tabbar/sort_on.png', link: '/pages/tabbar/sort/index' },
+                { name: 'VIP', icon: '/static/img/tabbar/vip.png', activeIcon: '/static/img/tabbar/vip_on.png', link: '/pages/tabbar/vip/index' },
+                { name: '我的', icon: '/static/img/tabbar/my.png', activeIcon: '/static/img/tabbar/my_on.png', link: '/pages/tabbar/my/index' }
+            ];
+        }
         for (var k = 0; k < tabs.length; k++) {
             var t = tabs[k];
             var isActive = k === 0;
             html += '<div class="tab-item">';
             html += '<div class="tab-icon' + (isActive ? ' active' : '') + '">';
-            html += '<img src="' + img(t.icon) + '" alt="' + t.name + '" onerror="this.parentElement.innerHTML=\'' + t.name.charAt(0) + '\'">';
+            var iconSrc = isActive ? (t.activeIcon || t.icon) : t.icon;
+            html += '<img src="' + img(iconSrc) + '" alt="' + t.name + '" onerror="this.parentElement.innerHTML=\'' + t.name.charAt(0) + '\'">';
             html += '</div><div class="tab-text' + (isActive ? ' active' : '') + '">' + t.name + '</div></div>';
         }
         html += '</div>';
@@ -131,22 +141,28 @@
     render();
     
     // 尝试从API加载真实数据
-    fetch('http://127.0.0.1:8080/api/index/config?from_id=1&plat_form=web&site=127.0.0.1')
+    fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1')
         .then(function(res) { return res.json(); })
         .then(function(data) {
             if (data.code === 200 && data.data && data.data.web) {
                 pageData.siteName = data.data.web.name || pageData.siteName;
+                if (data.data.tabbar && data.data.tabbar.list) {
+                    pageData.tabbar = data.data.tabbar.list;
+                }
             }
+            render();
         })
         .catch(function() {});
     
-    fetch('http://127.0.0.1:8080/api/index/pageData?from_id=1&plat_form=web')
+    fetch('/api/index/pageData?from_id=1&plat_form=web')
         .then(function(res) { return res.json(); })
         .then(function(data) {
             if (data.code === 200 && data.data) {
                 for (var i = 0; i < data.data.length; i++) {
                     var m = data.data[i];
-                    if (m.type === 'banner' && m.params && m.params.list && m.params.list[0]) {
+                    if (m.type === 'search' && m.params) {
+                        pageData.searchPlaceholder = m.params.placeholder || '搜索资源';
+                    } else if (m.type === 'banner' && m.params && m.params.list && m.params.list[0]) {
                         pageData.banner = { url: m.params.list[0].url };
                     } else if (m.type === 'nav' && m.params && m.params.list) {
                         pageData.navs = m.params.list;
