@@ -2,9 +2,6 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智创云享 - 首页</title>
     <style>
@@ -12,8 +9,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
         .page { min-height: 100vh; padding-bottom: 70px; }
         .loading { text-align: center; padding: 100px 20px; color: #666; }
-        .error-box { text-align: center; padding: 20px; color: #f00; background: #ffe0e0; margin: 20px; border-radius: 8px; }
-        .debug { text-align: left; padding: 10px; margin-top: 10px; font-size: 12px; color: #666; background: #f5f5f5; border-radius: 4px; word-break: break-all; }
+        .error { padding: 20px; margin: 20px; background: #ffe0e0; border-radius: 8px; color: #f00; text-align: center; }
         
         .header { background: linear-gradient(135deg, #FF9800, #FFB74D); padding: 15px; color: #fff; }
         .header h1 { font-size: 18px; }
@@ -22,179 +18,119 @@
         .search input { width: 100%; border: none; background: #f5f5f5; border-radius: 15px; padding: 8px 15px; font-size: 14px; }
         
         .module { background: #fff; margin: 10px 15px; border-radius: 8px; overflow: hidden; }
-        .module-title { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid #eee; }
-        
-        .banner img { width: 100%; height: 180px; object-fit: cover; display: block; }
-        
+        .banner img { width: 100%; height: 180px; object-fit: cover; }
         .nav { display: flex; flex-wrap: wrap; padding: 10px; }
         .nav-item { width: 25%; text-align: center; padding: 10px 0; }
         .nav-item img { width: 40px; height: 40px; border-radius: 8px; margin-bottom: 5px; }
         .nav-item span { display: block; font-size: 12px; }
+        .module-title { padding: 12px 15px; font-weight: bold; }
         
         .goods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .goods-item { background: #fff; border-radius: 8px; overflow: hidden; }
+        .goods-item { border-radius: 8px; overflow: hidden; }
         .goods-item img { width: 100%; height: 120px; object-fit: cover; background: #eee; }
         .goods-item .info { padding: 10px; }
         .goods-item .title { font-size: 13px; line-height: 1.4; min-height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         .goods-item .price { color: #ff6b00; font-size: 16px; font-weight: bold; margin-top: 5px; }
         
         .tabbar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #eee; display: flex; padding: 8px 0; z-index: 999; }
-        .tabbar-item { flex: 1; text-align: center; text-decoration: none; }
+        .tabbar-item { flex: 1; text-align: center; }
         .tabbar-item img { width: 24px; height: 24px; }
         .tabbar-item span { display: block; font-size: 10px; color: #999; }
         .tabbar-item.active span { color: #FF9800; }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div class="loading">加载中...</div>
-    </div>
+    <div id="app"><div class="loading">加载中...</div></div>
     
+    <script src="/static/js/chunk-vendors.8409c5ab.js"></script>
     <script>
-    var API = 'http://localhost:8080';
+    var API = location.protocol + '//' + location.hostname + ':8080';
+    if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+        API = 'http://127.0.0.1:8080';
+    }
     var app = document.getElementById('app');
     
-    function showError(msg, debug) {
-        var html = '<div class="error-box">' + msg;
-        if (debug) {
-            html += '<div class="debug">调试信息: ' + debug + '</div>';
-        }
-        html += '</div>';
-        app.innerHTML = html;
+    function show(msg) {
+        app.innerHTML = '<div class="error">' + msg + '</div>';
     }
     
-    function showLoading() {
-        app.innerHTML = '<div class="loading">加载中...</div>';
-    }
-    
-    function imgUrl(path) {
+    function img(path) {
         if (!path) return '';
         if (path.indexOf('http') === 0) return path;
         return API + path;
     }
     
-    async function fetchApi(url) {
-        console.log('Fetching:', url);
-        try {
-            var res = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                },
-                mode: 'cors'
-            });
-            console.log('Response status:', res.status);
-            console.log('Response ok:', res.ok);
-            
-            if (!res.ok) {
-                throw new Error('HTTP ' + res.status);
-            }
-            
-            var text = await res.text();
-            console.log('Response text length:', text.length);
-            
-            try {
-                var data = JSON.parse(text);
-                console.log('Parsed JSON, code:', data.code);
-                return data;
-            } catch (e) {
-                throw new Error('JSON解析失败: ' + e.message + ', 内容: ' + text.substring(0, 200));
-            }
-        } catch (e) {
-            console.error('Fetch error:', e);
-            throw new Error('请求失败: ' + e.message);
-        }
-    }
-    
-    async function loadConfig() {
-        var url = API + '/api/index/config?from_id=1&plat_form=web&site=127.0.0.1&t=' + Date.now();
-        return fetchApi(url);
-    }
-    
-    async function loadPageData() {
-        var url = API + '/api/index/pageData?from_id=1&plat_form=web&t=' + Date.now();
-        return fetchApi(url);
-    }
-    
-    function render(config, pageData) {
+    function render(config, data) {
         var html = '<div class="page">';
-        
         html += '<div class="header"><h1>' + (config.web && config.web.name || '首页') + '</h1></div>';
         
-        for (var i = 0; i < pageData.length; i++) {
-            var m = pageData[i];
-            var type = m.type;
+        for (var i = 0; i < data.length; i++) {
+            var m = data[i];
             var p = m.params || {};
             
-            if (type === 'search') {
-                html += '<div class="search"><input type="text" placeholder="' + (p.placeholder || '搜索资源') + '" readonly></div>';
-            } else if (type === 'banner' && p.list && p.list.length > 0) {
-                html += '<div class="module"><div class="banner"><img src="' + imgUrl(p.list[0].url) + '" alt="banner"></div></div>';
-            } else if (type === 'nav' && p.list && p.list.length > 0) {
+            if (m.type === 'search') {
+                html += '<div class="search"><input type="text" placeholder="' + (p.placeholder || '搜索') + '" readonly></div>';
+            } else if (m.type === 'banner' && p.list && p.list[0]) {
+                html += '<div class="module"><img src="' + img(p.list[0].url) + '" class="banner"></div>';
+            } else if (m.type === 'nav' && p.list) {
                 html += '<div class="module"><div class="nav">';
                 for (var j = 0; j < p.list.length; j++) {
-                    var nav = p.list[j];
-                    html += '<a href="#" class="nav-item"><img src="' + imgUrl(nav.icon) + '" alt="' + nav.name + '"><span>' + nav.name + '</span></a>';
+                    var n = p.list[j];
+                    html += '<div class="nav-item"><img src="' + img(n.icon) + '"><span>' + n.name + '</span></div>';
                 }
                 html += '</div></div>';
-            } else if (type === 'title') {
+            } else if (m.type === 'title') {
                 html += '<div class="module"><div class="module-title">' + (p.title || '') + '</div></div>';
-            } else if (type === 'goods' && p.list && p.list.length > 0) {
+            } else if (m.type === 'goods' && p.list) {
                 html += '<div class="module"><div class="goods">';
                 for (var k = 0; k < p.list.length; k++) {
                     var g = p.list[k];
-                    html += '<div class="goods-item"><img src="' + imgUrl(g.thumb) + '" alt="' + g.title + '"><div class="info"><div class="title">' + g.title + '</div><div class="price">¥' + (g.price || '0') + '</div></div></div>';
+                    html += '<div class="goods-item"><img src="' + img(g.thumb) + '"><div class="info"><div class="title">' + g.title + '</div><div class="price">¥' + (g.price || '0') + '</div></div></div>';
                 }
                 html += '</div></div>';
             }
         }
-        
         html += '</div>';
         
         html += '<div class="tabbar">';
         var tabs = [
-            { text: '首页', icon: '/static/img/tabbar/home.png', activeIcon: '/static/img/tabbar/home_on.png' },
-            { text: '分类', icon: '/static/img/tabbar/sort.png', activeIcon: '/static/img/tabbar/sort_on.png' },
-            { text: 'VIP', icon: '/static/img/tabbar/vip.png', activeIcon: '/static/img/tabbar/vip_on.png' },
-            { text: '我的', icon: '/static/img/tabbar/my.png', activeIcon: '/static/img/tabbar/my_on.png' }
+            {n:'首页', i:'/static/img/tabbar/home.png', a:'/static/img/tabbar/home_on.png'},
+            {n:'分类', i:'/static/img/tabbar/sort.png', a:'/static/img/tabbar/sort_on.png'},
+            {n:'VIP', i:'/static/img/tabbar/vip.png', a:'/static/img/tabbar/vip_on.png'},
+            {n:'我的', i:'/static/img/tabbar/my.png', a:'/static/img/tabbar/my_on.png'}
         ];
         for (var t = 0; t < tabs.length; t++) {
-            var tab = tabs[t];
-            var isActive = t === 0;
-            html += '<a href="#" class="tabbar-item' + (isActive ? ' active' : '') + '"><img src="' + imgUrl(isActive ? tab.activeIcon : tab.icon) + '"><span>' + tab.text + '</span></a>';
+            var isA = t === 0;
+            html += '<div class="tabbar-item' + (isA ? ' active' : '') + '"><img src="' + img(isA ? tabs[t].a : tabs[t].i) + '"><span>' + tabs[t].n + '</span></div>';
         }
         html += '</div>';
         
         app.innerHTML = html;
-        document.title = (config.web && config.web.name) || '首页';
+        document.title = config.web && config.web.name || '首页';
     }
     
-    async function init() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API + '/api/index/config?from_id=1&plat_form=web&site=' + location.hostname);
+    xhr.onload = function() {
         try {
-            showLoading();
+            var cfg = JSON.parse(xhr.responseText);
+            if (cfg.code !== 200) { show('配置失败:' + cfg.msg); return; }
             
-            var config = await loadConfig();
-            if (config.code !== 200) {
-                showError('配置加载失败: ' + (config.msg || '未知错误'), JSON.stringify(config));
-                return;
-            }
-            
-            var pageData = await loadPageData();
-            if (pageData.code !== 200) {
-                showError('页面数据加载失败: ' + (pageData.msg || '未知错误'), JSON.stringify(pageData));
-                return;
-            }
-            
-            render(config.data, pageData.data);
-            console.log('Page rendered successfully');
-            
-        } catch (e) {
-            showError(e.message);
-            console.error('Init error:', e);
-        }
-    }
-    
-    init();
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open('GET', API + '/api/index/pageData?from_id=1&plat_form=web');
+            xhr2.onload = function() {
+                try {
+                    var pd = JSON.parse(xhr2.responseText);
+                    if (pd.code !== 200) { show('数据失败:' + pd.msg); return; }
+                    render(cfg.data, pd.data);
+                } catch(e) { show('数据解析失败'); }
+            };
+            xhr2.onerror = function() { show('数据请求失败'); };
+            xhr2.send();
+        } catch(e) { show('配置解析失败'); }
+    };
+    xhr.onerror = function() { show('配置请求失败，请确认服务运行在 localhost:8080'); };
+    xhr.send();
     </script>
 </body>
 </html>
