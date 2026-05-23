@@ -57,6 +57,7 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
         if self.path.startswith("/api/"):
             self._forward_to_php("GET")
         elif self.path == "/" or self.path == "/index.html":
+            self.path = "/test_home.html"
             super().do_GET()
         elif self.path.startswith("/pages/"):
             file_path = os.path.join(H5_DIR, self.path.lstrip('/'))
