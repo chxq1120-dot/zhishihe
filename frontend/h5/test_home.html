@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>首页 - 智创云享</title>
+    <title>加载中... - 智创云享</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
@@ -34,31 +34,28 @@
         .tab-icon.active { background: #FF9800; }
         .tab-text { font-size: 10px; color: #999; margin-top: 2px; }
         .tab-text.active { color: #FF9800; }
-        .loading { display: flex; align-items: center; justify-content: center; }
-        .loading::after { content: '加载中...'; }
+        .loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #FF9800; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { margin-top: 15px; color: #666; font-size: 14px; }
+        .error { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; text-align: center; }
+        .error-icon { font-size: 48px; margin-bottom: 15px; }
+        .error-text { color: #666; font-size: 14px; margin-bottom: 15px; }
+        .retry-btn { padding: 10px 30px; background: #FF9800; color: #fff; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        <div class="loading">
+            <div>
+                <div class="loading-spinner"></div>
+                <div class="loading-text">正在加载...</div>
+            </div>
+        </div>
+    </div>
     
     <script>
-    var pageData = {
-        siteName: '智创云享',
-        searchPlaceholder: '搜索资源',
-        banner: { url: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' },
-        navs: [
-            { name: '首页', icon: '/static/img/tabbar/home_on.png' },
-            { name: '分类', icon: '/static/img/tabbar/sort_on.png' },
-            { name: 'VIP', icon: '/static/img/tabbar/vip_on.png' },
-            { name: '我的', icon: '/static/img/tabbar/my_on.png' }
-        ],
-        title: '热门推荐',
-        goods: [
-            { title: '芝士盒知识付费系统', price: '99', thumb: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' },
-            { title: 'VIP会员特权', price: '299', thumb: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' }
-        ],
-        tabbar: null
-    };
+    var pageData = null;
     
     function img(path, fallback) {
         if (!path) return fallback || '';
@@ -67,53 +64,68 @@
     }
     
     function render() {
+        if (!pageData) return;
+        
+        var siteName = pageData.siteName || '智创云享';
+        var searchPlaceholder = pageData.searchPlaceholder || '搜索资源';
+        var banner = pageData.banner || null;
+        var navs = pageData.navs || [];
+        var title = pageData.title || '推荐资源';
+        var goods = pageData.goods || [];
+        var tabbar = pageData.tabbar || [];
+        
         var html = '<div class="page">';
-        html += '<div class="header">' + pageData.siteName + '</div>';
-        html += '<div class="search">' + (pageData.searchPlaceholder || '搜索资源') + '</div>';
+        html += '<div class="header">' + siteName + '</div>';
+        html += '<div class="search">' + searchPlaceholder + '</div>';
         
         html += '<div class="module">';
         html += '<div class="banner">';
-        if (pageData.banner && pageData.banner.url) {
-            html += '<img src="' + pageData.banner.url + '" alt="banner" onerror="this.style.display=\'none\'">';
+        if (banner && banner.url) {
+            html += '<img src="' + banner.url + '" alt="banner" onerror="this.style.display=\'none\'">';
         }
         html += '</div></div>';
         
         html += '<div class="module"><div class="nav">';
-        for (var i = 0; i < pageData.navs.length; i++) {
-            var n = pageData.navs[i];
+        for (var i = 0; i < navs.length; i++) {
+            var n = navs[i];
             html += '<div class="nav-item">';
             html += '<div class="nav-icon">';
             if (n.icon && n.icon.indexOf('.png') > 0) {
                 html += '<img src="' + img(n.icon) + '" alt="' + n.name + '" onerror="this.parentElement.innerHTML=\'' + n.name.charAt(0) + '\'">';
             } else {
-                html += n.name.charAt(0);
+                html += (n.name ? n.name.charAt(0) : '?');
             }
-            html += '</div><div class="nav-text">' + n.name + '</div></div>';
+            html += '</div><div class="nav-text">' + (n.name || '') + '</div></div>';
         }
         html += '</div></div>';
         
         html += '<div class="module">';
-        html += '<div class="title-text">' + pageData.title + '<span class="title-more">更多 &gt;</span></div>';
+        html += '<div class="title-text">' + title + '<span class="title-more">更多 &gt;</span></div>';
         html += '<div class="goods">';
-        for (var j = 0; j < pageData.goods.length; j++) {
-            var g = pageData.goods[j];
+        for (var j = 0; j < goods.length; j++) {
+            var g = goods[j];
             html += '<div class="goods-item">';
             html += '<div class="goods-img">';
             if (g.thumb) {
-                html += '<img src="' + g.thumb + '" alt="' + g.title + '" onerror="this.style.display=\'none\'">';
+                html += '<img src="' + g.thumb + '" alt="' + (g.title || '') + '" onerror="this.style.display=\'none\'">';
             }
             html += '</div>';
-            html += '<div class="goods-info"><div class="goods-title">' + g.title + '</div>';
-            html += '<div class="goods-price">¥' + g.price + '</div></div></div>';
+            html += '<div class="goods-info"><div class="goods-title">' + (g.title || '') + '</div>';
+            html += '<div class="goods-price">¥' + (g.price || 0) + '</div></div></div>';
         }
         html += '</div></div>';
         html += '</div>';
         
         html += '<div class="tabbar">';
         var tabs;
-        if (pageData.tabbar && pageData.tabbar.length > 0) {
-            tabs = pageData.tabbar.map(function(item, idx) {
-                return { name: item.text || item.name || '', icon: item.iconPath || item.icon || '', activeIcon: item.selectedIconPath || item.icon || '', link: item.pagePath || '' };
+        if (tabbar.length > 0) {
+            tabs = tabbar.map(function(item, idx) {
+                return { 
+                    name: item.text || item.name || '', 
+                    icon: item.iconPath || item.icon || '', 
+                    activeIcon: item.selectedIconPath || item.icon || '', 
+                    link: item.pagePath || '' 
+                };
             });
         } else {
             tabs = [
@@ -135,33 +147,48 @@
         html += '</div>';
         
         document.getElementById('app').innerHTML = html;
-        document.title = pageData.siteName;
+        document.title = siteName;
     }
     
-    render();
+    function showError(msg) {
+        document.getElementById('app').innerHTML = '<div class="error"><div class="error-icon">⚠️</div><div class="error-text">' + msg + '</div><button class="retry-btn" onclick="location.reload()">重新加载</button></div>';
+    }
     
-    // 尝试从API加载真实数据
-    fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.code === 200 && data.data && data.data.web) {
-                pageData.siteName = data.data.web.name || pageData.siteName;
-                if (data.data.tabbar && data.data.tabbar.list) {
-                    pageData.tabbar = data.data.tabbar.list;
+    function loadData() {
+        document.getElementById('app').innerHTML = '<div class="loading"><div><div class="loading-spinner"></div><div class="loading-text">正在加载...</div></div></div>';
+        
+        Promise.all([
+            fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1').then(function(res) { return res.json(); }),
+            fetch('/api/index/pageData?from_id=1&plat_form=web').then(function(res) { return res.json(); })
+        ])
+        .then(function(results) {
+            var configData = results[0];
+            var pageDataResult = results[1];
+            
+            pageData = {
+                siteName: '智创云享',
+                searchPlaceholder: '搜索资源',
+                banner: null,
+                navs: [],
+                title: '推荐资源',
+                goods: [],
+                tabbar: []
+            };
+            
+            if (configData.code === 200 && configData.data) {
+                if (configData.data.web) {
+                    pageData.siteName = configData.data.web.name || pageData.siteName;
+                }
+                if (configData.data.tabbar && configData.data.tabbar.list) {
+                    pageData.tabbar = configData.data.tabbar.list;
                 }
             }
-            render();
-        })
-        .catch(function() {});
-    
-    fetch('/api/index/pageData?from_id=1&plat_form=web')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.code === 200 && data.data) {
-                for (var i = 0; i < data.data.length; i++) {
-                    var m = data.data[i];
+            
+            if (pageDataResult.code === 200 && pageDataResult.data) {
+                for (var i = 0; i < pageDataResult.data.length; i++) {
+                    var m = pageDataResult.data[i];
                     if (m.type === 'search' && m.params) {
-                        pageData.searchPlaceholder = m.params.placeholder || '搜索资源';
+                        pageData.searchPlaceholder = m.params.placeholder || pageData.searchPlaceholder;
                     } else if (m.type === 'banner' && m.params && m.params.list && m.params.list[0]) {
                         pageData.banner = { url: m.params.list[0].url };
                     } else if (m.type === 'nav' && m.params && m.params.list) {
@@ -172,10 +199,17 @@
                         pageData.goods = m.params.list;
                     }
                 }
-                render();
             }
+            
+            render();
         })
-        .catch(function() {});
+        .catch(function(error) {
+            console.error('API加载失败:', error);
+            showError('网络请求失败，请检查网络连接');
+        });
+    }
+    
+    loadData();
     </script>
 </body>
 </html>
