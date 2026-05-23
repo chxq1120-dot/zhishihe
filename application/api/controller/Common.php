@@ -128,7 +128,7 @@ class Common extends Controller
         #设置默认代理ID
         $from_id = $this->request->param('from_id/d');
         if (empty($from_id)) {
-            $from_id = (new Admin())->getDefaultAdminId();
+            $from_id = 1;
         }
         $this->request->from_id = $from_id;
         $this->plat_form = empty($this->request->param('plat_form')) ? '' : $this->request->param('plat_form');
