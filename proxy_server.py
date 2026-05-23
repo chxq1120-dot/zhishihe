@@ -42,14 +42,14 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=H5_DIR, **kwargs)
 
     def do_GET(self):
-        print(f"[DEBUG] GET request: {self.path}")
+        print(f"[DEBUG] Incoming GET: {self.path} from {self.client_address}")
         if self.path.startswith("/api/"):
             self._forward_to_php("GET")
         else:
             super().do_GET()
 
     def do_POST(self):
-        print(f"[DEBUG] POST request: {self.path}")
+        print(f"[DEBUG] Incoming POST: {self.path} from {self.client_address}")
         if self.path.startswith("/api/"):
             self._forward_to_php("POST")
         else:
@@ -103,8 +103,9 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
 
     def _set_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, token")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, token, X-Requested-With, Accept, Origin")
+        self.send_header("Access-Control-Max-Age", "86400")
 
 if __name__ == "__main__":
     threading.Thread(target=start_php_server, daemon=True).start()
