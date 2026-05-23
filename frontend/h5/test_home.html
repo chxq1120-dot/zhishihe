@@ -42,15 +42,11 @@
 <body>
     <div id="app"><div class="loading">加载中...</div></div>
     
-    <script src="/static/js/chunk-vendors.8409c5ab.js"></script>
     <script>
-    var API = location.protocol + '//' + location.hostname + ':8080';
-    if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
-        API = 'http://127.0.0.1:8080';
-    }
+    var API = 'http://127.0.0.1:8080';
     var app = document.getElementById('app');
     
-    function show(msg) {
+    function showError(msg) {
         app.innerHTML = '<div class="error">' + msg + '</div>';
     }
     
@@ -109,28 +105,60 @@
         document.title = config.web && config.web.name || '首页';
     }
     
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', API + '/api/index/config?from_id=1&plat_form=web&site=' + location.hostname);
-    xhr.onload = function() {
-        try {
-            var cfg = JSON.parse(xhr.responseText);
-            if (cfg.code !== 200) { show('配置失败:' + cfg.msg); return; }
+    function request(url, callback, timeout) {
+        timeout = timeout || 10000;
+        var xhr = new XMLHttpRequest();
+        var timeoutId = setTimeout(function() {
+            xhr.abort();
+            callback({error: '请求超时'});
+        }, timeout);
+        
+        xhr.open('GET', url);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                clearTimeout(timeoutId);
+                if (xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        callback(null, data);
+                    } catch(e) {
+                        callback({error: 'JSON解析失败: ' + e.message});
+                    }
+                } else {
+                    callback({error: 'HTTP ' + xhr.status});
+                }
+            }
+        };
+        xhr.onerror = function() {
+            clearTimeout(timeoutId);
+            callback({error: '网络错误'});
+        };
+        xhr.send();
+    }
+    
+    request(API + '/api/index/config?from_id=1&plat_form=web&site=127.0.0.1', function(err, cfg) {
+        if (err) {
+            showError('配置请求失败: ' + err.error);
+            return;
+        }
+        if (cfg.code !== 200) {
+            showError('配置错误: ' + cfg.msg);
+            return;
+        }
+        
+        request(API + '/api/index/pageData?from_id=1&plat_form=web', function(err, pd) {
+            if (err) {
+                showError('数据请求失败: ' + err.error);
+                return;
+            }
+            if (pd.code !== 200) {
+                showError('数据错误: ' + pd.msg);
+                return;
+            }
             
-            var xhr2 = new XMLHttpRequest();
-            xhr2.open('GET', API + '/api/index/pageData?from_id=1&plat_form=web');
-            xhr2.onload = function() {
-                try {
-                    var pd = JSON.parse(xhr2.responseText);
-                    if (pd.code !== 200) { show('数据失败:' + pd.msg); return; }
-                    render(cfg.data, pd.data);
-                } catch(e) { show('数据解析失败'); }
-            };
-            xhr2.onerror = function() { show('数据请求失败'); };
-            xhr2.send();
-        } catch(e) { show('配置解析失败'); }
-    };
-    xhr.onerror = function() { show('配置请求失败，请确认服务运行在 localhost:8080'); };
-    xhr.send();
+            render(cfg.data, pd.data);
+        });
+    });
     </script>
 </body>
 </html>
