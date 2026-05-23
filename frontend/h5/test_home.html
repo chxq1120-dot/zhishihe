@@ -47,9 +47,8 @@
         .retry-btn { padding: 10px 30px; background: #FF9800; color: #fff; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
         .api-badge { position: fixed; top: 10px; left: 10px; background: #4CAF50; color: #fff; padding: 8px 15px; border-radius: 20px; z-index: 10001; font-size: 12px; animation: pulse 2s infinite; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .debug-btn { position: fixed; top: 10px; right: 10px; background: #2196F3; color: #fff; padding: 8px 15px; border-radius: 20px; z-index: 10001; font-size: 12px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .debug-panel { position: fixed; top: 50px; left: 10px; right: 10px; background: rgba(0,0,0,0.95); color: #0f0; padding: 15px; font-size: 12px; max-height: 50vh; overflow-y: auto; z-index: 10002; border-radius: 10px; font-family: 'Courier New', monospace; display: none; }
-        .debug-content { white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: #fff; padding: 20px 30px; border-radius: 10px; z-index: 10003; font-size: 14px; text-align: center; max-width: 80%; }
+        .toast-btn { margin-top: 15px; padding: 8px 20px; background: #FF9800; color: #fff; border: none; border-radius: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -61,35 +60,28 @@
             </div>
         </div>
     </div>
-    <div id="debug-btn" class="debug-btn" onclick="toggleDebug()">调试信息</div>
-    <div id="debug-panel" class="debug-panel">
-        <div class="debug-content" id="debug-content"></div>
+    <div id="toast" class="toast" style="display:none;">
+        <div id="toast-content"></div>
+        <button class="toast-btn" onclick="hideToast()">确定</button>
     </div>
     
     <script>
     var pageData = null;
-    var debugMode = false;
     
-    function toggleDebug() {
-        var panel = document.getElementById('debug-panel');
-        debugMode = !debugMode;
-        panel.style.display = debugMode ? 'block' : 'none';
+    function showToast(title, message) {
+        var toast = document.getElementById('toast');
+        var content = document.getElementById('toast-content');
+        content.innerHTML = '<div style="font-weight:bold; margin-bottom:10px;">' + title + '</div><div>' + message + '</div>';
+        toast.style.display = 'block';
     }
     
-    function log(msg) {
-        console.log(msg);
-        if (debugMode) {
-            var content = document.getElementById('debug-content');
-            content.innerHTML += msg + '\n';
-            content.scrollTop = content.scrollHeight;
-        }
+    function hideToast() {
+        document.getElementById('toast').style.display = 'none';
     }
     
-    function navigateTo(url) {
-        log('🖱️ 点击导航到: ' + url);
-        if (url) {
-            window.location.href = url;
-        }
+    function navigateTo(url, name) {
+        console.log('点击: ' + name + ' -> ' + url);
+        showToast(name, '页面 "' + name + '" 正在开发中，暂不支持访问');
     }
     
     function img(path, fallback) {
@@ -106,17 +98,16 @@
         var banner = pageData.banner || null;
         var navs = pageData.navs || [];
         var title = pageData.title || '推荐资源';
-        var titleMoreLink = pageData.titleMoreLink || '/pages/tabbar/sort/index';
         var goods = pageData.goods || [];
         var tabbar = pageData.tabbar || [];
         
         var html = '<div class="page">';
         html += '<div class="api-badge">✓ API数据已加载</div>';
         html += '<div class="header">' + siteName + '</div>';
-        html += '<div class="search" onclick="log(\'🖱️ 点击搜索框\')">' + searchPlaceholder + '</div>';
+        html += '<div class="search" onclick="navigateTo(\'\', \'搜索\')">' + searchPlaceholder + '</div>';
         
         html += '<div class="module">';
-        html += '<div class="banner" onclick="navigateTo(\'' + (banner && banner.link ? banner.link : '') + '\')">';
+        html += '<div class="banner" onclick="navigateTo(\'\', \'Banner\')">';
         if (banner && banner.url) {
             html += '<img src="' + banner.url + '" alt="banner" onerror="this.style.display=\'none\'">';
         }
@@ -125,11 +116,11 @@
         html += '<div class="module"><div class="nav">';
         for (var i = 0; i < navs.length; i++) {
             var n = navs[i];
-            var navLink = n.link || 'javascript:void(0)';
-            html += '<div class="nav-item" onclick="navigateTo(\'' + navLink + '\')">';
+            var navName = n.name || '导航';
+            html += '<div class="nav-item" onclick="navigateTo(\'' + (n.link || '') + '\', \'' + navName + '\')">';
             html += '<div class="nav-icon">';
             if (n.icon && n.icon.indexOf('.png') > 0) {
-                html += '<img src="' + img(n.icon) + '" alt="' + n.name + '" onerror="this.parentElement.innerHTML=\'' + n.name.charAt(0) + '\'">';
+                html += '<img src="' + img(n.icon) + '" alt="' + n.name + '" onerror="this.parentElement.innerHTML=\'' + (n.name ? n.name.charAt(0) : '?') + '\'">';
             } else {
                 html += (n.name ? n.name.charAt(0) : '?');
             }
@@ -138,12 +129,11 @@
         html += '</div></div>';
         
         html += '<div class="module">';
-        html += '<div class="title-text">' + title + '<span class="title-more" onclick="navigateTo(\'' + titleMoreLink + '\')">更多 &gt;</span></div>';
+        html += '<div class="title-text">' + title + '<span class="title-more" onclick="navigateTo(\'/pages/tabbar/sort/index\', \'更多\')">更多 &gt;</span></div>';
         html += '<div class="goods">';
         for (var j = 0; j < goods.length; j++) {
             var g = goods[j];
-            var goodsLink = '/pages/resource/index?id=' + (g.id || 0);
-            html += '<div class="goods-item" onclick="navigateTo(\'' + goodsLink + '\')">';
+            html += '<div class="goods-item" onclick="navigateTo(\'/pages/resource/index?id=' + (g.id || 0) + '\', \'' + (g.title || '商品') + '\')">';
             html += '<div class="goods-img">';
             if (g.thumb) {
                 html += '<img src="' + g.thumb + '" alt="' + (g.title || '') + '" onerror="this.style.display=\'none\'">';
@@ -163,12 +153,12 @@
                     name: item.text || item.name || '', 
                     icon: item.iconPath || item.icon || '', 
                     activeIcon: item.selectedIconPath || item.icon || '', 
-                    link: '/' + (item.pagePath || '')
+                    link: item.pagePath || ''
                 };
             });
         } else {
             tabs = [
-                { name: '首页', icon: '/static/img/tabbar/home_on.png', activeIcon: '/static/img/tabbar/home_on.png', link: '/' },
+                { name: '首页', icon: '/static/img/tabbar/home_on.png', activeIcon: '/static/img/tabbar/home_on.png', link: '' },
                 { name: '分类', icon: '/static/img/tabbar/sort.png', activeIcon: '/static/img/tabbar/sort_on.png', link: '/pages/tabbar/sort/index' },
                 { name: 'VIP', icon: '/static/img/tabbar/vip.png', activeIcon: '/static/img/tabbar/vip_on.png', link: '/pages/tabbar/vip/index' },
                 { name: '我的', icon: '/static/img/tabbar/my.png', activeIcon: '/static/img/tabbar/my_on.png', link: '/pages/tabbar/my/index' }
@@ -177,7 +167,7 @@
         for (var k = 0; k < tabs.length; k++) {
             var t = tabs[k];
             var isActive = k === 0;
-            html += '<div class="tab-item" onclick="navigateTo(\'' + t.link + '\')">';
+            html += '<div class="tab-item" onclick="navigateTo(\'' + t.link + '\', \'' + t.name + '\')">';
             html += '<div class="tab-icon' + (isActive ? ' active' : '') + '">';
             var iconSrc = isActive ? (t.activeIcon || t.icon) : t.icon;
             html += '<img src="' + img(iconSrc) + '" alt="' + t.name + '" onerror="this.parentElement.innerHTML=\'' + t.name.charAt(0) + '\'">';
@@ -187,42 +177,22 @@
         
         document.getElementById('app').innerHTML = html;
         document.title = siteName;
-        
-        log('✅ 页面渲染完成！');
-        log('📦 站点名称: ' + siteName);
-        log('🔍 搜索占位符: ' + searchPlaceholder);
-        log('🖼️ Banner: ' + (banner && banner.url ? '有' : '无'));
-        log('📋 导航数量: ' + navs.length);
-        log('🏷️ 标题: ' + title);
-        log('🛒 商品数量: ' + goods.length);
-        log('📱 Tabbar数量: ' + tabs.length);
     }
     
     function showError(msg) {
         document.getElementById('app').innerHTML = '<div class="error"><div class="error-icon">⚠️</div><div class="error-text">' + msg + '</div><button class="retry-btn" onclick="location.reload()">重新加载</button></div>';
-        log('❌ 错误: ' + msg);
     }
     
     function loadData() {
-        log('🚀 开始加载API数据...');
         document.getElementById('app').innerHTML = '<div class="loading"><div><div class="loading-spinner"></div><div class="loading-text">正在从API加载数据...</div></div></div>';
         
         Promise.all([
-            fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1').then(function(res) { 
-                log('📡 /api/index/config 状态: ' + res.status);
-                return res.json(); 
-            }),
-            fetch('/api/index/pageData?from_id=1&plat_form=web').then(function(res) { 
-                log('📡 /api/index/pageData 状态: ' + res.status);
-                return res.json(); 
-            })
+            fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1').then(function(res) { return res.json(); }),
+            fetch('/api/index/pageData?from_id=1&plat_form=web').then(function(res) { return res.json(); })
         ])
         .then(function(results) {
             var configData = results[0];
             var pageDataResult = results[1];
-            
-            log('📥 收到配置数据: code=' + configData.code);
-            log('📥 收到页面数据: code=' + pageDataResult.code);
             
             pageData = {
                 siteName: '智创云享',
@@ -230,7 +200,6 @@
                 banner: null,
                 navs: [],
                 title: '推荐资源',
-                titleMoreLink: '/pages/tabbar/sort/index',
                 goods: [],
                 tabbar: []
             };
@@ -238,11 +207,9 @@
             if (configData.code === 200 && configData.data) {
                 if (configData.data.web) {
                     pageData.siteName = configData.data.web.name || pageData.siteName;
-                    log('🏠 站点名称来自API: ' + pageData.siteName);
                 }
                 if (configData.data.tabbar && configData.data.tabbar.list) {
                     pageData.tabbar = configData.data.tabbar.list;
-                    log('📱 Tabbar来自API: ' + pageData.tabbar.length + '项');
                 }
             }
             
@@ -251,20 +218,14 @@
                     var m = pageDataResult.data[i];
                     if (m.type === 'search' && m.params) {
                         pageData.searchPlaceholder = m.params.placeholder || pageData.searchPlaceholder;
-                        log('🔍 搜索占位符来自API: ' + pageData.searchPlaceholder);
                     } else if (m.type === 'banner' && m.params && m.params.list && m.params.list[0]) {
-                        pageData.banner = { url: m.params.list[0].url, link: m.params.list[0].link || '' };
-                        log('🖼️ Banner来自API');
+                        pageData.banner = { url: m.params.list[0].url };
                     } else if (m.type === 'nav' && m.params && m.params.list) {
                         pageData.navs = m.params.list;
-                        log('📋 导航来自API: ' + pageData.navs.length + '项');
                     } else if (m.type === 'title' && m.params) {
                         pageData.title = m.params.title || pageData.title;
-                        pageData.titleMoreLink = m.params.moreLink || pageData.titleMoreLink;
-                        log('🏷️ 标题来自API: ' + pageData.title);
                     } else if (m.type === 'goods' && m.params && m.params.list) {
                         pageData.goods = m.params.list;
-                        log('🛒 商品来自API: ' + pageData.goods.length + '项');
                     }
                 }
             }
@@ -273,7 +234,6 @@
         })
         .catch(function(error) {
             console.error('API加载失败:', error);
-            log('❌ API加载失败: ' + error.message);
             showError('网络请求失败，请检查网络连接');
         });
     }
