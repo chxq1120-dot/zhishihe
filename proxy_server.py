@@ -59,6 +59,18 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == "/" or self.path == "/index.html":
             self.path = "/test_home.html"
             super().do_GET()
+        elif self.path.startswith("/pages/"):
+            file_path = os.path.join(H5_DIR, self.path.lstrip('/'))
+            if not os.path.isfile(file_path):
+                file_path_html = file_path + ".html"
+                if os.path.isfile(file_path_html):
+                    self.path = self.path + ".html"
+                else:
+                    self.send_error(404, 'File not found: %s' % self.path)
+            super().do_GET()
+        elif self.path.startswith("/#/"):
+            self.path = "/index.html"
+            super().do_GET()
         else:
             super().do_GET()
 
