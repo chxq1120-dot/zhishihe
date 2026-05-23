@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源详情 - 智创云享</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
+        .page { min-height: 100vh; padding-bottom: 80px; }
+        .header { background: linear-gradient(135deg, #FF9800, #FFB74D); padding: 15px; color: #fff; font-size: 18px; font-weight: bold; display: flex; align-items: center; }
+        .back-btn { margin-right: 15px; cursor: pointer; }
+        .content { padding: 15px; }
+        .resource-image { width: 100%; height: 200px; background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
+        .resource-image img { width: 100%; height: 100%; object-fit: cover; }
+        .resource-title { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .resource-price { font-size: 24px; color: #ff6b00; font-weight: bold; margin-bottom: 15px; }
+        .resource-desc { font-size: 14px; color: #666; line-height: 1.6; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .buy-btn { background: #FF9800; color: #fff; padding: 15px; text-align: center; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .buy-btn:active { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <span class="back-btn" onclick="location.href='/'">&lt;</span>
+            <span>资源详情</span>
+        </div>
+        <div class="content">
+            <div class="resource-image">
+                <img src="https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png" alt="芝士盒知识付费系统">
+            </div>
+            <div class="resource-title">芝士盒知识付费系统</div>
+            <div class="resource-price">¥99</div>
+            <div class="resource-desc">
+                这是一套完整的知识付费系统，包括前端、后端、API接口等完整功能模块。支持知识付费、课程销售、用户管理等核心功能。
+            </div>
+            <div class="buy-btn">立即购买</div>
+        </div>
+    </div>
+</body>
+</html>

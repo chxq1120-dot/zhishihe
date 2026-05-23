@@ -81,7 +81,9 @@
     
     function navigateTo(url, name) {
         console.log('点击: ' + name + ' -> ' + url);
-        showToast(name, '页面 "' + name + '" 正在开发中，暂不支持访问');
+        if (url) {
+            window.location.href = url;
+        }
     }
     
     function img(path, fallback) {
