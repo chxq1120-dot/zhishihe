@@ -9,78 +9,157 @@
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
         .page { min-height: 100vh; padding-bottom: 70px; }
         .header { background: linear-gradient(135deg, #FF9800, #FFB74D); padding: 15px; color: #fff; font-size: 18px; font-weight: bold; }
-        .search { background: #fff; margin: -10px 15px 15px; padding: 10px 15px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; color: #999; font-size: 14px; }
+        .search { background: #fff; margin: -10px 15px 15px; padding: 10px 15px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; color: #999; font-size: 14px; cursor: pointer; }
         .module { background: #fff; margin: 10px 15px; border-radius: 8px; overflow: hidden; }
-        .banner { width: 100%; height: 180px; background: #eee; display: flex; align-items: center; justify-content: center; color: #999; }
+        .banner { width: 100%; height: 180px; background: #eee; display: flex; align-items: center; justify-content: center; color: #999; overflow: hidden; }
+        .banner img { width: 100%; height: 100%; object-fit: cover; }
         .nav { display: flex; flex-wrap: wrap; padding: 10px; }
-        .nav-item { width: 25%; text-align: center; padding: 10px 0; }
-        .nav-icon { width: 40px; height: 40px; background: #FF9800; border-radius: 8px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+        .nav-item { width: 25%; text-align: center; padding: 10px 0; cursor: pointer; }
+        .nav-icon { width: 40px; height: 40px; background: #FF9800; border-radius: 8px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; overflow: hidden; }
+        .nav-icon img { width: 100%; height: 100%; object-fit: cover; }
         .nav-text { font-size: 12px; color: #333; }
-        .title-text { padding: 12px 15px; font-weight: bold; font-size: 15px; }
+        .title-text { padding: 12px 15px; font-weight: bold; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .title-more { font-size: 12px; color: #999; font-weight: normal; }
         .goods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .goods-item { border-radius: 8px; overflow: hidden; }
-        .goods-img { width: 100%; height: 120px; background: #eee; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; }
+        .goods-item { border-radius: 8px; overflow: hidden; cursor: pointer; }
+        .goods-img { width: 100%; height: 120px; background: #eee; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; overflow: hidden; position: relative; }
+        .goods-img img { width: 100%; height: 100%; object-fit: cover; }
         .goods-info { padding: 10px; }
-        .goods-title { font-size: 13px; line-height: 1.4; color: #333; }
+        .goods-title { font-size: 13px; line-height: 1.4; color: #333; min-height: 36px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .goods-price { color: #ff6b00; font-size: 16px; font-weight: bold; margin-top: 5px; }
-        .tabbar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #eee; display: flex; padding: 8px 0; z-index: 999; }
-        .tab-item { flex: 1; text-align: center; }
-        .tab-icon { width: 24px; height: 24px; background: #ddd; border-radius: 4px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; }
+        .tabbar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #eee; display: flex; padding: 8px 0; z-index: 999; padding-bottom: env(safe-area-inset-bottom, 8px); }
+        .tab-item { flex: 1; text-align: center; cursor: pointer; }
+        .tab-icon { width: 24px; height: 24px; background: #ddd; border-radius: 4px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; overflow: hidden; }
+        .tab-icon img { width: 100%; height: 100%; object-fit: cover; }
         .tab-icon.active { background: #FF9800; }
         .tab-text { font-size: 10px; color: #999; margin-top: 2px; }
         .tab-text.active { color: #FF9800; }
+        .loading { display: flex; align-items: center; justify-content: center; }
+        .loading::after { content: '加载中...'; }
     </style>
 </head>
 <body>
-    <div id="app">
-        <div class="page">
-            <div class="header">智创云享</div>
-            <div class="search">搜索资源...</div>
-            
-            <div class="module">
-                <div class="banner">轮播图</div>
-            </div>
-            
-            <div class="module">
-                <div class="nav">
-                    <div class="nav-item"><div class="nav-icon">首</div><div class="nav-text">首页</div></div>
-                    <div class="nav-item"><div class="nav-icon">分</div><div class="nav-text">分类</div></div>
-                    <div class="nav-item"><div class="nav-icon">V</div><div class="nav-text">VIP</div></div>
-                    <div class="nav-item"><div class="nav-icon">我</div><div class="nav-text">我的</div></div>
-                </div>
-            </div>
-            
-            <div class="module">
-                <div class="title-text">推荐商品</div>
-                <div class="goods">
-                    <div class="goods-item">
-                        <div class="goods-img">商品图</div>
-                        <div class="goods-info">
-                            <div class="goods-title">芝士盒知识付费系统</div>
-                            <div class="goods-price">¥99</div>
-                        </div>
-                    </div>
-                    <div class="goods-item">
-                        <div class="goods-img">商品图</div>
-                        <div class="goods-info">
-                            <div class="goods-title">VIP会员特权</div>
-                            <div class="goods-price">¥299</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="tabbar">
-            <div class="tab-item"><div class="tab-icon active">首</div><div class="tab-text active">首页</div></div>
-            <div class="tab-item"><div class="tab-icon">分</div><div class="tab-text">分类</div></div>
-            <div class="tab-item"><div class="tab-icon">V</div><div class="tab-text">VIP</div></div>
-            <div class="tab-item"><div class="tab-icon">我</div><div class="tab-text">我的</div></div>
-        </div>
-    </div>
+    <div id="app"></div>
     
     <script>
-    document.getElementById('app').innerHTML = document.getElementById('app').innerHTML;
+    var pageData = {
+        siteName: '智创云享',
+        banner: { url: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' },
+        navs: [
+            { name: '首页', icon: '/static/img/tabbar/home_on.png' },
+            { name: '分类', icon: '/static/img/tabbar/sort_on.png' },
+            { name: 'VIP', icon: '/static/img/tabbar/vip_on.png' },
+            { name: '我的', icon: '/static/img/tabbar/my_on.png' }
+        ],
+        title: '热门推荐',
+        goods: [
+            { title: '芝士盒知识付费系统', price: '99', thumb: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' },
+            { title: 'VIP会员特权', price: '299', thumb: 'https://zpcms.oss-cn-beijing.aliyuncs.com/uploads/20241007/c514fd92769122adcbc96d94a919f00a.png' }
+        ]
+    };
+    
+    function img(path, fallback) {
+        if (!path) return fallback || '';
+        if (path.indexOf('http') === 0) return path;
+        return path;
+    }
+    
+    function render() {
+        var html = '<div class="page">';
+        html += '<div class="header">' + pageData.siteName + '</div>';
+        html += '<div class="search">搜索资源...</div>';
+        
+        html += '<div class="module">';
+        html += '<div class="banner">';
+        if (pageData.banner && pageData.banner.url) {
+            html += '<img src="' + pageData.banner.url + '" alt="banner" onerror="this.style.display=\'none\'">';
+        }
+        html += '</div></div>';
+        
+        html += '<div class="module"><div class="nav">';
+        for (var i = 0; i < pageData.navs.length; i++) {
+            var n = pageData.navs[i];
+            html += '<div class="nav-item">';
+            html += '<div class="nav-icon">';
+            if (n.icon && n.icon.indexOf('.png') > 0) {
+                html += '<img src="' + img(n.icon) + '" alt="' + n.name + '" onerror="this.parentElement.innerHTML=\'' + n.name.charAt(0) + '\'">';
+            } else {
+                html += n.name.charAt(0);
+            }
+            html += '</div><div class="nav-text">' + n.name + '</div></div>';
+        }
+        html += '</div></div>';
+        
+        html += '<div class="module">';
+        html += '<div class="title-text">' + pageData.title + '<span class="title-more">更多 &gt;</span></div>';
+        html += '<div class="goods">';
+        for (var j = 0; j < pageData.goods.length; j++) {
+            var g = pageData.goods[j];
+            html += '<div class="goods-item">';
+            html += '<div class="goods-img">';
+            if (g.thumb) {
+                html += '<img src="' + g.thumb + '" alt="' + g.title + '" onerror="this.style.display=\'none\'">';
+            }
+            html += '</div>';
+            html += '<div class="goods-info"><div class="goods-title">' + g.title + '</div>';
+            html += '<div class="goods-price">¥' + g.price + '</div></div></div>';
+        }
+        html += '</div></div>';
+        html += '</div>';
+        
+        html += '<div class="tabbar">';
+        var tabs = [
+            { name: '首页', icon: '/static/img/tabbar/home_on.png' },
+            { name: '分类', icon: '/static/img/tabbar/sort.png' },
+            { name: 'VIP', icon: '/static/img/tabbar/vip.png' },
+            { name: '我的', icon: '/static/img/tabbar/my.png' }
+        ];
+        for (var k = 0; k < tabs.length; k++) {
+            var t = tabs[k];
+            var isActive = k === 0;
+            html += '<div class="tab-item">';
+            html += '<div class="tab-icon' + (isActive ? ' active' : '') + '">';
+            html += '<img src="' + img(t.icon) + '" alt="' + t.name + '" onerror="this.parentElement.innerHTML=\'' + t.name.charAt(0) + '\'">';
+            html += '</div><div class="tab-text' + (isActive ? ' active' : '') + '">' + t.name + '</div></div>';
+        }
+        html += '</div>';
+        
+        document.getElementById('app').innerHTML = html;
+        document.title = pageData.siteName;
+    }
+    
+    render();
+    
+    // 尝试从API加载真实数据
+    fetch('http://127.0.0.1:8080/api/index/config?from_id=1&plat_form=web&site=127.0.0.1')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.code === 200 && data.data && data.data.web) {
+                pageData.siteName = data.data.web.name || pageData.siteName;
+            }
+        })
+        .catch(function() {});
+    
+    fetch('http://127.0.0.1:8080/api/index/pageData?from_id=1&plat_form=web')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.code === 200 && data.data) {
+                for (var i = 0; i < data.data.length; i++) {
+                    var m = data.data[i];
+                    if (m.type === 'banner' && m.params && m.params.list && m.params.list[0]) {
+                        pageData.banner = { url: m.params.list[0].url };
+                    } else if (m.type === 'nav' && m.params && m.params.list) {
+                        pageData.navs = m.params.list;
+                    } else if (m.type === 'title' && m.params) {
+                        pageData.title = m.params.title || pageData.title;
+                    } else if (m.type === 'goods' && m.params && m.params.list) {
+                        pageData.goods = m.params.list;
+                    }
+                }
+                render();
+            }
+        })
+        .catch(function() {});
     </script>
 </body>
 </html>
