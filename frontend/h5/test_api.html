@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>测试API</title>
+</head>
+<body>
+    <h1>API测试页面</h1>
+    <div id="result"></div>
+    <script>
+        var result = document.getElementById('result');
+        
+        // 测试API
+        fetch('http://localhost:8080/api/index/config?from_id=1&plat_form=web&site=127.0.0.1')
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                console.log('API Response:', data);
+            })
+            .catch(function(error) {
+                result.innerHTML = '<p style="color:red;">Error: ' + error.message + '</p>';
+                console.error('API Error:', error);
+            });
+    </script>
+</body>
+</html>

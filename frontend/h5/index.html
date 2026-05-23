@@ -1,2 +1,38 @@
-<!DOCTYPE html><html lang=zh-CN><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><title></title><script>var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'))
-            document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' + (coverSupport ? ', viewport-fit=cover' : '') + '" />')</script><link rel=stylesheet href=/static/index.883130ca.css></head><body><noscript><strong>Please enable JavaScript to continue.</strong></noscript><div id=app></div><script src=/static/js/chunk-vendors.8409c5ab.js></script><script src="/wcceinfo.js?v=5.0.15"></script><script src=/static/js/index.58d227c5.js></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>智创云享</title>
+    <script>var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'))
+            document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' + (coverSupport ? ', viewport-fit=cover' : '') + '" />')</script>
+    <link rel="stylesheet" href="/static/index.883130ca.css">
+    <style>
+        body { margin: 0; padding: 0; }
+        #app:empty { min-height: 100vh; background: #f5f5f5; }
+        .fallback-loading { padding: 100px 20px; text-align: center; color: #666; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        .fallback-btn { display: inline-block; margin-top: 20px; padding: 12px 30px; background: #FF9800; color: #fff; border-radius: 25px; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <noscript><strong>请启用 JavaScript 以继续使用本应用</strong></noscript>
+    <div id="app">
+        <div class="fallback-loading">
+            <div>加载中...</div>
+            <div style="margin-top:10px;font-size:12px;">如果长时间无法加载，请点击下面的链接</div>
+            <a href="/test_home.html" class="fallback-btn">打开简化版首页</a>
+        </div>
+    </div>
+    <script src=/static/js/chunk-vendors.8409c5ab.js></script>
+    <script src="/wcceinfo.js?v=5.0.15"></script>
+    <script src=/static/js/index.58d227c5.js></script>
+    <script>
+        setTimeout(function() {
+            var app = document.getElementById('app');
+            if (app && app.children.length <= 1 && !app.querySelector('.uni-page')) {
+                app.innerHTML = '<div class="fallback-loading"><div>应用加载失败</div><div style="margin-top:10px;font-size:12px;">可能是组件加载问题</div><a href="/test_home.html" class="fallback-btn">打开简化版首页</a></div>';
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

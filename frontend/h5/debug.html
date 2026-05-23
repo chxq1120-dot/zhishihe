@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>诊断页面</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+        .log { margin: 5px 0; padding: 5px; border-left: 3px solid #333; }
+        .success { border-left-color: #4ec9b0; }
+        .error { border-left-color: #f14c4c; }
+        .info { border-left-color: #dcdcaa; }
+        h2 { color: #569cd6; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>诊断页面</h1>
+    <div id="logs"></div>
+    
+    <script src="/static/js/chunk-vendors.8409c5ab.js"></script>
+    <script src="/wcceinfo.js?v=5.0.15"></script>
+    <script src="/static/js/index.58d227c5.js"></script>
+    
+    <script>
+        function log(msg, type) {
+            var div = document.createElement('div');
+            div.className = 'log ' + (type || '');
+            div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+            document.getElementById('logs').appendChild(div);
+            console.log(msg);
+        }
+        
+        function run() {
+            log('开始诊断...', 'info');
+            
+            // 1. 检查 wcceinfo
+            log('wcceinfo.siteurl: ' + (typeof wcceinfo !== 'undefined' ? wcceinfo.siteurl : '未定义'), 'info');
+            
+            // 2. 检查 uni 对象
+            log('uni 对象存在: ' + (typeof uni !== 'undefined'), 'info');
+            
+            // 3. 检查 storage
+            try {
+                var config = uni.getStorageSync('config');
+                log('Storage config 存在: ' + (!!config), 'info');
+                if (config) {
+                    log('Config keys: ' + Object.keys(config).join(', '), 'success');
+                }
+            } catch (e) {
+                log('Storage 读取错误: ' + e.message, 'error');
+            }
+            
+            // 4. 检查 Vue app
+            log('Vue 对象存在: ' + (typeof Vue !== 'undefined'), 'info');
+            
+            // 5. 测试 API 请求
+            var apiBase = typeof wcceinfo !== 'undefined' ? wcceinfo.siteurl : 'http://localhost:8080/';
+            log('API Base URL: ' + apiBase, 'info');
+            
+            fetch(apiBase + 'api/index/config?from_id=1&plat_form=web&site=127.0.0.1')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.code === 200) {
+                        log('API config 成功返回', 'success');
+                        log('站点名称: ' + data.data.web.name, 'success');
+                        
+                        // 保存到 storage
+                        try {
+                            uni.setStorageSync('config', data.data);
+                            log('Config 已保存到 storage', 'success');
+                        } catch (e) {
+                            log('Storage 保存错误: ' + e.message, 'error');
+                        }
+                    } else {
+                        log('API 返回错误: ' + data.msg, 'error');
+                    }
+                })
+                .catch(function(e) {
+                    log('API 请求失败: ' + e.message, 'error');
+                });
+            
+            // 6. 检查 tabbar 相关
+            log('检查 tabbar 元素...', 'info');
+            setTimeout(function() {
+                var tabbar = document.querySelector('.uni-tabbar-bottom, .uni-app--showTabBar, [class*="tabbar"]');
+                log('Tabbar 元素: ' + (tabbar ? '存在' : '不存在'), tabbar ? 'info' : 'error');
+                
+                var appDiv = document.getElementById('app');
+                log('App div 内容: ' + (appDiv ? appDiv.innerHTML.substring(0, 100) : '不存在'), 'info');
+            }, 1000);
+        }
+        
+        setTimeout(run, 500);
+    </script>
+</body>
+</html>
