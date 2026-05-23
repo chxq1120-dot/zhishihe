@@ -359,16 +359,14 @@ class Index extends Common
      */
     public function getThemeConfig()
     {
-        $admin_id = $this->request->param('from_id');
         $type = $this->request->param('type/d', 0);
-        $config = ThemeConfig::where(['page'=>$type,'admin_id'=>$admin_id])->find();
-        if (!empty($config)) {
-            $theme = json_decode($config->params, true);
-        }else{
-            $admin_id = (new Admin())->getDefaultAdminId();
-            $config = ThemeConfig::where(['page'=>$type,'admin_id'=>$admin_id])->find();
-            $theme = json_decode($config->params, true);
-        }
+        $theme = [
+            'themeColor' => '#FF9800',
+            'themeColorLight' => '#FFE0B2',
+            'tab_bg_color' => '#ffffff',
+            'tab_text_color' => '#666666',
+            'tab_text_color_on' => '#FF9800',
+        ];
         $this->success('success', $theme);
     }
 

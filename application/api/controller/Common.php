@@ -298,9 +298,8 @@ class Common extends Controller
     /**
      * 魔术方法：处理所有未定义的方法，返回默认响应
      */
-    public function __call($name, $arguments)
+    public function _empty($name)
     {
-        // 返回通用的成功响应
         $this->success('success', [
             'list' => [],
             'info' => [],

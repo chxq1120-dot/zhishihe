@@ -6,8 +6,8 @@ import json
 import subprocess
 import threading
 import time
+import sys
 
-# 清除所有代理环境变量，避免请求被系统代理拦截
 os.environ.pop('http_proxy', None)
 os.environ.pop('https_proxy', None)
 os.environ.pop('HTTP_PROXY', None)
@@ -21,6 +21,16 @@ H5_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "h
 PHP_PORT = 8081
 PHP_HOST = "127.0.0.1"
 
+SKIP_HEADERS = {
+    'transfer-encoding',
+    'connection',
+    'access-control-allow-origin',
+    'access-control-allow-methods',
+    'access-control-allow-headers',
+    'access-control-allow-credentials',
+    'access-control-max-age',
+}
+
 def start_php_server():
     time.sleep(1)
     proc = subprocess.Popen(
@@ -32,7 +42,6 @@ def start_php_server():
         universal_newlines=True
     )
     print(f"PHP backend started at http://{PHP_HOST}:{PHP_PORT}")
-    # 读取 PHP 服务器的输出并打印
     for line in proc.stdout:
         print(line, end='')
     proc.wait()
@@ -41,15 +50,16 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=H5_DIR, **kwargs)
 
+    def log_message(self, format, *args):
+        sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+
     def do_GET(self):
-        print(f"[DEBUG] Incoming GET: {self.path} from {self.client_address}")
         if self.path.startswith("/api/"):
             self._forward_to_php("GET")
         else:
             super().do_GET()
 
     def do_POST(self):
-        print(f"[DEBUG] Incoming POST: {self.path} from {self.client_address}")
         if self.path.startswith("/api/"):
             self._forward_to_php("POST")
         else:
@@ -61,7 +71,6 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def _forward_to_php(self, method):
-        print(f"[DEBUG] Incoming request: {method} {self.path}")
         try:
             url = f"http://{PHP_HOST}:{PHP_PORT}{self.path}"
             headers = {}
@@ -73,16 +82,14 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
                 content_length = int(self.headers.get("Content-Length", 0))
                 if content_length > 0:
                     body = self.rfile.read(content_length)
-            print(f"[DEBUG] Forwarding to PHP backend: {url}")
             req = urllib.request.Request(url, data=body, headers=headers, method=method)
             proxy_handler = urllib.request.ProxyHandler({})
             opener = urllib.request.build_opener(proxy_handler)
             with opener.open(req, timeout=15) as resp:
                 resp_body = resp.read()
-                print(f"[DEBUG] PHP backend responded with status: {resp.status}")
                 self.send_response(resp.status)
                 for key, value in resp.getheaders():
-                    if key.lower() not in ("transfer-encoding", "connection"):
+                    if key.lower() not in SKIP_HEADERS:
                         self.send_header(key, value)
                 self._set_cors_headers()
                 self.end_headers()
