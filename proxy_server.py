@@ -15,10 +15,16 @@ def start_php_server():
     time.sleep(1)
     proc = subprocess.Popen(
         ["php", "-S", f"{PHP_HOST}:{PHP_PORT}", "-t", "/workspace/public", "/workspace/public/router.php"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+        universal_newlines=True
     )
     print(f"PHP backend started at http://{PHP_HOST}:{PHP_PORT}")
+    # 读取 PHP 服务器的输出并打印
+    for line in proc.stdout:
+        print(line, end='')
     proc.wait()
 
 class LocalHandler(http.server.SimpleHTTPRequestHandler):
