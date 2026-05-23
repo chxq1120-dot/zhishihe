@@ -42,6 +42,11 @@
         .error-icon { font-size: 48px; margin-bottom: 15px; }
         .error-text { color: #666; font-size: 14px; margin-bottom: 15px; }
         .retry-btn { padding: 10px 30px; background: #FF9800; color: #fff; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
+        .debug-panel { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); color: #0f0; padding: 10px; font-size: 12px; max-height: 40vh; overflow-y: auto; z-index: 10000; font-family: monospace; }
+        .debug-toggle { position: fixed; top: 10px; right: 10px; background: #FF9800; color: #fff; padding: 5px 10px; border-radius: 5px; cursor: pointer; z-index: 10001; font-size: 12px; }
+        .debug-content { white-space: pre-wrap; word-break: break-all; }
+        .api-badge { position: fixed; top: 10px; left: 10px; background: #4CAF50; color: #fff; padding: 5px 10px; border-radius: 5px; z-index: 10001; font-size: 12px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body>
@@ -49,13 +54,32 @@
         <div class="loading">
             <div>
                 <div class="loading-spinner"></div>
-                <div class="loading-text">正在加载...</div>
+                <div class="loading-text">正在从API加载数据...</div>
             </div>
         </div>
+    </div>
+    <div id="debug-toggle" class="debug-toggle" onclick="toggleDebug()">调试信息</div>
+    <div id="debug-panel" class="debug-panel" style="display:none;">
+        <div class="debug-content" id="debug-content"></div>
     </div>
     
     <script>
     var pageData = null;
+    var debugMode = false;
+    
+    function toggleDebug() {
+        var panel = document.getElementById('debug-panel');
+        debugMode = !debugMode;
+        panel.style.display = debugMode ? 'block' : 'none';
+    }
+    
+    function log(msg) {
+        console.log(msg);
+        if (debugMode) {
+            var content = document.getElementById('debug-content');
+            content.innerHTML += msg + '\n';
+        }
+    }
     
     function img(path, fallback) {
         if (!path) return fallback || '';
@@ -75,6 +99,7 @@
         var tabbar = pageData.tabbar || [];
         
         var html = '<div class="page">';
+        html += '<div class="api-badge">API数据已加载</div>';
         html += '<div class="header">' + siteName + '</div>';
         html += '<div class="search">' + searchPlaceholder + '</div>';
         
@@ -148,22 +173,42 @@
         
         document.getElementById('app').innerHTML = html;
         document.title = siteName;
+        
+        log('✅ 页面渲染完成！');
+        log('📦 站点名称: ' + siteName);
+        log('🔍 搜索占位符: ' + searchPlaceholder);
+        log('🖼️ Banner: ' + (banner ? banner.url : '无'));
+        log('📋 导航数量: ' + navs.length);
+        log('🏷️ 标题: ' + title);
+        log('🛒 商品数量: ' + goods.length);
+        log('📱 Tabbar数量: ' + tabs.length);
     }
     
     function showError(msg) {
         document.getElementById('app').innerHTML = '<div class="error"><div class="error-icon">⚠️</div><div class="error-text">' + msg + '</div><button class="retry-btn" onclick="location.reload()">重新加载</button></div>';
+        log('❌ 错误: ' + msg);
     }
     
     function loadData() {
-        document.getElementById('app').innerHTML = '<div class="loading"><div><div class="loading-spinner"></div><div class="loading-text">正在加载...</div></div></div>';
+        log('🚀 开始加载API数据...');
+        document.getElementById('app').innerHTML = '<div class="loading"><div><div class="loading-spinner"></div><div class="loading-text">正在从API加载数据...</div></div></div>';
         
         Promise.all([
-            fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1').then(function(res) { return res.json(); }),
-            fetch('/api/index/pageData?from_id=1&plat_form=web').then(function(res) { return res.json(); })
+            fetch('/api/index/config?from_id=1&plat_form=web&site=127.0.0.1').then(function(res) { 
+                log('📡 /api/index/config 状态: ' + res.status);
+                return res.json(); 
+            }),
+            fetch('/api/index/pageData?from_id=1&plat_form=web').then(function(res) { 
+                log('📡 /api/index/pageData 状态: ' + res.status);
+                return res.json(); 
+            })
         ])
         .then(function(results) {
             var configData = results[0];
             var pageDataResult = results[1];
+            
+            log('📥 收到配置数据: code=' + configData.code);
+            log('📥 收到页面数据: code=' + pageDataResult.code);
             
             pageData = {
                 siteName: '智创云享',
@@ -178,9 +223,11 @@
             if (configData.code === 200 && configData.data) {
                 if (configData.data.web) {
                     pageData.siteName = configData.data.web.name || pageData.siteName;
+                    log('🏠 站点名称来自API: ' + pageData.siteName);
                 }
                 if (configData.data.tabbar && configData.data.tabbar.list) {
                     pageData.tabbar = configData.data.tabbar.list;
+                    log('📱 Tabbar来自API: ' + pageData.tabbar.length + '项');
                 }
             }
             
@@ -189,14 +236,19 @@
                     var m = pageDataResult.data[i];
                     if (m.type === 'search' && m.params) {
                         pageData.searchPlaceholder = m.params.placeholder || pageData.searchPlaceholder;
+                        log('🔍 搜索占位符来自API: ' + pageData.searchPlaceholder);
                     } else if (m.type === 'banner' && m.params && m.params.list && m.params.list[0]) {
                         pageData.banner = { url: m.params.list[0].url };
+                        log('🖼️ Banner来自API');
                     } else if (m.type === 'nav' && m.params && m.params.list) {
                         pageData.navs = m.params.list;
+                        log('📋 导航来自API: ' + pageData.navs.length + '项');
                     } else if (m.type === 'title' && m.params) {
                         pageData.title = m.params.title || pageData.title;
+                        log('🏷️ 标题来自API: ' + pageData.title);
                     } else if (m.type === 'goods' && m.params && m.params.list) {
                         pageData.goods = m.params.list;
+                        log('🛒 商品来自API: ' + pageData.goods.length + '项');
                     }
                 }
             }
@@ -205,6 +257,7 @@
         })
         .catch(function(error) {
             console.error('API加载失败:', error);
+            log('❌ API加载失败: ' + error.message);
             showError('网络请求失败，请检查网络连接');
         });
     }
