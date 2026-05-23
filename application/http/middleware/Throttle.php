@@ -2,6 +2,8 @@
 
 namespace app\http\middleware;
 
+use think\facade\Cache;
+
 class Throttle
 {
     public function handle($request, \Closure $next)
@@ -10,21 +12,15 @@ class Throttle
         $action = $request->action();
         $ip = $request->ip(0, 1);
         $key = md5($ip . '_' . $controller . '_' . $action);
-        $redis = new \Redis();
-        $redis->connect(config('redis.host'), config('redis.port'));
-        if (!empty(config('redis.auth'))) {
-            $redis->auth(config('redis.auth'));
+        $limit = config('redis.limit') ?: 60;
+        $count = Cache::get($key, 0);
+        if ($count > $limit) {
+            return json(['code' => 403, 'msg' => '请稍后...', 'data' => [], 'time' => time()]);
         }
-        $passed = $redis->exists($key);
-        if ($passed) {
-            $redis->incr($key);
-            $count = $redis->get($key);
-            if ($count > config('redis.limit')) {
-                return json(['code' => 403, 'msg' => '请稍后...', 'data' => [], 'time' => time()]);
-            }
+        if ($count > 0) {
+            Cache::inc($key);
         } else {
-            $redis->incr($key);
-            $redis->expire($key, 60);
+            Cache::set($key, 1, 60);
         }
         return $next($request);
     }
