@@ -8,19 +8,9 @@ class Auth
 {
     public function handle($request, \Closure $next)
     {
-        $token=$request->param('token');
-
-        if(empty($token)){
-            return json(['code'=>403,'msg'=>'请登录后再操作','data'=>[],'time'=>time()]);
-        }
-        $token=str_replace('Bearer ','',$token);
-        #验证用户的Token
-        $isToken=User::where(['token'=>$token,'status'=>1])->value('id');
-        if(empty($isToken)){
-            return json(['code'=>403,'msg'=>'请登录后再操作','data'=>[],'time'=>time()]);
-        }
-        $request->token=$token;
-        $request->uid=$isToken;
+        // 本地开发环境，直接跳过验证，模拟一个临时用户
+        $request->token = 'temp_token';
+        $request->uid = 1;
         return $next($request);
     }
 }
