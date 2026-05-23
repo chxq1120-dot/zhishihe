@@ -61,7 +61,9 @@ class LocalHandler(http.server.SimpleHTTPRequestHandler):
                 if content_length > 0:
                     body = self.rfile.read(content_length)
             req = urllib.request.Request(url, data=body, headers=headers, method=method)
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            proxy_handler = urllib.request.ProxyHandler({})
+            opener = urllib.request.build_opener(proxy_handler)
+            with opener.open(req, timeout=15) as resp:
                 resp_body = resp.read()
                 self.send_response(resp.status)
                 for key, value in resp.getheaders():
