@@ -1,6 +1,12 @@
 <?php
 namespace app\api\controller;
 
+use app\common\model\SpreadHand;
+use app\common\model\Spread;
+use app\common\model\ResourceTask;
+use app\common\model\AdminSite;
+use think\Db;
+
 class Resource extends Common
 {
     public function initialize()
@@ -40,8 +46,8 @@ class Resource extends Common
     public function resdetail()
     {
         $data = [
-            'id' => 1, 'title' => '芝士盒知识付费系统', 
-            'desc' => '这是一个完整的知识付费系统', 
+            'id' => 1, 'title' => '芝士盒知识付费系统',
+            'desc' => '这是一个完整的知识付费系统',
             'price' => 99, 'dis_price' => 69, 'sales' => 100,
             'level' => 0, 'type' => 1,
             'level_name' => '普通', 'svip_name' => '会员专享',
@@ -59,5 +65,92 @@ class Resource extends Common
     public function download()
     {
         $this->success('success');
+    }
+
+    public function handSpread()
+    {
+        $id = $this->request->param('id/d', 0);
+        $r_uid = $this->request->param('r_uid/d', 0);
+        $uid = $this->request->uid ?? 0;
+
+        if (empty($id)) {
+            $this->error('资源ID不能为空');
+        }
+        if (empty($uid)) {
+            $this->error('请先登录', null, 401);
+        }
+
+        $spread = Spread::where('id', $id)->field('id,invite_num,exc_video')->find();
+        if (empty($spread)) {
+            $this->error('资源不存在');
+        }
+
+        if (empty($r_uid)) {
+            $this->error('缺少被助力用户信息');
+        }
+
+        if ($r_uid == $uid) {
+            $this->error('不能给自己助力');
+        }
+
+        $admin_id = $this->request->from_id ?? 1;
+
+        $spreadHand = new SpreadHand();
+        $result = $spreadHand->handSpread($r_uid, $uid, $admin_id, $id);
+
+        if ($result[0]) {
+            $inviter = ResourceTask::where('uid', $r_uid)->where('rid', $id)->find();
+            $invite_num = $inviter ? $inviter->invite_num : 0;
+            $this->success($result[1], [
+                'invite_num' => $invite_num,
+                'need_num' => $spread->invite_num,
+                'is_complete' => $inviter ? ($inviter->status == 1) : false
+            ]);
+        } else {
+            $this->error($result[1]);
+        }
+    }
+
+    public function getHandList()
+    {
+        $id = $this->request->param('id/d', 0);
+        $r_uid = $this->request->param('r_uid/d', 0);
+        $page = $this->request->param('page/d', 1);
+        $limit = $this->request->param('limit/d', 10);
+
+        if (empty($id)) {
+            $this->error('资源ID不能为空');
+        }
+
+        $where = ['rid' => $id];
+        if (!empty($r_uid)) {
+            $where['r_uid'] = $r_uid;
+        }
+
+        $list = SpreadHand::with(['user' => function($query) {
+            $query->field('id,nickname,avatar');
+        }])->where($where)->order('ctime desc')->page($page, $limit)->select();
+
+        $total = SpreadHand::where($where)->count();
+
+        $result = [];
+        foreach ($list as $item) {
+            $result[] = [
+                'id' => $item->id,
+                'uid' => $item->uid,
+                'r_uid' => $item->r_uid,
+                'rid' => $item->rid,
+                'ctime_text' => $item->ctime_text,
+                'nickname' => $item->user ? $item->user->nickname : '未知用户',
+                'avatar' => $item->user ? $item->user->avatar : '',
+            ];
+        }
+
+        $this->success('success', [
+            'list' => $result,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit
+        ]);
     }
 }
