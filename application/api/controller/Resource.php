@@ -76,9 +76,6 @@ class Resource extends Common
         if (empty($id)) {
             $this->error('资源ID不能为空');
         }
-        if (empty($uid)) {
-            $this->error('请先登录', null, 401);
-        }
 
         $spread = Spread::where('id', $id)->field('id,invite_num,exc_video')->find();
         if (empty($spread)) {
@@ -89,25 +86,40 @@ class Resource extends Common
             $this->error('缺少被助力用户信息');
         }
 
-        if ($r_uid == $uid) {
-            $this->error('不能给自己助力');
+        $admin_id = $this->request->from_id ?? 1;
+
+        $result_data = [
+            'is_self' => false,
+            'invite_num' => 0,
+            'need_num' => $spread->invite_num,
+            'is_complete' => false,
+            'msg' => ''
+        ];
+
+        if (empty($uid)) {
+            $this->success('请先登录后助力', $result_data);
         }
 
-        $admin_id = $this->request->from_id ?? 1;
+        if ($r_uid == $uid) {
+            $result_data['is_self'] = true;
+            $result_data['invite_num'] = 0;
+            $result_data['is_complete'] = false;
+            $result_data['msg'] = '本人访问';
+            $this->success('本人访问', $result_data);
+        }
 
         $spreadHand = new SpreadHand();
         $result = $spreadHand->handSpread($r_uid, $uid, $admin_id, $id);
 
         if ($result[0]) {
             $inviter = ResourceTask::where('uid', $r_uid)->where('rid', $id)->find();
-            $invite_num = $inviter ? $inviter->invite_num : 0;
-            $this->success($result[1], [
-                'invite_num' => $invite_num,
-                'need_num' => $spread->invite_num,
-                'is_complete' => $inviter ? ($inviter->status == 1) : false
-            ]);
+            $result_data['invite_num'] = $inviter ? $inviter->invite_num : 0;
+            $result_data['is_complete'] = $inviter ? ($inviter->status == 1) : false;
+            $result_data['msg'] = $result[1];
+            $this->success($result[1], $result_data);
         } else {
-            $this->error($result[1]);
+            $result_data['msg'] = $result[1];
+            $this->error($result[1], $result_data);
         }
     }
 
@@ -146,11 +158,20 @@ class Resource extends Common
             ];
         }
 
+        $spread = Spread::where('id', $id)->field('id,invite_num')->find();
+        $inviter_task = null;
+        if (!empty($r_uid)) {
+            $inviter_task = ResourceTask::where('uid', $r_uid)->where('rid', $id)->find();
+        }
+
         $this->success('success', [
             'list' => $result,
             'total' => $total,
             'page' => $page,
-            'limit' => $limit
+            'limit' => $limit,
+            'invite_num' => $inviter_task ? $inviter_task->invite_num : 0,
+            'need_num' => $spread ? $spread->invite_num : 0,
+            'is_complete' => $inviter_task ? ($inviter_task->status == 1) : false
         ]);
     }
 }
