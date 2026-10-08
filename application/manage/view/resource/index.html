@@ -60,6 +60,10 @@
                     <i class="layui-icon layui-icon-upload-drag"></i>
                     批量导入
                 </a>
+                <a href="javascript:;" class="batchadd layui-btn layui-bg-blue layui-btn-small">
+                    <i class="layui-icon layui-icon-file"></i>
+                    批量上传文档
+                </a>
                 <a href="javascript:;" class="add layui-btn layui-bg-blue layui-btn-small">
                     <i class="layui-icon layui-icon-addition"></i>
                     {:lang('add')}资源
@@ -266,6 +270,19 @@
                 maxmin: true,
                 content:'{:createUrl("batch")}',
                 area:['500px','350px'],
+                end:function(){
+                    tableIn.reload();
+                }
+            });
+        });
+        //批量上传文档（自动识别分类）
+        $('#func-btn .batchadd').on('click',function () {
+            layer.open({
+                title:'批量上传文档',
+                type:2,
+                maxmin: true,
+                content:'{:createUrl("batchadd")}',
+                area:['90%','85%'],
                 end:function(){
                     tableIn.reload();
                 }

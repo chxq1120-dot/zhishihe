@@ -558,6 +558,202 @@ class Resource extends Common
             return view();
         }
     }
+
+    /**
+     * 默认分类ID（未匹配到任何分类时使用）
+     */
+    const DEFAULT_CATEGORY_ID = 43;
+
+    /**
+     * 分类识别配置：56个分类规则 (基于 ID 和 名称)
+     * @return array
+     */
+    protected function getCategoryConfig()
+    {
+        return [
+            13 => ['name' => '私域运营', 'keywords' => ['私域', '社群', '企微', '转化', '私域流量']],
+            15 => ['name' => '增长密码', 'keywords' => ['增长', '获客', '留存', '裂变', '增长黑客']],
+            16 => ['name' => '小红书运营', 'keywords' => ['小红书', 'Red', '种草', '笔记', '薯条']],
+            17 => ['name' => '直播/短视频', 'keywords' => ['直播', '短视频', '抖音', '快手', '视频号', '带货']],
+            18 => ['name' => '数字广告', 'keywords' => ['广告', '投放', '流量', '营销通', '竞价']],
+            69 => ['name' => '营销策划', 'keywords' => ['营销', '策划', '方案', '品牌', '活动']],
+            19 => ['name' => '综合金融', 'keywords' => ['金融', '理财', '投资', '证券', '资产']],
+            20 => ['name' => '银行', 'keywords' => ['银行', '信用卡', '信贷', '储蓄', '银行业']],
+            21 => ['name' => '保险', 'keywords' => ['保险', '寿险', '财险', '年金', '保单']],
+            14 => ['name' => '康养(养老)', 'keywords' => ['养老', '康养', '老年', '银发', '托养']],
+            22 => ['name' => '大健康', 'keywords' => ['健康', '大健康', '健康管理', '养生', '体检', '预防']],
+            23 => ['name' => '互联网医疗', 'keywords' => ['医疗', '互联网医疗', '在线问诊', '医药电商', '挂号']],
+            24 => ['name' => '慢病管理', 'keywords' => ['慢病', '糖尿病', '高血压', '慢性病', '健康监测']],
+            25 => ['name' => '药品器械', 'keywords' => ['药品', '医疗器械', '制药', '医药', '耗材']],
+            26 => ['name' => '保健品', 'keywords' => ['营养', '滋补', '保健', '药膳', '保健品', '膳食', '补充剂', '维生素', '营养品']],
+            27 => ['name' => '长期照护', 'keywords' => ['照护', '护理', '长期看护', '病患', '看护']],
+            33 => ['name' => '心理', 'keywords' => ['心理', '心灵', '疗愈', '抑郁', '精神健康']],
+            28 => ['name' => '消费者洞察', 'keywords' => ['消费', '快消', '消费者', '用户研究', '消费趋势', '洞察', '行为分析']],
+            29 => ['name' => '宠物', 'keywords' => ['宠物', '猫', '狗', '宠粮', '宠医', '撸猫']],
+            30 => ['name' => '母婴', 'keywords' => ['幼儿', '母婴', '婴儿', '奶粉', '孕产', '备孕', '纸尿裤']],
+            31 => ['name' => '汽车', 'keywords' => ['汽车', '新能源车', '乘用车', '自动驾驶', '二手车']],
+            32 => ['name' => '家电', 'keywords' => ['家电', '冰箱', '洗衣机', '空调', '白电', '厨电']],
+            34 => ['name' => '美妆护肤', 'keywords' => ['美妆', '护肤', '化妆', '防晒', '口红', '护肤品']],
+            35 => ['name' => '家居', 'keywords' => ['装修', '家居', '家具', '软装', '全屋定制', '家装']],
+            36 => ['name' => '旅游', 'keywords' => ['酒店', '旅游', '酒旅', '景区', '自由行', '出境游', '门票']],
+            37 => ['name' => '运动健身', 'keywords' => ['运动', '健身', '瑜伽', '户外', '跑鞋', '装备']],
+            38 => ['name' => '数码3C', 'keywords' => ['数码', '3C', '手机', '电脑', '耳机', '平板']],
+            39 => ['name' => '服饰鞋包', 'keywords' => ['服饰', '服装', '鞋', '包', '时尚', '穿搭']],
+            40 => ['name' => '奢侈品', 'keywords' => ['奢侈品', '名表', '珠宝', 'Luxury']],
+            41 => ['name' => '其他消费', 'keywords' => ['消费', '购物', '零售']],
+            64 => ['name' => '房地产', 'keywords' => ['地产', '房产', '置业', '楼市', '物业']],
+            65 => ['name' => '医美', 'keywords' => ['医美', '整容', '医美机构', '抗衰', '玻尿酸']],
+            47 => ['name' => '餐饮洞察', 'keywords' => ['餐饮', '餐厅', '外卖', '饭店', '美食']],
+            48 => ['name' => '茶饮', 'keywords' => ['茶饮', '奶茶', '新茶饮', '果茶']],
+            49 => ['name' => '咖啡', 'keywords' => ['咖啡', '星巴克', '瑞幸', '生椰']],
+            50 => ['name' => '酒水饮料', 'keywords' => ['饮料', '酒水', '白酒', '啤酒', '软饮', '汽水']],
+            51 => ['name' => '预制菜', 'keywords' => ['预制菜', '速食', '方便食品', '半成品菜']],
+            68 => ['name' => '零食', 'keywords' => ['零食', '休闲食品', '炒货', '糖果']],
+            52 => ['name' => '科技洞察', 'keywords' => ['科技', '前沿', '研报', '产业趋势']],
+            53 => ['name' => '物联网', 'keywords' => ['物联网', 'IoT', '传感器', '智能设备', '万物互联']],
+            54 => ['name' => 'AI人工智能', 'keywords' => ['AI', '人工智能', '大模型', 'AIGC', 'GPT']],
+            55 => ['name' => '虚拟现实', 'keywords' => ['眼镜', 'VR', 'AR', '元宇宙', '虚拟人', 'XR']],
+            56 => ['name' => '大数据', 'keywords' => ['大数据', '数据中心', '云', '算力', 'Data']],
+            57 => ['name' => '区块链', 'keywords' => ['区块链', 'Web3', '数字货币', '加密']],
+            58 => ['name' => '元宇宙', 'keywords' => ['元宇宙', '数字孪生', '虚拟空间']],
+            71 => ['name' => '低空经济', 'keywords' => ['低空', '无人机', '飞行汽车', 'eVTOL']],
+            60 => ['name' => '教培洞察', 'keywords' => ['教培', '教育', '辅导', '培训']],
+            61 => ['name' => '婴幼儿教育', 'keywords' => ['早教', '幼教', '托育', '启蒙']],
+            62 => ['name' => 'K12教育', 'keywords' => ['K12', '中小学', '素质教育']],
+            63 => ['name' => '成人教育', 'keywords' => ['成人教育', '考公', '职业教育', '考证']],
+            59 => ['name' => '游戏洞察', 'keywords' => ['游戏', '手游', '电竞', 'Game']],
+            70 => ['name' => '短剧', 'keywords' => ['短剧', '剧场', '竖屏剧', '爽剧']],
+            44 => ['name' => '电商洞察', 'keywords' => ['电商', '网购', '平台', '带货']],
+            45 => ['name' => '跨境电商', 'keywords' => ['跨境', '出口', 'Temu', 'TikTok Shop', '亚马逊']],
+            46 => ['name' => '新零售电商', 'keywords' => ['零售', '新零售', '即时零售', 'O2O', '生鲜电商']],
+            43 => ['name' => '其他', 'keywords' => ['其他', 'Misc']],
+        ];
+    }
+
+    /**
+     * 根据文档标题自动识别分类ID
+     * 匹配规则：遍历所有分类，统计标题中命中的关键词数量，取命中最多的分类；
+     * 若没有任何分类命中关键词，则返回默认分类 ID (43 其他)。
+     * @param string $title 文档标题/文件名
+     * @return int 分类ID
+     */
+    protected function detectCategory($title)
+    {
+        $title = (string)$title;
+        if ($title === '') {
+            return self::DEFAULT_CATEGORY_ID;
+        }
+        $config = $this->getCategoryConfig();
+        $bestId = self::DEFAULT_CATEGORY_ID;
+        $bestScore = 0;
+        foreach ($config as $id => $item) {
+            if ($id == self::DEFAULT_CATEGORY_ID) {
+                continue; // 默认分类不参与计分，仅作为兜底
+            }
+            $score = 0;
+            foreach ($item['keywords'] as $kw) {
+                if ($kw !== '' && mb_strpos($title, $kw) !== false) {
+                    $score++;
+                }
+            }
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $bestId = (int)$id;
+            }
+        }
+        return $bestId;
+    }
+
+    /**
+     * 批量上传文档
+     * 分类逻辑：每个文档优先使用前端传入的 sort_id（手动修改），
+     * 未传入时根据文档标题自动识别分类，识别不到则归入默认分类。
+     * @return [type] [description]
+     */
+    public function batchadd()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            $data = input('post.');
+            if (empty($data['wdoclist'])) {
+                return callback(400, '请上传文档');
+            }
+            if (!isset($data['limit']) || $data['limit'] > 5) {
+                $data['limit'] = 2;
+            }
+            Db::startTrans();
+            foreach ($data['wdoclist'] as $items) {
+                $content = '';
+                $imgList = isset($items['imgurl']) ? (array)$items['imgurl'] : [];
+                foreach ($imgList as $img) {
+                    $content .= "\n\n![]({$img})\n\n";
+                }
+                $remain = max(0, (int)$items['count'] - (int)$data['limit']);
+                $content .= "----预览已结束，还剩{$remain}页未读----\n";
+                $content .= '会员可免费下载高清完整文档';
+                $size = isset($items['size']) ? bcdiv(bcdiv($items['size'], 1024, 2), 1024, 2) . 'MB' : '';
+                $title = str_replace('.' . $items['type'], '', $items['title']);
+                $thumb = !empty($imgList) ? $imgList[0] : '';
+                // 分类：优先使用前端传入的手动分类，否则根据标题自动识别
+                if (!empty($items['sort_id'])) {
+                    $sortIds = is_array($items['sort_id']) ? $items['sort_id'] : explode(',', $items['sort_id']);
+                } else {
+                    $sortIds = [$this->detectCategory($items['title'])];
+                }
+                $sortIds = array_values(array_filter(array_map('intval', $sortIds)));
+                if (empty($sortIds)) {
+                    $sortIds = [self::DEFAULT_CATEGORY_ID];
+                }
+                $docslist = [
+                    'title' => $title,
+                    'admin_id' => $this->admin_uid,
+                    'type' => 3,
+                    'thumb' => $thumb,
+                    'link' => isset($items['url']) ? $items['url'] : '',
+                    'ext_code' => isset($items['type']) ? $items['type'] : '',
+                    'price' => isset($data['price']) ? $data['price'] : 0,
+                    'dis_price' => isset($data['dis_price']) ? $data['dis_price'] : 0,
+                    'level' => isset($data['level']) ? $data['level'] : 0,
+                    'is_fenxiao' => 1,
+                    'sell_set' => 1,
+                    'sell_type' => 1,
+                    'sell_type2' => 1,
+                    'sell' => 0.05,
+                    'sell2' => 0.05,
+                    'sales' => mt_rand(66, 99),
+                    'views' => mt_rand(111, 999),
+                    'size' => $size,
+                    'pages' => isset($items['count']) ? $items['count'] : 0,
+                    'limit' => $data['limit'],
+                    'invite' => 1,
+                    'invite_num' => 3,
+                    'status' => 1,
+                    'ctime' => time(),
+                ];
+                $resource = ResourceModel::create($docslist, true);
+                if ($resource->id) {
+                    $arr = [];
+                    foreach ($sortIds as $value) {
+                        $arr[] = ['rid' => $resource->id, 'sid' => $value];
+                    }
+                    if (!(new ResourceType)->saveAll($arr)) {
+                        Db::rollback();
+                        return callback(400, '添加失败');
+                    }
+                    ResourceInfo::create(['rid' => $resource->id, 'free_content' => $content, 'content' => $content], true);
+                } else {
+                    Db::rollback();
+                    return callback(400, '添加失败');
+                }
+            }
+            Db::commit();
+            return callback(200, '添加成功');
+        }
+        $level = ResourceLevel::where('status', 1)->order('indexid asc')->select();
+        $this->assign('levels', $level);
+        $this->assign('categoryConfig', json_encode($this->getCategoryConfig(), JSON_UNESCAPED_UNICODE));
+        return view();
+    }
+
     /**
      * 读取excel
      * @param  [type] $filePath [description]

@@ -1,0 +1,303 @@
+{include file="common/head"/}
+<body>
+<div class="layui-fluid">
+	<div class="admin-head">
+		<ul>
+			<li class="on">批量上传文档</li>
+		</ul>
+	</div>
+	<div class="table-body">
+		<form class="layui-form layui-form-pane" id="form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">选择文档：</label>
+				<div class="layui-input-inline from-inline-5" style="display:flex;align-items:center;">
+					<input type="file" id="docFiles" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" class="layui-input" style="border:none;box-shadow:none;padding-left:0;">
+					<button type="button" class="layui-btn layui-bg-blue" id="pickFiles"><i class="layui-icon layui-icon-upload"></i> 选择文档</button>
+				</div>
+				<div class="layui-word-aux">支持 PDF / Word / PPT / Excel / TXT，可多选。上传后将根据文档名称自动识别分类，可手动修改。</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">资源价格：</label>
+				<div class="layui-input-inline from-inline-5" style="display:flex;align-items:center;">
+					<div class="layui-inline" style="margin-right:0;color:#6c6c6c;">现价</div>
+					<div class="layui-inline" style="width:155px">
+						<input type="text" name="price" value="0" class="layui-input" placeholder="现价，默认免费">
+					</div>
+					<div class="layui-inline" style="margin-right:0;color:#6c6c6c;">原价</div>
+					<div class="layui-inline" style="width:155px">
+						<input type="text" name="dis_price" value="0" class="layui-input" placeholder="划线价格">
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">资源级别：</label>
+				<div class="layui-input-inline from-inline-5">
+					{volist name="levels" id="v"}
+						<input type="radio" name="level" value="{$v.id}" title="{$v.name}" {if $key==0}checked{/if}>
+					{/volist}
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">预览页数：</label>
+				<div class="layui-input-inline from-inline-3">
+					<input type="number" name="limit" value="2" min="1" max="5" class="layui-input" placeholder="免费预览页数（最大5）">
+				</div>
+				<div class="layui-word-aux">超过5页将自动按2页处理</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">文档列表：</label>
+				<div class="layui-input-block">
+					<table class="layui-table" id="docTable" lay-size="sm">
+						<thead>
+						<tr>
+							<th style="width:60px;">序号</th>
+							<th>文档名称</th>
+							<th style="width:110px;">大小</th>
+							<th style="width:260px;">分类（自动识别，可修改）</th>
+							<th style="width:90px;">操作</th>
+						</tr>
+						</thead>
+						<tbody id="docTbody">
+						<tr><td colspan="5" style="text-align:center;color:#999;">暂未选择文档</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"></label>
+				<div class="layui-input-inline">
+					<button type="button" class="layui-btn" id="submitBtn" lay-submit lay-filter="sub">
+						<i class="layui-icon layui-icon-release"></i> 批量提交
+					</button>
+					<button type="reset" class="layui-btn layui-btn-primary" id="resetBtn">重置</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+{include file="common/foot"/}
+<script>
+// 后端注入的分类配置（56个分类 + 关键词）
+var CATEGORY_CONFIG = {$categoryConfig|raw};
+var DEFAULT_CATEGORY_ID = 43;
+
+/**
+ * 根据文档名称自动识别分类ID（与后端 detectCategory 逻辑一致）
+ * @param {string} title 文档名称
+ * @returns {number} 分类ID
+ */
+function detectCategory(title) {
+	title = (title || '').toString();
+	if (title === '') return DEFAULT_CATEGORY_ID;
+	var lowerTitle = title.toLowerCase();
+	var bestId = DEFAULT_CATEGORY_ID;
+	var bestScore = 0;
+	for (var id in CATEGORY_CONFIG) {
+		if (!CATEGORY_CONFIG.hasOwnProperty(id)) continue;
+		if (parseInt(id, 10) === DEFAULT_CATEGORY_ID) continue; // 默认分类不参与计分
+		var item = CATEGORY_CONFIG[id];
+		var score = 0;
+		var kws = item.keywords || [];
+		for (var i = 0; i < kws.length; i++) {
+			var kw = kws[i];
+			if (kw === '') continue;
+			// 英文关键词忽略大小写，中文直接匹配
+			if (lowerTitle.indexOf(kw.toLowerCase()) !== -1) {
+				score++;
+			}
+		}
+		if (score > bestScore) {
+			bestScore = score;
+			bestId = parseInt(id, 10);
+		}
+	}
+	return bestId;
+}
+
+/**
+ * 生成分类下拉选项 HTML
+ * @param {number} selectedId 选中的分类ID
+ * @returns {string}
+ */
+function buildCategoryOptions(selectedId) {
+	var html = '';
+	// 把配置转为数组并按分类名称排序，方便查找
+	var list = [];
+	for (var id in CATEGORY_CONFIG) {
+		if (CATEGORY_CONFIG.hasOwnProperty(id)) {
+			list.push({id: parseInt(id, 10), name: CATEGORY_CONFIG[id].name});
+		}
+	}
+	list.sort(function (a, b) { return a.id - b.id; });
+	for (var i = 0; i < list.length; i++) {
+		var sel = (list[i].id === selectedId) ? ' selected' : '';
+		html += '<option value="' + list[i].id + '"' + sel + '>' + list[i].name + '</option>';
+	}
+	return html;
+}
+
+// 文档列表数据：{index, title, type, size, count, url, imgurl, sort_id}
+var wdoclist = [];
+
+// 格式化文件大小
+function formatSize(bytes) {
+	if (!bytes && bytes !== 0) return '';
+	var mb = bytes / 1024 / 1024;
+	if (mb >= 1) return mb.toFixed(2) + ' MB';
+	var kb = bytes / 1024;
+	return kb.toFixed(2) + ' KB';
+}
+
+// 渲染文档列表
+function renderList() {
+	var $tbody = $('#docTbody');
+	if (wdoclist.length === 0) {
+		$tbody.html('<tr><td colspan="5" style="text-align:center;color:#999;">暂未选择文档</td></tr>');
+		return;
+	}
+	var html = '';
+	for (var i = 0; i < wdoclist.length; i++) {
+		var doc = wdoclist[i];
+		html += '<tr data-index="' + i + '">';
+		html += '<td>' + (i + 1) + '</td>';
+		html += '<td><input type="text" class="layui-input doc-title" value="' + (doc.title || '').replace(/"/g, '&quot;') + '" style="height:32px;"></td>';
+		html += '<td>' + (doc.sizeText || '') + '</td>';
+		html += '<td><select class="layui-input doc-sort" style="height:32px;">' + buildCategoryOptions(doc.sort_id) + '</select></td>';
+		html += '<td><button type="button" class="layui-btn layui-btn-sm layui-btn-danger del-doc">移除</button></td>';
+		html += '</tr>';
+	}
+	$tbody.html(html);
+}
+
+// 同步输入：文档名称 -> 重新识别分类
+$(document).on('input', '.doc-title', function () {
+	var $tr = $(this).closest('tr');
+	var idx = parseInt($tr.data('index'), 10);
+	if (isNaN(idx) || !wdoclist[idx]) return;
+	wdoclist[idx].title = $(this).val();
+	// 名称变化后重新自动识别分类
+	var newSid = detectCategory(wdoclist[idx].title);
+	wdoclist[idx].sort_id = newSid;
+	$tr.find('.doc-sort').val(newSid);
+});
+
+// 同步下拉：手动修改分类
+$(document).on('change', '.doc-sort', function () {
+	var $tr = $(this).closest('tr');
+	var idx = parseInt($tr.data('index'), 10);
+	if (isNaN(idx) || !wdoclist[idx]) return;
+	wdoclist[idx].sort_id = parseInt($(this).val(), 10);
+});
+
+// 移除文档
+$(document).on('click', '.del-doc', function () {
+	var $tr = $(this).closest('tr');
+	var idx = parseInt($tr.data('index'), 10);
+	if (isNaN(idx)) return;
+	wdoclist.splice(idx, 1);
+	renderList();
+});
+
+// 选择文档按钮
+$('#pickFiles').on('click', function () {
+	$('#docFiles').click();
+});
+
+// 文件选择处理
+$('#docFiles').on('change', function (e) {
+	var files = e.target.files;
+	if (!files || files.length === 0) return;
+	for (var i = 0; i < files.length; i++) {
+		var f = files[i];
+		var name = f.name;
+		var dot = name.lastIndexOf('.');
+		var ext = dot > -1 ? name.substring(dot + 1).toLowerCase() : '';
+		var baseName = dot > -1 ? name.substring(0, dot) : name;
+		var doc = {
+			title: name,            // 原始文件名（含后缀）
+			baseName: baseName,     // 不含后缀
+			type: ext,              // 扩展名
+			size: f.size,           // 字节
+			sizeText: formatSize(f.size),
+			count: 0,               // 页数（由文档解析服务填充，此处占位）
+			url: '',                // 文件地址（由文档解析服务填充）
+			imgurl: [],             // 预览图数组（由文档解析服务填充）
+			sort_id: detectCategory(name) // 自动识别分类
+		};
+		wdoclist.push(doc);
+	}
+	renderList();
+	// 清空 input，允许重复选择同一批文件
+	$(this).val('');
+});
+
+layui.use(['form'], function () {
+	var form = layui.form;
+
+	// 提交
+	form.on('submit(sub)', function () {
+		if (wdoclist.length === 0) {
+			layer.msg('请先选择文档', {icon: 2, time: 1500});
+			return false;
+		}
+		// 组装后端需要的 wdoclist 结构，每个文档携带 sort_id
+		var payload = [];
+		for (var i = 0; i < wdoclist.length; i++) {
+			var d = wdoclist[i];
+			payload.push({
+				title: d.title,
+				type: d.type,
+				url: d.url,
+				size: d.size,
+				count: d.count,
+				imgurl: d.imgurl,
+				sort_id: [d.sort_id]   // 手动修改后的分类
+			});
+		}
+		var postData = {
+			wdoclist: payload,
+			price: $('input[name="price"]').val(),
+			dis_price: $('input[name="dis_price"]').val(),
+			level: $('input[name="level"]:checked').val(),
+			limit: $('input[name="limit"]').val()
+		};
+		var loading = layer.load(1, {shade: [0.1, '#fff']});
+		$.ajax({
+			url: '{:createUrl("batchadd")}',
+			type: 'post',
+			data: postData,
+			success: function (res) {
+				layer.close(loading);
+				if (res.status === 200) {
+					layer.msg(res.msg, {icon: 1, time: 1000}, function () {
+						wdoclist = [];
+						renderList();
+						var index = parent.layer.getFrameIndex(window.name);
+						if (index) parent.layer.close(index);
+					});
+				} else {
+					layer.msg(res.msg || '操作失败', {icon: 2, time: 1500});
+				}
+			},
+			error: function () {
+				layer.close(loading);
+				layer.msg('网络异常，请重试', {icon: 2, time: 1500});
+			}
+		});
+		return false;
+	});
+
+	// 重置
+	$('#resetBtn').on('click', function () {
+		wdoclist = [];
+		renderList();
+	});
+});
+</script>
+</body>
+</html>
